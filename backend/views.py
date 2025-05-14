@@ -4,6 +4,8 @@ from .models import *
 from .serializers import *
 from rest_framework import status
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 
 # Create your views here.
 class LoginView(APIView):
@@ -28,9 +30,14 @@ class RegisterView(APIView):
     def post(self, request):
         serializer = UserSerializer(data=request.data)   
         if serializer.is_valid():
+            password = request.data['password']
+            try:
+                validate_password(password)
+            except ValidationError as e:
+                return Response({"message": "Password must be minimum 8 characters"})
             serializer.save()
             user = User.objects.get(username = request.data['username'])
-            user.set_password(request.data['password'])
+            user.set_password(password)
             user.save()
             return Response(
                 {"message": "Registration successful"})
