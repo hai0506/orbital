@@ -7,77 +7,53 @@ from rest_framework import status
 # Create your tests here.
 class AuthTest(APITestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username='testuser', password='testpassword', email='test@gmail.com')
+        self.register_url = reverse('register')
+        self.login_url = reverse('get_token')
+        self.user_data = {
+            'username': 'user',
+            'password': 'fhsjhd353',
+            'email': 'a@a.com'
+        }
+        self.user = User.objects.create_user(**self.user_data)
 
     def test_register(self):
-        url = reverse('register')
-        data = {
-            'username': 'someuser',
-            'password': 'somepassword',
-            'email': 'some@gmail.com'
-        }
-        response = self.client.post(url, data, format='json')
-        self.assertIn('Registration successful', response.data['message'])
-        data = {
-            'username': 'someuser',
-            'password': 'somepassword',
-            'email': 'some@gmail.com'
-        }
-        response = self.client.post(url, data, format='json')
-        self.assertIn('A user with that username already exists.', response.data['message'])
-        data = {
-            'username': 'testuser',
-            'password': 'afadgbsfb',
-            'email': 'test2222@gmail.com'
-        }
-        response = self.client.post(url, data, format='json')
-        self.assertIn('A user with that username already exists.', response.data['message'])
-        data = {
-            'username': 'new',
-            'password': 'a',
-            'email': 'test2222@gmail.com'
-        }
-        response = self.client.post(url, data, format='json')
-        self.assertIn('Password must be minimum 8 characters', response.data['message'])
+        response = self.client.post(self.register_url, {
+            'username': 'user',
+            'password': 'gdhfjsad35',
+            'email': ''
+        })
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        response = self.client.post(self.register_url, {
+            'username': 'user2',
+            'password': 'password',
+            'email': ''
+        })
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        response = self.client.post(self.register_url, {
+            'username': 'user2',
+            'password': '1',
+            'email': ''
+        })
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        response = self.client.post(self.register_url, {
+            'username': 'user2',
+            'password': 'gdhfjsad35',
+            'email': ''
+        })
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
 
     def test_login(self):
-        url = reverse('login')  # Adjust to match your URLconf
-        data = {
-            'username': 'testuser',
-            'password': 'testpassword'
-        }
-        response = self.client.post(url, data, format='json')
-        self.assertIn('Login successful', response.data['message'])
-        data = {
-            'username': 'testuser',
-            'password': 'TESTPASSWORD'
-        }
-        response = self.client.post(url, data, format='json')
-        self.assertIn('Invalid credentials', response.data['message'])
-        data = {
-            'username': 'TESTUSER',
-            'password': 'testpassword'
-        }
-        response = self.client.post(url, data, format='json')
-        self.assertIn('Invalid credentials', response.data['message'])
+        response = self.client.post(self.login_url, {
+            'username': self.user_data['username'],
+            'password': self.user_data['password']
+        })
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('access', response.data)
+        self.assertIn('refresh', response.data)
 
-    def test_home_authenticated(self):
-        self.client.login(username='testuser', password='testpassword')
-        url = reverse('home')  # Adjust based on your URLconf
-        response = self.client.get(url)
-        self.assertEqual(response.data['username'], 'testuser')
-
-    def test_home_unauthenticated(self):
-        url = reverse('home')
-        response = self.client.get(url)
-        self.assertIn('no one logged in rn', response.data['message'])
-
-    def test_logout(self):
-        self.client.login(username='testuser', password='testpassword')
-        url = reverse('logout')
-        response = self.client.post(url)
-        self.assertIn('Logged out', response.data['message'])
-
-        home_url = reverse('home')
-        home_response = self.client.get(home_url)
-        self.assertIn('no one logged in', home_response.data['message'])
+        response = self.client.post(self.login_url, {
+            'username': self.user_data['username'],
+            'password': 'wrongpassword'
+        })
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
