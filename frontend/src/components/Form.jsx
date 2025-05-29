@@ -16,6 +16,8 @@ const Form = ({route, method}) => {
     const handleSubmit = async (e) => {
         setLoading(true);
         e.preventDefault();
+        console.log("Requesting:", route);
+        console.log("Requesting Full URL:", api.defaults.baseURL + route);
 
         try {
             const info = {username, password}
@@ -34,6 +36,7 @@ const Form = ({route, method}) => {
                 navigate("/login")
             }
         } catch (error) {
+            console.log(error)
             alert(error)
         } finally {
             setLoading(false)
@@ -58,23 +61,25 @@ const Form = ({route, method}) => {
                 placeholder="Password"
             />
             {method === "register" && (
-                <select
-                    className="form-input"
-                    value={userType}
-                    onChange={(e) => setUserType(e.target.value)}
-                    required
-                >
-                    <option value="Organization">I am an organization!</option>
-                    <option value="Vendor">I am a vendor!</option>
-                </select>
-            ) && (
-                <input
-                    className="form-input"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Email"
-                />
+                <>
+                    <select
+                        className="form-input"
+                        value={userType}
+                        onChange={(e) => setUserType(e.target.value)}
+                        required
+                    >
+                        <option value="Organization">I am an organization!</option>
+                        <option value="Vendor">I am a vendor!</option>
+                    </select>
+
+                    <input
+                        className="form-input"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="Email"
+                    />
+                </>
             )}
             <button className="form-button" type="submit">
                 {name}
