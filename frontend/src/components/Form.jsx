@@ -20,7 +20,7 @@ const Form = ({route, method}) => {
             const info = {username, password}
 
             if (method !== 'login') {
-                info.user_type = userType
+                info.user_type = userType === 'Vendor'
             }
 
             const res = await api.post(route, info)
