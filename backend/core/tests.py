@@ -1,6 +1,6 @@
 from django.test import TestCase
 from rest_framework.test import APITestCase
-from django.contrib.auth.models import User
+from .models import *
 from django.urls import reverse
 from rest_framework import status
 
@@ -14,33 +14,52 @@ class AuthTest(APITestCase):
             'password': 'fhsjhd353',
             'email': 'a@a.com'
         }
-        self.user = User.objects.create_user(**self.user_data)
+        user = User.objects.create_user(**self.user_data)
+        self.user_profile = UserProfile.objects.create(user=user, user_type=False) # student type
 
     def test_register(self):
         response = self.client.post(self.register_url, {
             'username': 'user',
             'password': 'gdhfjsad35',
-            'email': ''
+            'email': '',
+            'user_type': True
         })
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST) # duplicate username
         response = self.client.post(self.register_url, {
             'username': 'user2',
             'password': 'password',
-            'email': ''
+            'email': '',
+            'user_type': True
         })
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST) # bad password
         response = self.client.post(self.register_url, {
             'username': 'user2',
             'password': '1',
-            'email': ''
+            'email': '',
+            'user_type': True
         })
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST) # bad password
         response = self.client.post(self.register_url, {
             'username': 'user2',
             'password': 'gdhfjsad35',
-            'email': ''
+            'email': '',
+            'user_type': True
         })
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED) # register successful
+        user = User.objects.get(username='user2')
+        profile = UserProfile.objects.get(user=user)
+        self.assertTrue(profile.user_type) # check correct user type (vendor)
+
+        response = self.client.post(self.register_url, {
+            'username': 'user3',
+            'password': 'adghdge542',
+            'email': 's@s.com',
+            'user_type': False
+        })
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED) # register successful
+        user = User.objects.get(username='user3')
+        profile = UserProfile.objects.get(user=user)
+        self.assertFalse(profile.user_type) # check correct user type (student)
 
 
     def test_login(self):
@@ -48,12 +67,16 @@ class AuthTest(APITestCase):
             'username': self.user_data['username'],
             'password': self.user_data['password']
         })
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK) # login successful
         self.assertIn('access', response.data)
         self.assertIn('refresh', response.data)
+
+        user = User.objects.get(username=self.user_data['username'])
+        profile = UserProfile.objects.get(user=user)
+        self.assertFalse(profile.user_type) # check user type (student)
 
         response = self.client.post(self.login_url, {
             'username': self.user_data['username'],
             'password': 'wrongpassword'
         })
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED) # wrong password
