@@ -6,6 +6,7 @@ import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
 const Form = ({route, method}) => {
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
+    const [email, setEmail] = useState("")
     const [userType, setUserType] = useState("Organization")
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate()
@@ -21,6 +22,7 @@ const Form = ({route, method}) => {
 
             if (method !== 'login') {
                 info.user_type = userType === 'Vendor'
+                info.email = email
             }
 
             const res = await api.post(route, info)
@@ -65,6 +67,14 @@ const Form = ({route, method}) => {
                     <option value="Organization">I am an organization!</option>
                     <option value="Vendor">I am a vendor!</option>
                 </select>
+            ) && (
+                <input
+                    className="form-input"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Email"
+                />
             )}
             <button className="form-button" type="submit">
                 {name}
