@@ -2,6 +2,7 @@ import {useState} from "react";
 import api from "../api";
 import { useNavigate } from "react-router-dom";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
+import '../styles/form.css';
 
 const Form = ({route, method}) => {
     const [username, setUsername] = useState("")
@@ -52,58 +53,60 @@ const Form = ({route, method}) => {
 
     return (
         <>
-            <form onSubmit={handleSubmit} className="form-container">
-                <h1>{name}</h1> 
-                <input
-                    className="form-input"
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    placeholder="Username"
-                />
-                
-                <input
-                    className="form-input"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Password"
-                />
-                {method === "register" && (
-                    <>
-                        <select
-                            className="form-input"
-                            value={userType}
-                            onChange={(e) => setUserType(e.target.value)}
-                            required
-                        >
-                            <option value="Organization">I am an organization!</option>
-                            <option value="Vendor">I am a vendor!</option>
-                        </select>
+            <div className="center-container">
+                <form onSubmit={handleSubmit} className="form-container">
+                    <h1>{name}</h1> 
+                    <input
+                        className="form-input"
+                        type="text"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        placeholder="Username"
+                    />
+                    
+                    <input
+                        className="form-input"
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Password"
+                    />
+                    {method === "register" && (
+                        <>
+                            <select
+                                className="form-input"
+                                value={userType}
+                                onChange={(e) => setUserType(e.target.value)}
+                                required
+                            >
+                                <option value="Organization">I am an organization!</option>
+                                <option value="Vendor">I am a vendor!</option>
+                            </select>
 
-                        <input
-                            className="form-input"
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="Email"
-                        />
-                    </>
-                )}
-                <button className="form-button" type="submit">
-                    {name}
-                </button>
-            </form>
-            {wrongLogin && 
-                <div className="wrong-info">
-                    Incorrect username or password!
-                </div>
-            }
-            {Object.keys(wrongRegister).length > 0 && 
-                <div className="wrong-info">
-                    {Object.values(wrongRegister)[0]?.[0]}
-                </div>
-            }
+                            <input
+                                className="form-input"
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="Email"
+                            />
+                        </>
+                    )}
+                    <button className="form-button" type="submit">
+                        {name}
+                    </button>
+                </form>
+                {wrongLogin && 
+                    <div className="wrong-info">
+                        Incorrect username or password!
+                    </div>
+                }
+                {Object.keys(wrongRegister).length > 0 && 
+                    <div className="wrong-info">
+                        {Object.values(wrongRegister)[0]?.[0]}
+                    </div>
+                }
+            </div>
         </>
     )
     
