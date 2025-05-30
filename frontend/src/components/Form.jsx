@@ -95,17 +95,17 @@ const Form = ({route, method}) => {
                     <button className="form-button" type="submit">
                         {name}
                     </button>
-                </form>
-                {wrongLogin && 
+                    {wrongLogin && 
                     <div className="wrong-info">
                         Incorrect username or password!
                     </div>
-                }
-                {Object.keys(wrongRegister).length > 0 && 
-                    <div className="wrong-info">
-                        {Object.values(wrongRegister)[0]?.[0]}
-                    </div>
-                }
+                    }
+                    {Object.keys(wrongRegister).length > 0 && 
+                        <div className="wrong-info">
+                            {Object.values(wrongRegister)[0]?.[0]}
+                        </div>
+                    }
+                </form>
             </div>
         </>
     )
