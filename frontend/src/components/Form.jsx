@@ -8,6 +8,8 @@ const Form = ({route, method}) => {
     const [password, setPassword] = useState("")
     const [email, setEmail] = useState("")
     const [userType, setUserType] = useState("Organization")
+    const [wrongRegister, setWrongRegister] = useState({})
+    const [wrongLogin, setWrongLogin] = useState(false)
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate()
 
@@ -27,6 +29,7 @@ const Form = ({route, method}) => {
                 info.email = email
             }
 
+            console.log("Sending info:", info);
             const res = await api.post(route, info)
             if (method === "login") {
                 localStorage.setItem(ACCESS_TOKEN, res.data.access)
@@ -37,54 +40,72 @@ const Form = ({route, method}) => {
             }
         } catch (error) {
             console.log(error)
-            alert(error)
+            if (method === "login") {
+                setWrongLogin(true);
+            } else if (method === "register") {
+                setWrongRegister(error.response.data);
+            }
         } finally {
             setLoading(false)
         }
     }
 
-    return <form onSubmit={handleSubmit} className="form-container">
-            <h1>{name}</h1> 
-            <input
-                className="form-input"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Username"
-            />
-            
-            <input
-                className="form-input"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-            />
-            {method === "register" && (
-                <>
-                    <select
-                        className="form-input"
-                        value={userType}
-                        onChange={(e) => setUserType(e.target.value)}
-                        required
-                    >
-                        <option value="Organization">I am an organization!</option>
-                        <option value="Vendor">I am a vendor!</option>
-                    </select>
+    return (
+        <>
+            <form onSubmit={handleSubmit} className="form-container">
+                <h1>{name}</h1> 
+                <input
+                    className="form-input"
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="Username"
+                />
+                
+                <input
+                    className="form-input"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Password"
+                />
+                {method === "register" && (
+                    <>
+                        <select
+                            className="form-input"
+                            value={userType}
+                            onChange={(e) => setUserType(e.target.value)}
+                            required
+                        >
+                            <option value="Organization">I am an organization!</option>
+                            <option value="Vendor">I am a vendor!</option>
+                        </select>
 
-                    <input
-                        className="form-input"
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="Email"
-                    />
-                </>
-            )}
-            <button className="form-button" type="submit">
-                {name}
-            </button>
-        </form>
+                        <input
+                            className="form-input"
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="Email"
+                        />
+                    </>
+                )}
+                <button className="form-button" type="submit">
+                    {name}
+                </button>
+            </form>
+            {wrongLogin && 
+                <div className="wrong-info">
+                    Incorrect username or password!
+                </div>
+            }
+            {Object.keys(wrongRegister).length > 0 && 
+                <div className="wrong-info">
+                    {Object.values(wrongRegister)[0]?.[0]}
+                </div>
+            }
+        </>
+    )
     
 }
 
