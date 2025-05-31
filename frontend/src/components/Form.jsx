@@ -80,19 +80,22 @@ const Form = ({route, method}) => {
 
                 <Fieldset.Content>
                     <Field.Root>
-                        <Field.Label>Username</Field.Label>
-                        <Input 
-                            name="username"   
+                        <Field.Label invalid={wrongRegister.username?.length > 0}>Username</Field.Label>
+                        <Input
+                            name="username"
                             type="text"
-                            autoComplete="off"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             placeholder="Username"
                         />
+                        {wrongRegister.username && (
+                            <Fieldset.ErrorText>{wrongRegister.username[0]}</Fieldset.ErrorText>
+                        )}
                     </Field.Root>
 
+
                     <Field.Root>
-                        <Field.Label>Password</Field.Label>
+                        <Field.Label invalid = {wrongRegister.password?.length > 0}>Password</Field.Label>
                         <Input 
                             name="password"   
                             type="password"
@@ -101,6 +104,9 @@ const Form = ({route, method}) => {
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="Password"
                         />
+                        {wrongRegister.password && (
+                            <Fieldset.ErrorText>{wrongRegister.password[0]}</Fieldset.ErrorText>
+                        )}
                     </Field.Root>
 
                     {method === "register" && (
@@ -119,7 +125,7 @@ const Form = ({route, method}) => {
                             */}
                             
                             <Field.Root>
-                                <Field.Label>Email address</Field.Label>
+                                <Field.Label invalid = {wrongRegister.email?.length > 0}>Email address</Field.Label>
                                 <Input 
                                     name="email" 
                                     className="form-input"
@@ -128,6 +134,9 @@ const Form = ({route, method}) => {
                                     onChange={(e) => setEmail(e.target.value)}
                                     placeholder="Email" 
                                 />
+                                {wrongRegister.email && (
+                                    <Fieldset.ErrorText>{wrongRegister.email[0]}</Fieldset.ErrorText>
+                                )}
                             </Field.Root>
 
                             <Field.Root>
@@ -152,14 +161,13 @@ const Form = ({route, method}) => {
                             </Field.Root>
                         </>
                     )}
-                    {(wrongLogin || Object.keys(wrongRegister).length > 0) && (
+
+                    {wrongLogin && (
                         <Fieldset.ErrorText>
-                            {wrongLogin
-                                ? "Incorrect username or password!"
-                                : Object.values(wrongRegister)[0]?.[0]
-                            }
+                            Incorrect username or password!
                         </Fieldset.ErrorText>
                     )}
+
                 </Fieldset.Content>
 
                 <Button type="submit" alignSelf="flex-start">
