@@ -96,9 +96,9 @@ const Form = ({route, method}) => {
                         {name}
                     </button>
                     {wrongLogin && 
-                    <div className="wrong-info">
-                        Incorrect username or password!
-                    </div>
+                        <div className="wrong-info">
+                            Incorrect username or password!
+                        </div>
                     }
                     {Object.keys(wrongRegister).length > 0 && 
                         <div className="wrong-info">
