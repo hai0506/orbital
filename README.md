@@ -20,11 +20,12 @@ Follow the steps below to get this project running on your local machine.
 - Git
 - A web browser
 
-### Setting up the app
+### Setting up the Backend
 
 1. **Clone the Repository**
    
 git clone https://github.com/hai0506/orbital.git
+
 cd orbital
 
 2. **Create a Virtual Environment**
@@ -54,15 +55,17 @@ python manage.py migrate
    
 python manage.py runserver
 
-7. **Install frontend dependencies**
+### Setting up the Frontend
+
+1. **Install frontend dependencies**
 
 cd .\frontend\ (if in root folder)
 npm install
 
-8. **Run the frontend server**
+2. **Run the frontend server**
    
 npm run dev
 
-9. **Open the App in Your Browser**
+3. **Open the App in Your Browser**
     
 Visit http://localhost:5173 to start using the application.
