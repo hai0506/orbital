@@ -20,7 +20,7 @@ Follow the steps below to get this project running on your local machine.
 - Git
 - A web browser
 
-### Setting up the backend
+### Setting up the app
 
 1. **Clone the Repository**
    
