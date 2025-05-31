@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 
 
 class UserSerializer(serializers.ModelSerializer):
-    user_type = serializers.BooleanField(write_only=True)
+    user_type = serializers.ChoiceField(choices=['Organization', 'Vendor'], write_only=True)
 
     class Meta:
         model = User
@@ -24,8 +24,8 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user_type = validated_data.pop('user_type')
         user = User.objects.create_user(**validated_data)
-        if user_type == 0:
+        if user_type == 'Organization':
             Student.objects.create(user=user)
-        elif user_type == 1:
+        elif user_type == 'Vendor':
             Vendor.objects.create(user=user)
         return user
