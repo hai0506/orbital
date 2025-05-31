@@ -4,7 +4,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError as DjangoValidationError
 
 
-class UserProfileSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     user_type = serializers.BooleanField(write_only=True)
 
     class Meta:
@@ -24,5 +24,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user_type = validated_data.pop('user_type')
         user = User.objects.create_user(**validated_data)
-        UserProfile.objects.create(user=user, user_type=user_type)
+        if user_type == 0:
+            Student.objects.create(user=user)
+        elif user_type == 1:
+            Vendor.objects.create(user=user)
         return user
