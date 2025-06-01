@@ -15,51 +15,49 @@ class AuthTest(APITestCase):
             'email': 'a@a.com'
         }
         user = User.objects.create_user(**self.user_data)
-        self.user_profile = UserProfile.objects.create(user=user, user_type=False) # student type
+        self.user_profile = Student.objects.create(user=user) # student type
 
     def test_register(self):
         response = self.client.post(self.register_url, {
             'username': 'user',
             'password': 'gdhfjsad35',
-            'email': '',
-            'user_type': True
+            'email': 'u@u.com',
+            'user_type': 'Vendor'
         })
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST) # duplicate username
         response = self.client.post(self.register_url, {
             'username': 'user2',
             'password': 'password',
-            'email': '',
-            'user_type': True
+            'email': 'u@u.com',
+            'user_type': 'Vendor'
         })
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST) # bad password
         response = self.client.post(self.register_url, {
             'username': 'user2',
             'password': '1',
-            'email': '',
-            'user_type': True
+            'email': 'u@u.com',
+            'user_type': 'Vendor'
         })
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST) # bad password
         response = self.client.post(self.register_url, {
             'username': 'user2',
             'password': 'gdhfjsad35',
-            'email': '',
-            'user_type': True
+            'email': 'u@u.com',
+            'user_type': 'Vendor'
         })
         self.assertEqual(response.status_code, status.HTTP_201_CREATED) # register successful
         user = User.objects.get(username='user2')
-        profile = UserProfile.objects.get(user=user)
-        self.assertTrue(profile.user_type) # check correct user type (vendor)
+        self.assertTrue(Vendor.objects.filter(user=user).exists()) # check correct user type (vendor)
 
         response = self.client.post(self.register_url, {
             'username': 'user3',
             'password': 'adghdge542',
             'email': 's@s.com',
-            'user_type': False
+            'user_type': 'Organization'
         })
         self.assertEqual(response.status_code, status.HTTP_201_CREATED) # register successful
         user = User.objects.get(username='user3')
-        profile = UserProfile.objects.get(user=user)
-        self.assertFalse(profile.user_type) # check correct user type (student)
+        self.assertTrue(Student.objects.filter(user=user).exists()) # check correct user type (student)
 
 
     def test_login(self):
@@ -72,8 +70,8 @@ class AuthTest(APITestCase):
         self.assertIn('refresh', response.data)
 
         user = User.objects.get(username=self.user_data['username'])
-        profile = UserProfile.objects.get(user=user)
-        self.assertFalse(profile.user_type) # check user type (student)
+        self.assertTrue(Student.objects.filter(user=user).exists()) # check user type (student)
+        self.assertFalse(Vendor.objects.filter(user=user).exists()) 
 
         response = self.client.post(self.login_url, {
             'username': self.user_data['username'],
