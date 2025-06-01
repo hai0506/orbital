@@ -1,11 +1,26 @@
 import {useState} from "react";
 import api from "../api";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
+import '../styles/form.css';
+import {
+  Button,
+  Field,
+  Fieldset,
+  For,
+  Input,
+  NativeSelect,
+  Stack,
+} from "@chakra-ui/react"
 
 const Form = ({route, method}) => {
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
+    const [confirmPassword, setConfirmPassword] = useState("")
+    const [email, setEmail] = useState("")
+    const [userType, setUserType] = useState("Organization")
+    const [wrongRegister, setWrongRegister] = useState({})
+    const [wrongLogin, setWrongLogin] = useState(false)
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate()
 
@@ -14,44 +29,165 @@ const Form = ({route, method}) => {
     const handleSubmit = async (e) => {
         setLoading(true);
         e.preventDefault();
+        console.log("Requesting:", route);
+        console.log("Requesting Full URL:", api.defaults.baseURL + route);
 
         try {
-            const res = await api.post(route, {username, password})
+            const info = {username, password}
+
+            if (method !== 'login') {
+                info.user_type = userType
+                info.email = email
+            }
+
+            console.log("Sending info:", info);
+            const res = await api.post(route, info)
             if (method === "login") {
                 localStorage.setItem(ACCESS_TOKEN, res.data.access)
                 localStorage.setItem(REFRESH_TOKEN, res.data.refresh)
+                localStorage.setItem("username", username)
                 navigate("/")
             } else {
                 navigate("/login")
             }
         } catch (error) {
-            alert(error)
+            console.log(error)
+            if (method === "login") {
+                setWrongLogin(true);
+                console.log("login failed")
+            } else if (method === "register") {
+                console.log("register failed")
+                setWrongRegister(error.response.data);
+            }
         } finally {
             setLoading(false)
         }
     }
 
-    return <form onSubmit={handleSubmit} className="form-container">
-        <h1>{name}</h1> 
-        <input
-            className="form-input"
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="Username"
-        />
-        
-        <input
-            className="form-input"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
-        />
-        <button className="form-button" type="submit">
-            {name}
-        </button>
-    </form>
+    return (
+        <form onSubmit={handleSubmit} className="center-container" autoComplete="off">
+            <Fieldset.Root size="lg" maxW="md" invalid={wrongLogin || Object.keys(wrongRegister).length > 0}>
+                <Stack>
+                    <Fieldset.Legend>{name}</Fieldset.Legend>
+                    <Fieldset.HelperText>
+                        {
+                            method === "register" 
+                                ? "Please provide your details below."
+                                : "Please key in your credentials."
+                        }
+                    </Fieldset.HelperText>
+                </Stack>
+
+                <Fieldset.Content>
+                    <Field.Root>
+                        <Field.Label invalid={wrongRegister.username?.length > 0}>Username</Field.Label>
+                        <Input
+                            name="username"
+                            type="text"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            placeholder="Username"
+                        />
+                        {wrongRegister.username && (
+                            <Fieldset.ErrorText>{wrongRegister.username[0]}</Fieldset.ErrorText>
+                        )}
+                    </Field.Root>
+
+
+                    <Field.Root>
+                        <Field.Label invalid = {wrongRegister.password?.length > 0}>Password</Field.Label>
+                        <Input 
+                            name="password"   
+                            type="password"
+                            autoComplete="new-password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="Password"
+                        />
+                        {wrongRegister.password && (
+                            <Fieldset.ErrorText>{wrongRegister.password[0]}</Fieldset.ErrorText>
+                        )}
+                    </Field.Root>
+
+                    {method === "register" && (
+                        <>
+                            {/*
+                                <Field.Root>
+                                <Field.Label>Confirm Password</Field.Label>
+                                <Input 
+                                    name="confirm-password"   
+                                    type="password"
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    placeholder="Confirm Password"
+                                />
+                                </Field.Root>
+                            */}
+                            
+                            <Field.Root>
+                                <Field.Label invalid = {wrongRegister.email?.length > 0}>Email address</Field.Label>
+                                <Input 
+                                    name="email" 
+                                    className="form-input"
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    placeholder="Email" 
+                                />
+                                {wrongRegister.email && (
+                                    <Fieldset.ErrorText>{wrongRegister.email[0]}</Fieldset.ErrorText>
+                                )}
+                            </Field.Root>
+
+                            <Field.Root>
+                                <Field.Label>Are you an organization or vendor?</Field.Label>
+                                <NativeSelect.Root>
+                                    <NativeSelect.Field 
+                                        name="user-type"
+                                        className="form-input"
+                                        value={userType}
+                                        onChange={(e) => setUserType(e.target.value)}
+                                    >
+                                    <For each={["Organization", "Vendor"]}>
+                                        {(item) => (
+                                        <option key={item} value={item}>
+                                            {item}
+                                        </option>
+                                        )}
+                                    </For>
+                                    </NativeSelect.Field>
+                                    <NativeSelect.Indicator />
+                                </NativeSelect.Root>
+                            </Field.Root>
+                        </>
+                    )}
+
+                    {wrongLogin && (
+                        <Fieldset.ErrorText>
+                            Incorrect username or password!
+                        </Fieldset.ErrorText>
+                    )}
+
+                </Fieldset.Content>
+
+                <Button type="submit" alignSelf="flex-start">
+                    {name}
+                </Button>
+
+                {method === "login"
+                    ? <p>
+                        Don't have an account? 
+                        <Link to="/register" className="link"> Register here</Link>
+                      </p>
+                    : <p>
+                        Already have an account? 
+                        <Link to="/login" className="link"> Login here</Link>
+                      </p>
+                }
+
+            </Fieldset.Root>
+        </form>
+    )
 }
 
-export default Form
+export default Form;
