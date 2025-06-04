@@ -9,10 +9,8 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username', 'password', 'email', 'user_type']
-        extra_kwargs = {
-            'password': {'write_only': True},
-        }
+        fields = ['id','username', 'password', 'email', 'user_type']
+        extra_kwargs = {'password': {'write_only': True}}
 
     def validate_password(self, value):
         try:
@@ -29,3 +27,9 @@ class UserSerializer(serializers.ModelSerializer):
         elif user_type == 'Vendor':
             Vendor.objects.create(user=user)
         return user
+    
+class JobPostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = JobPost
+        fields = ['id','title', 'content', 'time_created', 'attachment', 'keywords', 'author']
+        extra_kwargs = {"author": {"read_only": True}}
