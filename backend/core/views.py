@@ -16,14 +16,17 @@ class CreatePost(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        user = self.request.user
-        return JobPost.objects.filter(author=user)
+        try:
+            student = Student.objects.get(user=self.request.user)
+        except Student.DoesNotExist:
+            return JobPost.objects.none()
+        return JobPost.objects.filter(author=student)
 
     def perform_create(self, serializer):
         try:
-            Student.objects.get(user=self.request.user)
+            student = Student.objects.get(user=self.request.user)
             if serializer.is_valid():
-                serializer.save(author=self.request.user)
+                serializer.save(author=student)
             else:
                 print(serializer.errors)
         except Student.DoesNotExist:
