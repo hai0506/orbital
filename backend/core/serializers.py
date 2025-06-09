@@ -27,9 +27,28 @@ class UserSerializer(serializers.ModelSerializer):
         elif user_type == 'Vendor':
             Vendor.objects.create(user=user)
         return user
-    
+
 class JobPostSerializer(serializers.ModelSerializer):
+    keyword_list = serializers.ListField(write_only=True)
+    keywords = serializers.SlugRelatedField(  # for output
+        many=True,
+        read_only=True,
+        slug_field='value'
+    )
+    author = serializers.PrimaryKeyRelatedField(read_only=True)
+
     class Meta:
         model = JobPost
-        fields = ['id','title', 'content', 'time_created', 'attachment', 'keywords', 'author']
-        extra_kwargs = {"author": {"read_only": True}}
+        fields = ['post_id','title', 'content', 'time_created', 'attachment', 'author', 'keywords', 'keyword_list']
+
+    def create(self, validated_data):
+        keyword_values = validated_data.pop('keyword_list', []) 
+        
+        post = JobPost.objects.create(**validated_data)
+        k = []
+        for v in keyword_values:
+            value = v.strip().lower()
+            keyword_obj, _ = Keyword.objects.get_or_create(value=value)
+            k.append(keyword_obj)
+        post.keywords.set(k)
+        return post
