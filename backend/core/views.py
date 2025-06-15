@@ -2,9 +2,11 @@ from django.shortcuts import render
 from django.contrib.auth.models import User
 from rest_framework.response import Response
 from rest_framework import generics, status
+from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .serializers import *
 from itertools import chain
+import pandas as pd
 
 def get_or_none(classmodel, **kwargs):
     try:
@@ -19,28 +21,28 @@ class CreateUserView(generics.CreateAPIView): # register
 
 class CreatePostView(generics.ListCreateAPIView): # create and view own posts
     serializer_class = JobPostSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     
     def get_queryset(self):
-        author = get_or_none(Student, user=self.request.user)
-        if author:
-            return JobPost.filter(author=author)
-        else: return JobPost.objects.none()
-        # return JobPost.objects.none()
+        # author = get_or_none(Student, user=self.request.user)
+        # if author:
+        #     return JobPost.filter(author=author)
+        # else: return JobPost.objects.none()
+        return JobPost.objects.none()
 
     def perform_create(self, serializer):
-        # student = Student.objects.get(user_id=1)
-        # serializer.save(author=student)
+        student = Student.objects.get(user_id=1)
+        serializer.save(author=student)
 
-        author = get_or_none(Student, user=self.request.user)
-        if author:
-            serializer.save(author=author)
-        else:
-            raise PermissionError('User cannot create posts')
+        # author = get_or_none(Student, user=self.request.user)
+        # if author:
+        #     serializer.save(author=author)
+        # else:
+        #     raise PermissionError('User cannot create posts')
 
 class PostListView(generics.ListAPIView): # view others posts and filters.
     serializer_class = JobPostSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get_queryset(self): # to filter: http://127.0.0.1:8000/core/posts/?keywords=whatever1&keywords=whatever2&...
         keyword_values = self.request.query_params.getlist('keywords')
@@ -54,4 +56,46 @@ class PostListView(generics.ListAPIView): # view others posts and filters.
                     else: combined_queryset = combined_queryset.union(keyword.jobpost_set.all())
             return combined_queryset
         else: return JobPost.objects.all()
+
+class CreateProductView(generics.ListCreateAPIView):
+    serializer_class = ProductSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        # vendor = get_or_none(Vendor, user=self.request.user)
+        # if vendor:
+        #     return Product.filter(vendor=vendor)
+        # else: return Product.objects.none()
+        return JobPost.objects.none()
+    
+    def perform_create(self, serializer):
+        vendor = Vendor.objects.get(user_id=2)
+        serializer.save(vendor=vendor)
+
+        # vendor = get_or_none(Vendor, user=self.request.user)
+        # if vendor:
+        #     serializer.save(vendor=vendor)
+        # else:
+        #     raise PermissionError('User cannot create products')
+
+class CreateProductView(generics.ListCreateAPIView):
+    serializer_class = ProductSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        # vendor = get_or_none(Vendor, user=self.request.user)
+        # if vendor:
+        #     return Product.filter(vendor=vendor)
+        # else: return Product.objects.none()
+        return JobPost.objects.none()
+    
+    def perform_create(self, serializer):
+        vendor = Vendor.objects.get(user_id=2)
+        serializer.save(vendor=vendor)
+
+        # vendor = get_or_none(Vendor, user=self.request.user)
+        # if vendor:
+        #     serializer.save(vendor=vendor)
+        # else:
+        #     raise PermissionError('User cannot create products')
 

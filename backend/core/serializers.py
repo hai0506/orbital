@@ -52,3 +52,9 @@ class JobPostSerializer(serializers.ModelSerializer):
             k.append(keyword_obj)
         post.keywords.set(k)
         return post
+    
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['product_id','name', 'quantity', 'price', 'image', 'vendor']
+        extra_kwargs = {'vendor': {'read_only': True}}

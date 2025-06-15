@@ -10,3 +10,4 @@ PyJWT
 pytz
 psycopg2-binary
 python-dotenv
+Pillow==11.2.1
