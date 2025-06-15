@@ -111,7 +111,7 @@ class MassProductUploadView(APIView):
         except:
             return Response({"error": "Failed to parse file."}, status=status.HTTP_400_BAD_REQUEST)
         
-class ProductEditView(generics.RetrieveUpdateAPIView):
+class ProductEditView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ProductSerializer
     permission_classes = [IsAuthenticated]
 
@@ -121,7 +121,6 @@ class ProductEditView(generics.RetrieveUpdateAPIView):
             return Product.filter(vendor=vendor)
         else: 
             raise PermissionError('User cannot edit products')
-            return Product.objects.none()
         # return Product.objects.all()
 
     lookup_field = 'product_id' # to edit: go http://127.0.0.1:8000/core/edit-product/<whatever product id>/
