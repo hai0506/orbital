@@ -79,7 +79,7 @@ class CreateProductView(generics.ListCreateAPIView):
             raise PermissionError('User cannot create products')
 
 class MassProductUploadView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     serializer_class = MassProductUploadSerializer
     def post(self, request):
         # vendor = Vendor.objects.get(user_id=2)
@@ -110,3 +110,18 @@ class MassProductUploadView(APIView):
                 return Response(status=status.HTTP_201_CREATED)
         except:
             return Response({"error": "Failed to parse file."}, status=status.HTTP_400_BAD_REQUEST)
+        
+class ProductEditView(generics.RetrieveUpdateAPIView):
+    serializer_class = ProductSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        vendor = get_or_none(Vendor, user=self.request.user)
+        if vendor:
+            return Product.filter(vendor=vendor)
+        else: 
+            raise PermissionError('User cannot edit products')
+            return Product.objects.none()
+        # return Product.objects.all()
+
+    lookup_field = 'product_id' # to edit: go http://127.0.0.1:8000/core/edit-product/<whatever product id>/
