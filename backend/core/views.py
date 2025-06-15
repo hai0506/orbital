@@ -21,28 +21,28 @@ class CreateUserView(generics.CreateAPIView): # register
 
 class CreatePostView(generics.ListCreateAPIView): # create and view own posts
     serializer_class = JobPostSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
-        # author = get_or_none(Student, user=self.request.user)
-        # if author:
-        #     return JobPost.filter(author=author)
-        # else: return JobPost.objects.none()
-        return JobPost.objects.none()
+        author = get_or_none(Student, user=self.request.user)
+        if author:
+            return JobPost.filter(author=author)
+        else: return JobPost.objects.none()
+        # return JobPost.objects.none()
 
     def perform_create(self, serializer):
-        student = Student.objects.get(user_id=1)
-        serializer.save(author=student)
+        # student = Student.objects.get(user_id=1)
+        # serializer.save(author=student)
 
-        # author = get_or_none(Student, user=self.request.user)
-        # if author:
-        #     serializer.save(author=author)
-        # else:
-        #     raise PermissionError('User cannot create posts')
+        author = get_or_none(Student, user=self.request.user)
+        if author:
+            serializer.save(author=author)
+        else:
+            raise PermissionError('User cannot create posts')
 
 class PostListView(generics.ListAPIView): # view others posts and filters.
     serializer_class = JobPostSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self): # to filter: http://127.0.0.1:8000/core/posts/?keywords=whatever1&keywords=whatever2&...
         keyword_values = self.request.query_params.getlist('keywords')
@@ -59,43 +59,54 @@ class PostListView(generics.ListAPIView): # view others posts and filters.
 
 class CreateProductView(generics.ListCreateAPIView):
     serializer_class = ProductSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        # vendor = get_or_none(Vendor, user=self.request.user)
-        # if vendor:
-        #     return Product.filter(vendor=vendor)
-        # else: return Product.objects.none()
-        return JobPost.objects.none()
+        vendor = get_or_none(Vendor, user=self.request.user)
+        if vendor:
+            return Product.filter(vendor=vendor)
+        else: return Product.objects.none()
+        # return JobPost.objects.none()
     
     def perform_create(self, serializer):
-        vendor = Vendor.objects.get(user_id=2)
-        serializer.save(vendor=vendor)
+        # vendor = Vendor.objects.get(user_id=2)
+        # serializer.save(vendor=vendor)
 
-        # vendor = get_or_none(Vendor, user=self.request.user)
-        # if vendor:
-        #     serializer.save(vendor=vendor)
-        # else:
-        #     raise PermissionError('User cannot create products')
+        vendor = get_or_none(Vendor, user=self.request.user)
+        if vendor:
+            serializer.save(vendor=vendor)
+        else:
+            raise PermissionError('User cannot create products')
 
-class CreateProductView(generics.ListCreateAPIView):
-    serializer_class = ProductSerializer
+class MassProductUploadView(APIView):
     permission_classes = [AllowAny]
+    serializer_class = MassProductUploadSerializer
+    def post(self, request):
+        # vendor = Vendor.objects.get(user_id=2)
 
-    def get_queryset(self):
-        # vendor = get_or_none(Vendor, user=self.request.user)
-        # if vendor:
-        #     return Product.filter(vendor=vendor)
-        # else: return Product.objects.none()
-        return JobPost.objects.none()
-    
-    def perform_create(self, serializer):
-        vendor = Vendor.objects.get(user_id=2)
-        serializer.save(vendor=vendor)
+        vendor = get_or_none(Vendor, user=self.request.user)
+        if not vendor:
+            raise PermissionError('User cannot create products')
 
-        # vendor = get_or_none(Vendor, user=self.request.user)
-        # if vendor:
-        #     serializer.save(vendor=vendor)
-        # else:
-        #     raise PermissionError('User cannot create products')
+        file = request.FILES['file']
+        if not file:
+            return Response({"error": "No file uploaded."}, status=status.HTTP_400_BAD_REQUEST)
 
+        try: # parse file
+            if file.name.endswith('.csv'):
+                df = pd.read_csv(file)
+            elif file.name.endswith('.xlsx'):
+                df = pd.read_excel(file)
+            else:
+                return Response({"error": "Unsupported file format."}, status=status.HTTP_400_BAD_REQUEST)
+            if not {"name", "quantity", "price"}.issubset(df.columns):
+                return Response({"error": "Failed to parse file. Ensure columns are: name, quantity, price."}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                for _, row in df.iterrows(): # create products
+                    try:
+                        Product.objects.create(name=row['name'], quantity=row.quantity, price=row.price, vendor=vendor)
+                    except:
+                        return Response({"error": "Failed to parse file. Ensure that entries are formatted correctly."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(status=status.HTTP_201_CREATED)
+        except:
+            return Response({"error": "Failed to parse file."}, status=status.HTTP_400_BAD_REQUEST)

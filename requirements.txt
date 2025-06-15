@@ -10,3 +10,7 @@ PyJWT
 pytz
 psycopg2-binary
 python-dotenv
+Pillow==11.2.1
+numpy==2.3.0
+pandas==2.3.0
+openpyxl==3.1.5

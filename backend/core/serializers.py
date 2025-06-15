@@ -58,3 +58,6 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = ['product_id','name', 'quantity', 'price', 'image', 'vendor']
         extra_kwargs = {'vendor': {'read_only': True}}
+
+class MassProductUploadSerializer(serializers.ModelSerializer):
+    file = models.FileField()
