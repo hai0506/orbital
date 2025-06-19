@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.validators import MinValueValidator
 
 class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='student_user')
@@ -16,7 +17,13 @@ class Keyword(models.Model):
 class JobPost(models.Model):
     post_id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=200)
+    location = models.CharField(max_length=500)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    start_time = models.TimeField()
+    end_time = models.TimeField()
     content = models.TextField(max_length=2000)
+    commission = models.IntegerField(max_digits=3, validators=[MinValueValidator(0)])
     time_created = models.DateTimeField(auto_now_add=True)
     attachment = models.FileField(upload_to='post_attachments/', blank=True, null=True) # TODO: add security
     keywords = models.ManyToManyField(Keyword, blank=True)
