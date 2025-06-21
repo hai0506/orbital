@@ -22,7 +22,7 @@ class CreatePostView(generics.ListCreateAPIView): # create and view own posts
     permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
-        author = get_or_none(Student, user=self.request.user)
+        author = get_or_none(Organization, user=self.request.user)
         if author:
             return JobPost.filter(author=author)
         else: return JobPost.objects.none()
@@ -32,7 +32,7 @@ class CreatePostView(generics.ListCreateAPIView): # create and view own posts
         # student = Student.objects.get(user_id=1)
         # serializer.save(author=student)
 
-        author = get_or_none(Student, user=self.request.user)
+        author = get_or_none(Organization, user=self.request.user)
         if author:
             serializer.save(author=author)
         else:

@@ -23,7 +23,7 @@ class UserSerializer(serializers.ModelSerializer):
         user_type = validated_data.pop('user_type')
         user = User.objects.create_user(**validated_data)
         if user_type == 'Organization':
-            Student.objects.create(user=user)
+            Organization.objects.create(user=user)
         elif user_type == 'Vendor':
             Vendor.objects.create(user=user)
         return user
