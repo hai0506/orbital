@@ -1,39 +1,76 @@
-import { MapPinned, Calendar1, Clock, HandCoins } from "lucide-react";
+import { useState } from "react";
+import { MapPinned, Calendar1, Clock, HandCoins, X } from "lucide-react";
+import { Button } from "@headlessui/react";
+import Helper from "./ListingDetails";
+import Helper2 from "./MakeOffer";
 
 const Listing = ({fields}) => {
 
-    const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString("en-GB");
+    
+    const dates = [];
+    const start = new Date(fields.start_date);
+    const end = new Date(fields.end_date);
+    const current = new Date(start);
 
-    const formatTime = (timeStr) =>
-        new Date(`1970-01-01T${timeStr}Z`).toLocaleTimeString("en-GB", {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false,
-        });
+    while (current <= end) {
+        dates.push(new Date(current)); 
+        current.setDate(current.getDate() + 1);
+    }
+
+
+    const [hovered, setHovered] = useState(false);
+    const [open, setOpen] = useState(false);
 
     return (
-        <div className="border border-gray-300 rounded-lg p-4 shadow-sm bg-white max-w-md">
-            {/*<h3 className="text-lg font-semibold text-gray-900 mb-3">{details.title}</h3>*/}
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">{fields["title"]}</h3>
-            <dl className="space-y-2">
-                <div className="flex text-sm text-gray-700">
-                    <MapPinned className="mr-2" />
-                    <dt className="font-medium">{fields["location"]}</dt>
+        <>
+            <div onMouseEnter={() => setHovered(true)} 
+                onMouseLeave={() => setHovered(false)} 
+                className="border border-gray-300 rounded-lg p-4 shadow-sm bg-white max-w-md"
+            >
+                <Helper fields={fields} />
+
+                <button
+                    className="absolute top-2 right-2 text-gray-500 hover:text-black"
+                >
+                    <X/>
+                </button>
+
+                {hovered && (
+                    <Button onClick={() => {setOpen(true);setHovered(false);}} style={{ marginTop: "10px" }} className="inline-flex items-center gap-2 rounded-md bg-gray-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-gray-600 data-open:bg-gray-700">
+                        Check it out!
+                    </Button>
+                )}
+            </div>
+
+            {open && (
+                <div 
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm"
+                    onClick={() => setOpen(false)}
+                >
+                    <div 
+                        className="max-w-2xl w-full rounded-lg bg-white p-6 shadow-lg relative"
+                        onClick={e => e.stopPropagation()}
+                    >
+                        <div className="flex h-full w-full">
+                            <div className="w-[50%] p-4">
+                                <Helper fields={fields} />
+                            </div>
+
+                            <div className="w-[70%] border-l border-gray-300 p-4">
+                                <Helper2 dates={dates} />
+                            </div>
+                        </div>
+
+                        <button
+                            onClick={() => setOpen(false)}
+                            className="absolute top-2 right-2 text-gray-500 hover:text-black"
+                        >
+                            <X/>
+                        </button>
+                    </div>
                 </div>
-                <div className="flex text-sm text-gray-700">
-                    <Calendar1 className="mr-2" />
-                    <dt className="font-medium">{formatDate(fields.start_date)} - {formatDate(fields.end_date)}</dt>
-                </div>
-                <div className="flex text-sm text-gray-700">
-                    <Clock className="mr-2" />
-                    <dt className="font-medium">{formatTime(fields.start_time)} - {formatTime(fields.end_time)}</dt>
-                </div>
-                <div className="flex text-sm text-gray-700">
-                    <HandCoins className="mr-2" />
-                    <dt className="font-medium">{fields.commission + "% Commision"}</dt>
-                </div>
-            </dl>
-        </div>
+            )}
+        </>
     );
 };
 
