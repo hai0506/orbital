@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Organization(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='organization_user')
@@ -23,11 +23,11 @@ class JobPost(models.Model):
     start_time = models.TimeField()
     end_time = models.TimeField()
     content = models.TextField(max_length=2000)
-    commission = models.IntegerField(max_digits=3, validators=[MinValueValidator(0)])
+    commission = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)])
     time_created = models.DateTimeField(auto_now_add=True)
     attachment = models.FileField(upload_to='post_attachments/', blank=True, null=True) # TODO: add security
     keywords = models.ManyToManyField(Keyword, blank=True)
-    author = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="job_posts")
+    author = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="job_posts")
 
     def __str__(self):
         return self.title
