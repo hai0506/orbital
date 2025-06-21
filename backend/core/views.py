@@ -5,6 +5,25 @@ from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .serializers import *
 from itertools import chain
+from rest_framework.decorators import api_view
+
+
+@api_view(['GET'])
+def get_user_profile(request):
+    user = request.user
+    role = None
+
+    if hasattr(user, 'organization_user'):
+        role = 'organization'
+    elif hasattr(user, 'vendor_user'):
+        role = 'vendor'
+
+    return Response({
+        'id': user.id,
+        'username': user.username,
+        'email': user.email,
+        'role': role,
+    })
 
 def get_or_none(classmodel, **kwargs):
     try:
