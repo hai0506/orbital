@@ -3,10 +3,10 @@ import { MapPinned, Calendar1, Clock, HandCoins, X } from "lucide-react";
 import { Button } from "@headlessui/react";
 import Helper from "./ListingDetails";
 import Helper2 from "./MakeOffer";
+import MakeOffer from "./MakeOffer";
+import ListingDetails from "./ListingDetails";
 
 const Listing = ({fields}) => {
-
-    
     const dates = [];
     const start = new Date(fields.start_date);
     const end = new Date(fields.end_date);
@@ -53,11 +53,11 @@ const Listing = ({fields}) => {
                     >
                         <div className="flex h-full w-full">
                             <div className="w-[50%] p-4">
-                                <Helper fields={fields} />
+                                <ListingDetails fields={fields} />
                             </div>
 
                             <div className="w-[70%] border-l border-gray-300 p-4">
-                                <Helper2 dates={dates} />
+                                <MakeOffer dates={dates} categories={fields.keywords}  />
                             </div>
                         </div>
 
