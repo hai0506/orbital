@@ -1,41 +1,42 @@
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { Link, useNavigate } from 'react-router-dom';
 import Listing from './Listing'
 import listings from '../data/Listings'
-
-const user = {
-  name: 'Tom Cook',
-  email: 'tom@example.com',
-  imageUrl:
-    'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-}
-
-const navigation = [
-  { name: 'Listings', href: '#', current: true },
-  { name: 'Fundraisers', href: '#', current: false },
-]
-const userNavigation = [
-  { name: 'Your Profile', href: '#' },
-  { name: 'Settings', href: '#' },
-  { name: 'Sign out', href: '#' },
-]
-
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-export default function Layout({method}) {
+export default function Layout({ method, children }) {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate('/login');
+  };
+
+  const user = {
+    name: 'Tom Cook',
+    email: 'tom@example.com',
+    imageUrl:
+      'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+  }
+
+  const navigation = [
+    { name: 'Listings', href: '#', current: true },
+    { name: 'Fundraisers', href: '#', current: false },
+  ]
+      
+
+  const userNavigation = [
+    { name: 'Your Profile', href: '/profile' },
+    { name: 'Settings', href: '/settings' },
+    { name: 'Sign out', onClick: handleLogout },
+  ];
+
   return (
     <>
-      {/*
-        This example requires updating your template:
-
-        ```
-        <html class="h-full bg-gray-100">
-        <body class="h-full">
-        ```
-      */}
       <div className="min-h-full">
         <Disclosure as="nav" className="bg-gray-800">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -92,12 +93,21 @@ export default function Layout({method}) {
                     >
                       {userNavigation.map((item) => (
                         <MenuItem key={item.name}>
-                          <a
-                            href={item.href}
-                            className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
-                          >
-                            {item.name}
-                          </a>
+                          {item.href ? (
+                            <Link
+                              to={item.href}
+                              className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
+                            >
+                              {item.name}
+                            </Link>
+                          ) : (
+                            <button
+                              onClick={item.onClick}
+                              className="block w-full text-left px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
+                            >
+                              {item.name}
+                            </button>
+                          )}
                         </MenuItem>
                       ))}
                     </MenuItems>
@@ -173,13 +183,7 @@ export default function Layout({method}) {
           </div>
         </header>
         <main>
-            {method === "Listings" && (
-              <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 grid grid-cols-3 gap-4">
-                {listings.map((listing, index) => (
-                    <Listing key={listing.id || index} fields={listing} />
-                ))}
-              </div>
-            )}
+            {children}
         </main>
       </div>
     </>
