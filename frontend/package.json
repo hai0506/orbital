@@ -15,6 +15,8 @@
     "@headlessui/react": "^2.2.4",
     "@heroicons/react": "^2.2.0",
     "axios": "^1.9.0",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.18.1",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.518.0",
     "next-themes": "^0.4.6",
