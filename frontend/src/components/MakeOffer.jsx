@@ -3,13 +3,16 @@ import { Description, Field, Fieldset, Input, Label, Button, Select, Textarea, C
 import { ChevronDownIcon, CheckIcon } from '@heroicons/react/20/solid'
 import clsx from 'clsx'
 
-export default function Helper2({ dates }) {
+export default function MakeOffer({ dates, categories }) {
     const [allDays, setAllDays] = useState("Yes");
     const [selectedDays, setSelectedDays] = useState([]);
+    const [selectedCategories, setSelectedCategories] = useState([]);
+    const [otherCategories, setOtherCategories] = useState("");
     const [commission, setCommission] = useState(30);
+    const [remarks, setRemarks] = useState("");
 
-    const toggle = date => {
-        selectedDays.includes(date) ?  setSelectedDays(selectedDays.filter(item => item !== date)) : setSelectedDays([...selectedDays, date]);
+    const toggle = (target, arr, setArr) => {
+        arr.includes(target) ? setArr(arr.filter(item => item !== target)) : setArr([...arr, target]);
     }
 
     return (
@@ -26,6 +29,7 @@ export default function Helper2({ dates }) {
                                 '*:text-black'
                             )}
                             onChange={e => setAllDays(e.target.value)}
+                            
                         >
                             <option>Yes</option>
                             <option>No</option>
@@ -36,25 +40,66 @@ export default function Helper2({ dates }) {
                         />
                     </div>
                 </Field>
-                    {allDays === "No" && (
-                        <Field>
-                            <Description className="text-sm/6 text-black/50">Which days are you unable to make it?</Description>
-                            <div className="relative">
-                                {dates.map(date => (
-                                    <label key={date} className="flex items-center space-x-2 cursor-pointer mt-2">
-                                        <Checkbox
+                {allDays === "No" && (
+                    <Field>
+                        <Description style={{ marginTop: "10px" }} className="text-sm/6 text-black/50">Which days are you unable to make it?</Description>
+                        <div className="grid grid-cols-2 gap-1 mt-2 max-h-35 overflow-y-auto">
+                            {dates.map(date => (
+                                <label key={date} className="flex items-center space-x-2 cursor-pointer mt-2">
+                                    <Checkbox
                                         checked={selectedDays.includes(date)}
-                                        onChange={() => toggle(date)}
-                                        className="group size-6 rounded-md bg-white/10 p-1 ring-1 ring-gray-300 ring-inset focus:outline focus:outline-offset-2 focus:outline-indigo-500 data-checked:bg-indigo-600"
-                                        >
-                                        <CheckIcon className="hidden size-4 fill-black group-data-checked:block" />
-                                        </Checkbox>
-                                        <span className="text-gray-700">{date.toLocaleDateString("en-GB")}</span>
-                                    </label>
-                                ))}
-                            </div>
-                        </Field>
-                    )}
+                                        onChange={() => toggle(date, selectedDays, setSelectedDays)}
+                                        className="group size-6 rounded-md bg-white/10 p-1 ring-1 ring-gray-300 ring-inset focus:outline-none data-checked:bg-indigo-600"
+                                    >
+                                    <CheckIcon className="hidden size-4 fill-black group-data-checked:block" />
+                                    </Checkbox>
+                                    <span className="text-sm text-gray-700">{date.toLocaleDateString("en-GB")}</span>
+                                </label>
+                            ))}
+                        </div>
+                    </Field>
+                )}
+                <Field>
+                    <Label className="text-base/7 font-medium text-black">Products</Label>
+                    <Description className="text-sm/6 text-black/50">What will you be selling?</Description>
+                    <div className="grid grid-cols-2 gap-1 mt-2 max-h-35 overflow-y-auto">
+                        {categories.map(category => (
+                            <label key={category} className="flex items-center space-x-2 cursor-pointer mt-2">
+                                <Checkbox
+                                    checked={selectedCategories.includes(category)}
+                                    onChange={() => toggle(category, selectedCategories, setSelectedCategories)}
+                                    className="group size-6 rounded-md bg-white/10 p-1 ring-1 ring-gray-300 ring-inset focus:outline-none data-checked:bg-indigo-600"
+                                >
+                                <CheckIcon className="hidden size-4 fill-black group-data-checked:block" />
+                                </Checkbox>
+                                <span className="text-sm text-gray-700">{category}</span>
+                            </label>
+                        ))}
+                        <label key="Others" className="flex items-center space-x-2 cursor-pointer mt-2">
+                            <Checkbox
+                                checked={selectedCategories.includes("Others")}
+                                onChange={() => toggle("Others", selectedCategories, setSelectedCategories)}
+                                className="group size-6 rounded-md bg-white/10 p-1 ring-1 ring-gray-300 ring-inset focus:outline-none data-checked:bg-indigo-600"
+                            >
+                            <CheckIcon className="hidden size-4 fill-black group-data-checked:block" />
+                            </Checkbox>
+                            <span className="text-sm text-gray-700">Others</span>
+                        </label>
+                    </div>
+                </Field>
+                <Field>
+                        {selectedCategories.includes("Others") && (
+                            <Textarea
+                                value={otherCategories}
+                                onChange={e => setOtherCategories(e.target.value)}
+                                className={clsx(
+                                'mt-3 block w-full resize-none rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black',
+                                'focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25'
+                                )}
+                                rows={2}
+                            />
+                        )}
+                </Field>
                 <Field>
                     <Label className="text-base/7 font-medium text-black">Commission</Label>
                     <Description className="text-sm/6 text-black/50">
@@ -77,6 +122,8 @@ export default function Helper2({ dates }) {
                         Anything else we might need to know
                     </Description>
                     <Textarea
+                        value={remarks}
+                        onChange={e => setRemarks(e.target.value)}
                         className={clsx(
                         'mt-3 block w-full resize-none rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black',
                         'focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25'
