@@ -1,10 +1,17 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from rest_framework.response import Response
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .serializers import *
 from itertools import chain
+
+from datetime import datetime
+import asyncio
+from typing import AsyncGenerator
+from django.http import HttpRequest, StreamingHttpResponse, HttpResponse
+import json
+import random
 
 def get_or_none(classmodel, **kwargs):
     try:
@@ -54,4 +61,25 @@ class PostListView(generics.ListAPIView): # view others posts and filters.
                     else: combined_queryset = combined_queryset.union(keyword.jobpost_set.all())
             return combined_queryset
         else: return JobPost.objects.all()
+
+class CreateMessageView(generics.CreateAPIView):
+    serializer_class = MessageSerializer
+    permission_classes = [AllowAny]
+
+    def perform_create(self, serializer):
+        # serializer.validated_data['sender'] = self.request.user
+        serializer.validated_data['sender'] = User.objects.get(id=1)
+        receiver = self.request.data.get('receiver', '')
+
+        try:
+            receiver_user = User.objects.get(id=receiver)
+            serializer.validated_data['receiver'] = receiver_user
+            if serializer.is_valid():
+                serializer.save()
+                return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except User.DoesNotExist:
+            return Response({'error': 'Receiver does not exist'}, status=status.HTTP_400_BAD_REQUEST)
+
 

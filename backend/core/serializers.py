@@ -52,3 +52,9 @@ class JobPostSerializer(serializers.ModelSerializer):
             k.append(keyword_obj)
         post.keywords.set(k)
         return post
+    
+class MessageSerializer(serializers.ModelSerializer):
+    sender = serializers.PrimaryKeyRelatedField(read_only=True)
+    class Meta:
+        model = Message
+        fields = ['message_id', 'sender', 'receiver', 'content', 'time_created', 'read']
