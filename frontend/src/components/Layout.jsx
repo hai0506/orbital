@@ -6,13 +6,15 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-export default function Layout({ heading, children, role }) {
+export default function Layout({ heading, children }) {
   const navigate = useNavigate();
 
   const handleLogout = () => {
     localStorage.clear();
     navigate('/login');
   };
+
+  const role = localStorage.getItem("ROLE");
 
   const user = {
     name: 'Tom Cook',
