@@ -4,8 +4,9 @@ import api from "../api";
 import { REFRESH_TOKEN, ACCESS_TOKEN } from "../constants";
 import { useState, useEffect } from "react";
  
-function ProtectedRoute({children}) {
+function ProtectedRoute({ children, authRoles }) {
     const [isAuthorized, setIsAuthorized] = useState(null);
+    const role = localStorage.getItem("ROLE");
 
     useEffect(() => {
         auth().catch(() => setIsAuthorized(false))
@@ -51,7 +52,16 @@ function ProtectedRoute({children}) {
             Loading...
         </div>;
     }
-    return isAuthorized ? children : <Navigate to="/login" />
+
+    if (!isAuthorized) {
+        return <Navigate to="/login" />
+    }
+
+    if (!authRoles || authRoles.includes(role)) {
+        return children;
+    } else {
+        return <Navigate to="/login" />
+    }
 }
 
 export default ProtectedRoute;
