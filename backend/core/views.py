@@ -5,6 +5,25 @@ from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .serializers import *
 from itertools import chain
+from rest_framework.decorators import api_view
+
+
+@api_view(['GET'])
+def get_user_profile(request):
+    user = request.user
+    role = None
+
+    if hasattr(user, 'organization_user'):
+        role = 'organization'
+    elif hasattr(user, 'vendor_user'):
+        role = 'vendor'
+
+    return Response({
+        'id': user.id,
+        'username': user.username,
+        'email': user.email,
+        'role': role,
+    })
 
 from datetime import datetime
 import asyncio
@@ -29,17 +48,17 @@ class CreatePostView(generics.ListCreateAPIView): # create and view own posts
     permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
-        author = get_or_none(Student, user=self.request.user)
+        author = get_or_none(Organization, user=self.request.user)
         if author:
             return JobPost.filter(author=author)
         else: return JobPost.objects.none()
         # return JobPost.objects.none()
 
     def perform_create(self, serializer):
-        # student = Student.objects.get(user_id=1)
+        # student = Organization.objects.get(user_id=1)
         # serializer.save(author=student)
 
-        author = get_or_none(Student, user=self.request.user)
+        author = get_or_none(Organization, user=self.request.user)
         if author:
             serializer.save(author=author)
         else:
