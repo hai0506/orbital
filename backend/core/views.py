@@ -48,7 +48,7 @@ class CreatePostView(generics.ListCreateAPIView): # create and view own posts
         # return JobPost.objects.none()
 
     def perform_create(self, serializer):
-        # student = Student.objects.get(user_id=1)
+        # student = Organization.objects.get(user_id=1)
         # serializer.save(author=student)
 
         author = get_or_none(Organization, user=self.request.user)
