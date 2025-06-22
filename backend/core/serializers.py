@@ -29,7 +29,7 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 class JobPostSerializer(serializers.ModelSerializer):
-    keyword_list = serializers.ListField(write_only=True)
+    keyword_list = serializers.ListField(write_only=True, required=False)
     keywords = serializers.SlugRelatedField(  # for output
         many=True,
         read_only=True,

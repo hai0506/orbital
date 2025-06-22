@@ -64,11 +64,13 @@ class PostListView(generics.ListAPIView): # view others posts and filters.
     def get_queryset(self): # to filter: http://127.0.0.1:8000/core/posts/?keywords=whatever1&keywords=whatever2&...
         keyword_values = self.request.query_params.getlist('keywords')
         combined_queryset = None
-        for v in keyword_values:
-            value = v.strip().lower()
-            keyword = get_or_none(Keyword, value = value)
-            if keyword:
-                if combined_queryset is None: combined_queryset = keyword.jobpost_set.all()
-                else: combined_queryset = combined_queryset.union(keyword.jobpost_set.all())
-        return combined_queryset
+        if len(keyword_values) > 0:
+            for v in keyword_values:
+                value = v.strip().lower()
+                keyword = get_or_none(Keyword, value = value)
+                if keyword:
+                    if combined_queryset is None: combined_queryset = keyword.jobpost_set.all()
+                    else: combined_queryset = combined_queryset.union(keyword.jobpost_set.all())
+            return combined_queryset
+        else: return JobPost.objects.all()
 

@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.exceptions import ValidationError
 
 class Organization(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='organization_user')
@@ -13,6 +14,13 @@ class Keyword(models.Model):
 
     def __str__(self):
         return self.value
+    
+
+def filesize_valid(value):
+    lim = 5
+    max_size = lim * 1024 * 1024
+    if value.size > max_size:
+        raise ValidationError(f"File size must be under {lim}MB.")
 
 class JobPost(models.Model):
     post_id = models.AutoField(primary_key=True)
@@ -25,7 +33,7 @@ class JobPost(models.Model):
     content = models.TextField(max_length=2000)
     commission = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)])
     time_created = models.DateTimeField(auto_now_add=True)
-    attachment = models.FileField(upload_to='post_attachments/', blank=True, null=True) # TODO: add security
+    attachment = models.FileField(upload_to='post_attachments/', blank=True, null=True, validators=[filesize_valid])
     keywords = models.ManyToManyField(Keyword, blank=True)
     author = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="job_posts")
 
