@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Description, Field, Fieldset, Input, Label, Button, Select, Textarea, Checkbox } from '@headlessui/react'
 import { ChevronDownIcon, CheckIcon } from '@heroicons/react/20/solid'
@@ -17,6 +17,19 @@ const CreateListing = () => {
     const [remarks, setRemarks] = useState("");
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
+    const [currentTime, setCurrentTime] = useState(() => new Date().toTimeString().slice(0, 5)); 
+    
+    const todayDate = new Date().toISOString().split("T")[0];
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentTime(new Date().toTimeString().slice(0, 5));
+        }, 60000); 
+
+        return () => clearInterval(interval); 
+    }, []);
+
+    const minTime = startDate === todayDate ? currentTime : undefined;
 
     const toggle = (target, arr, setArr) => {
         arr.includes(target) ? setArr(arr.filter(item => item !== target)) : setArr([...arr, target]);
@@ -115,9 +128,10 @@ const CreateListing = () => {
                         <Description className="text-sm/6 text-black/50">Start date of the fundraiser</Description>
                         <div className="relative">
                             <Input 
-                                type="text" 
+                                type="date" 
                                 value={startDate}
                                 onChange={e => setStartDate(e.target.value)}
+                                min={new Date().toISOString().split("T")[0]}
                                 className={clsx(
                                         'mt-3 block w-full appearance-none rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black',
                                         'focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25',
@@ -131,8 +145,10 @@ const CreateListing = () => {
                         <Description className="text-sm/6 text-black/50">End date of the fundraiser</Description>
                         <div className="relative">
                             <Input 
-                                type="text" 
+                                type="date" 
                                 value={endDate}
+                                min={startDate}
+                                disabled={!startDate}
                                 onChange={e => setEndDate(e.target.value)}
                                 className={clsx(
                                         'mt-3 block w-full appearance-none rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black',
@@ -150,14 +166,16 @@ const CreateListing = () => {
                         <Description className="text-sm/6 text-black/50">Start time of the fundraiser</Description>
                         <div className="relative">
                             <Input 
-                                type="text" 
+                                type="time" 
                                 value={startTime}
+                                min={minTime}
+                                disabled={!startDate}
                                 onChange={e => setStartTime(e.target.value)}
                                 className={clsx(
-                                        'mt-3 block w-full appearance-none rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black',
-                                        'focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25',
-                                        '*:text-black'
-                                    )}
+                                    'mt-3 block w-full appearance-none rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black',
+                                    'focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25',
+                                    '*:text-black'
+                                )}
                             />
                         </div>
                         {errors.startTime && (
@@ -166,8 +184,10 @@ const CreateListing = () => {
                         <Description className="text-sm/6 text-black/50">End time of the fundraiser</Description>
                         <div className="relative">
                             <Input 
-                                type="text" 
+                                type="time" 
                                 value={endTime}
+                                min={startTime}
+                                disabled={!startTime}
                                 onChange={e => setEndTime(e.target.value)}
                                 className={clsx(
                                         'mt-3 block w-full appearance-none rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black',
@@ -222,7 +242,7 @@ const CreateListing = () => {
                     <Field>
                         <Label className="text-base/7 font-medium text-black">Remarks</Label>  
                         <Description className="text-sm/6 text-black/50">
-                            Anything else we might need to know
+                            Anything you might want your vendors to know
                         </Description>
                         <Textarea
                             value={remarks}
