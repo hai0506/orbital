@@ -1,14 +1,12 @@
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { Link, useNavigate } from 'react-router-dom';
-import Listing from './Listing'
-import listings from '../data/Listings'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-export default function Layout({ method, children }) {
+export default function Layout({ heading, children, role }) {
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -23,10 +21,19 @@ export default function Layout({ method, children }) {
       'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
   }
 
-  const navigation = [
-    { name: 'Listings', href: '#', current: true },
-    { name: 'Fundraisers', href: '#', current: false },
+  const vendorNavigation = [
+    { name: 'Listings', href: '/', current: true },
+    { name: 'Offers', href: '/offers', current: false },
+    { name: 'Fundraisers', href: '/fundraisers', current: false },
   ]
+
+  const orgNavigation = [
+    { name: 'Offers', href: '/', current: true },
+    { name: 'Create Listing', href: '/create', current: false },
+    { name: 'Fundraisers', href: '/fundraisers', current: false },
+  ]
+
+  const navigation = role === 'vendor' ? vendorNavigation : orgNavigation;
       
 
   const userNavigation = [
@@ -52,9 +59,9 @@ export default function Layout({ method, children }) {
                 <div className="hidden md:block">
                   <div className="ml-10 flex items-baseline space-x-4">
                     {navigation.map((item) => (
-                      <a
+                      <Link
                         key={item.name}
-                        href={item.href}
+                        to={item.href}
                         aria-current={item.current ? 'page' : undefined}
                         className={classNames(
                           item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
@@ -62,7 +69,7 @@ export default function Layout({ method, children }) {
                         )}
                       >
                         {item.name}
-                      </a>
+                      </Link>
                     ))}
                   </div>
                 </div>
@@ -179,7 +186,7 @@ export default function Layout({ method, children }) {
 
         <header className="bg-white shadow-sm">
           <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-bold tracking-tight text-gray-900">{method}</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-gray-900">{heading}</h1>
           </div>
         </header>
         <main>
