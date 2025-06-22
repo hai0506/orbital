@@ -10,3 +10,5 @@ PyJWT
 pytz
 psycopg2-binary
 python-dotenv
+channels==4.2.2
+uvicorn[standard]

@@ -81,24 +81,24 @@ class PostListView(generics.ListAPIView): # view others posts and filters.
             return combined_queryset
         else: return JobPost.objects.all()
 
-class CreateMessageView(generics.CreateAPIView):
-    serializer_class = MessageSerializer
-    permission_classes = [AllowAny]
+# class CreateMessageView(generics.CreateAPIView):
+#     serializer_class = MessageSerializer
+#     permission_classes = [AllowAny]
 
-    def perform_create(self, serializer):
-        # serializer.validated_data['sender'] = self.request.user
-        serializer.validated_data['sender'] = User.objects.get(id=1)
-        receiver = self.request.data.get('receiver', '')
+#     def perform_create(self, serializer):
+#         # serializer.validated_data['sender'] = self.request.user
+#         serializer.validated_data['sender'] = User.objects.get(id=1)
+#         receiver = self.request.data.get('receiver', '')
 
-        try:
-            receiver_user = User.objects.get(id=receiver)
-            serializer.validated_data['receiver'] = receiver_user
-            if serializer.is_valid():
-                serializer.save()
-                return Response(data=serializer.data, status=status.HTTP_201_CREATED)
-            else:
-                return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except User.DoesNotExist:
-            return Response({'error': 'Receiver does not exist'}, status=status.HTTP_400_BAD_REQUEST)
+#         try:
+#             receiver_user = User.objects.get(id=receiver)
+#             serializer.validated_data['receiver'] = receiver_user
+#             if serializer.is_valid():
+#                 serializer.save()
+#                 return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+#             else:
+#                 return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#         except User.DoesNotExist:
+#             return Response({'error': 'Receiver does not exist'}, status=status.HTTP_400_BAD_REQUEST)
 
 
