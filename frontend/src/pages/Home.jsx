@@ -31,20 +31,22 @@ const Home = () => {
 
   return (
     <>
-      <Layout heading="Listings">
         {role === "vendor" && (
-          <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 grid grid-cols-3 gap-4">
-            {listings.map((listing, index) => (
-              <Listing key={listing.id || index} fields={listing} />
-            ))}
-          </div>
+          <Layout heading="Listings">
+            <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 grid grid-cols-3 gap-4">
+              {listings.map((listing, index) => (
+                <Listing key={listing.id || index} fields={listing} />
+              ))}
+            </div>
+          </Layout>
         )}
         {role === "organization" && (
-          <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-            <p>Hello organization</p>
-          </div>
+          <Layout heading="Offers">
+              <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                <p>Hello organization</p>
+              </div>
+          </Layout>
         )}
-      </Layout>
     </>
   );
 };
