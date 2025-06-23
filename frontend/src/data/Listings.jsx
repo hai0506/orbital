@@ -7,7 +7,7 @@ const listings = [
     start_time: "08:45:00",
     end_time: "13:45:00",
     commission: "30",
-    keywords: ["Art & Crafts", "Accessories", "Books"]
+    category_list: ["Art & Crafts", "Accessories", "Books"]
   },
   {
     title: "Project 2",
@@ -17,7 +17,7 @@ const listings = [
     start_time: "09:00:00",
     end_time: "14:00:00",
     commission: "25",
-    keywords: ["Tech Gadgets", "Food & Beverages"]
+    category_list: ["Tech Gadgets", "Food & Beverages"]
   },
   {
     title: "Project 3",
@@ -27,7 +27,7 @@ const listings = [
     start_time: "10:00:00",
     end_time: "15:00:00",
     commission: "20",
-    keywords: ["Stationery", "Pet Supplies"]
+    category_list: ["Stationery", "Pet Supplies"]
   },
   {
     title: "Project 4",
@@ -37,7 +37,7 @@ const listings = [
     start_time: "08:00:00",
     end_time: "12:00:00",
     commission: "35",
-    keywords: ["Books", "Home Decor", "Clothing"]
+    category_list: ["Books", "Home Decor", "Clothing"]
   },
   {
     title: "Project 5",
@@ -47,7 +47,7 @@ const listings = [
     start_time: "09:30:00",
     end_time: "13:30:00",
     commission: "40",
-    keywords: ["Food & Beverages", "Accessories"]
+    category_list: ["Food & Beverages", "Accessories"]
   },
   {
     title: "Project 6",
@@ -57,7 +57,7 @@ const listings = [
     start_time: "10:15:00",
     end_time: "15:15:00",
     commission: "28",
-    keywords: ["Skincare & Beauty", "Plants", "Art & Crafts"]
+    category_list: ["Skincare & Beauty", "Plants", "Art & Crafts"]
   },
   {
     title: "Project 7",
@@ -67,7 +67,7 @@ const listings = [
     start_time: "08:45:00",
     end_time: "12:45:00",
     commission: "32",
-    keywords: ["Toys & Games", "Clothing"]
+    category_list: ["Toys & Games", "Clothing"]
   },
   {
     title: "Project 8",
@@ -77,7 +77,7 @@ const listings = [
     start_time: "09:00:00",
     end_time: "14:00:00",
     commission: "27",
-    keywords: ["Stationery", "Books"]
+    category_list: ["Stationery", "Books"]
   },
   {
     title: "Project 9",
@@ -87,7 +87,7 @@ const listings = [
     start_time: "10:00:00",
     end_time: "16:00:00",
     commission: "30",
-    keywords: ["Tech Gadgets", "Plants"]
+    category_list: ["Tech Gadgets", "Plants"]
   },
   {
     title: "Project 10",
@@ -97,7 +97,7 @@ const listings = [
     start_time: "08:30:00",
     end_time: "13:30:00",
     commission: "29",
-    keywords: ["Food & Beverages", "Toys & Games"]
+    category_list: ["Food & Beverages", "Toys & Games"]
   },
   {
     title: "Project 11",
@@ -107,7 +107,7 @@ const listings = [
     start_time: "09:45:00",
     end_time: "14:45:00",
     commission: "33",
-    keywords: ["Skincare & Beauty", "Accessories"]
+    category_list: ["Skincare & Beauty", "Accessories"]
   },
   {
     title: "Project 12",
@@ -117,7 +117,7 @@ const listings = [
     start_time: "08:00:00",
     end_time: "12:00:00",
     commission: "35",
-    keywords: ["Home Decor", "Pet Supplies", "Clothing"]
+    category_list: ["Home Decor", "Pet Supplies", "Clothing"]
   }
 ];
 
