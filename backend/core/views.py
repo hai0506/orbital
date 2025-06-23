@@ -38,24 +38,24 @@ class CreateUserView(generics.CreateAPIView): # register
 
 class CreatePostView(generics.ListCreateAPIView): # create and view own posts
     serializer_class = JobPostSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
-        # author = get_or_none(Organization, user=self.request.user)
-        # if author:
-        #     return JobPost.filter(author=author)
-        # else: return JobPost.objects.none()
-        return JobPost.objects.none()
+        author = get_or_none(Organization, user=self.request.user)
+        if author:
+            return JobPost.filter(author=author)
+        else: return JobPost.objects.none()
+        # return JobPost.objects.none()
 
     def perform_create(self, serializer):
-        student = Organization.objects.get(user_id=1)
-        serializer.save(author=student)
+        # student = Organization.objects.get(user_id=1)
+        # serializer.save(author=student)
 
-        # author = get_or_none(Organization, user=self.request.user)
-        # if author:
-        #     serializer.save(author=author)
-        # else:
-        #     raise PermissionError('User cannot create posts')
+        author = get_or_none(Organization, user=self.request.user)
+        if author:
+            serializer.save(author=author)
+        else:
+            raise PermissionError('User cannot create posts')
 
 class PostListView(generics.ListAPIView): # view others posts and filters.
     serializer_class = JobPostSerializer
