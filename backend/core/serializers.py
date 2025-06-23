@@ -39,7 +39,11 @@ class JobPostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = JobPost
-        fields = ['post_id','title','location','start_date','end_date','start_time','end_time','content','commission','time_created','attachment','author','keywords','keyword_list']
+        fields = [
+            'post_id', 'title', 'location', 'start_date', 'end_date',
+            'start_time', 'end_time', 'remarks', 'commission',
+            'attachment', 'author', 'keywords', 'keyword_list'
+        ]
 
     def create(self, validated_data):
         keyword_values = validated_data.pop('keyword_list', []) 

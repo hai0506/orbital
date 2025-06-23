@@ -30,7 +30,7 @@ class JobPost(models.Model):
     end_date = models.DateField()
     start_time = models.TimeField()
     end_time = models.TimeField()
-    content = models.TextField(max_length=2000)
+    remarks = models.TextField(max_length=2000, blank=True)
     commission = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)])
     time_created = models.DateTimeField(auto_now_add=True)
     attachment = models.FileField(upload_to='post_attachments/', blank=True, null=True, validators=[filesize_valid])
