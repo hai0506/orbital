@@ -1,8 +1,6 @@
 import { useState } from "react";
-import { MapPinned, Calendar1, Clock, HandCoins, X } from "lucide-react";
+import { X } from "lucide-react";
 import { Button } from "@headlessui/react";
-import Helper from "./ListingDetails";
-import Helper2 from "./MakeOffer";
 import MakeOffer from "./MakeOffer";
 import ListingDetails from "./ListingDetails";
 
@@ -17,7 +15,6 @@ const Listing = ({fields}) => {
         current.setDate(current.getDate() + 1);
     }
 
-
     const [hovered, setHovered] = useState(false);
     const [open, setOpen] = useState(false);
 
@@ -27,7 +24,7 @@ const Listing = ({fields}) => {
                 onMouseLeave={() => setHovered(false)} 
                 className="border border-gray-300 rounded-lg p-4 shadow-sm bg-white max-w-md"
             >
-                <Helper fields={fields} />
+                <ListingDetails fields={fields} />
 
                 <button
                     className="absolute top-2 right-2 text-gray-500 hover:text-black"
@@ -57,7 +54,7 @@ const Listing = ({fields}) => {
                             </div>
 
                             <div className="w-[70%] border-l border-gray-300 p-4">
-                                <MakeOffer dates={dates} categories={fields.keywords}  />
+                                <MakeOffer dates={dates} categories={fields.category_list}  />
                             </div>
                         </div>
 
