@@ -4,6 +4,7 @@ import { Description, Field, Fieldset, Input, Label, Button, Select, Textarea, C
 import { ChevronDownIcon, CheckIcon } from '@heroicons/react/20/solid'
 import Layout from '../components/Layout'
 import clsx from 'clsx'
+import api from '../api'
 
 const CreateListing = () => {
     const [title, setTitle] = useState("");
@@ -12,8 +13,8 @@ const CreateListing = () => {
     const [endDate, setEndDate] = useState("");
     const [startTime, setStartTime] = useState("");
     const [endTime, setEndTime] = useState("");
-    const [keywords, setKeywords] = useState([]);
-    const [commission, setCommission] = useState();
+    const [categories, setCategories] = useState([]);
+    const [commission, setCommission] = useState(0);
     const [remarks, setRemarks] = useState("");
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
@@ -35,7 +36,7 @@ const CreateListing = () => {
         arr.includes(target) ? setArr(arr.filter(item => item !== target)) : setArr([...arr, target]);
     }
 
-    const categories = [
+    const allCategories = [
         "Food & Beverages",
         "Accessories",
         "Stationery",
@@ -55,22 +56,23 @@ const CreateListing = () => {
     const handleSubmit = async (e) => {
         setLoading(true);
         e.preventDefault();
+        console.log("submitting")
 
         try {
             const info = {
                 title, 
                 location,
-                startDate,
-                endDate,
-                startTime,
-                endTime,
-                keywords,
+                start_date: startDate,
+                end_date: endDate,
+                start_time: startTime,
+                end_time: endTime,
+                remarks,
                 commission,
-                remarks
+                category_list: categories,
             }
 
             console.log("Sending info:", info);
-            const route = "create-post/";
+            const route = "core/create-post/";
             const res = await api.post(route, info)
             navigate("/")
         } catch (error) {
@@ -139,7 +141,7 @@ const CreateListing = () => {
                                     )}
                             />
                         </div>
-                        {errors.startDate && (
+                        {errors.start_date && (
                             <p className="mt-1 text-sm text-red-600">{errors.startDate[0]}</p>
                         )}
                         <Description className="text-sm/6 text-black/50">End date of the fundraiser</Description>
@@ -204,12 +206,12 @@ const CreateListing = () => {
                         <Label className="text-base/7 font-medium text-black">Vendors</Label>
                         <Description className="text-sm/6 text-black/50">What vendor types do you prefer?</Description>
                         <div className="grid grid-cols-2 gap-1 mt-2 max-h-35 overflow-y-auto">
-                            {categories.map(category => {
+                            {allCategories.map(category => {
                                     return (<label key={category} className="flex items-center space-x-2 cursor-pointer mt-2">
                                         <Checkbox
                                             className="group size-6 rounded-md bg-white/10 p-1 ring-1 ring-gray-300 ring-inset focus:outline-none data-checked:bg-indigo-600"
-                                            checked={keywords.includes(category)}
-                                            onChange={() => toggle(category, keywords, setKeywords)}
+                                            checked={categories.includes(category)}
+                                            onChange={() => toggle(category, categories, setCategories)}
                                         >
                                         <CheckIcon className="hidden size-4 fill-black group-data-checked:block" />
                                         </Checkbox>
@@ -257,7 +259,7 @@ const CreateListing = () => {
                             <p className="mt-1 text-sm text-red-600">{errors.remarks[0]}</p>
                         )}
                     </Field>
-                    <Button style={{ marginTop: "10px" }} className="inline-flex items-center gap-2 rounded-md bg-gray-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-gray-600 data-open:bg-gray-700">
+                    <Button type="submit" style={{ marginTop: "10px" }} className="inline-flex items-center gap-2 rounded-md bg-gray-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-gray-600 data-open:bg-gray-700">
                         Post Listing
                     </Button>
                 </Fieldset>
