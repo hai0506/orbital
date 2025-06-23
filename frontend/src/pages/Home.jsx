@@ -1,29 +1,53 @@
-import React from 'react'
-import { Avatar, Button, Card } from "@chakra-ui/react"
-import { useNavigate } from "react-router-dom";
-import '../styles/form.css';
+import React, { useEffect, useState } from 'react';
+import api from '../api';
+import Layout from "../components/Layout";
+import Listing from '../components/Listing';
+import listings from '../data/Listings';
 
 const Home = () => {
-  const username = localStorage.getItem("username");
-  const navigate = useNavigate()
-  return (
-    <div className='center-container'>
-      <Card.Root width="320px">
-        <Card.Body gap="2">
-          <Avatar.Root size="lg" shape="rounded">
-            <Avatar.Fallback name={username} />
-          </Avatar.Root>
-          <Card.Title mt="2">Hello, {username}!</Card.Title>
-          <Card.Description>
-            That's it for now. See you at the end of the month!
-          </Card.Description>
-        </Card.Body>
-        <Card.Footer justifyContent="flex-end">
-          <Button onClick={() => navigate("/logout")}>Log Out</Button>
-        </Card.Footer>
-      </Card.Root>
-    </div>
-  )
-}
+  const [role, setRole] = useState(null);
+  //const [listings, setListings] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-export default Home
+  useEffect(() => {
+    async function fetchProfileAndListings() {
+      try {
+        const userProfile = await api.get('core/user/profile/');
+        setRole(userProfile.data.role);
+        /*
+        if (profileRes.data.role === 'vendor') {
+          const listingsRes = await api.get('core/posts/');
+          setListings(listingsRes.data);
+        }
+        */
+      } catch (error) {
+        console.error('Failed to load profile or listings:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchProfileAndListings();
+  }, []);
+
+  return (
+    <>
+      <Layout method="Listings">
+        {role === "vendor" && (
+          <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 grid grid-cols-3 gap-4">
+            {listings.map((listing, index) => (
+              <Listing key={listing.id || index} fields={listing} />
+            ))}
+          </div>
+        )}
+        {role === "organization" && (
+          <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+            <p>Hello organization</p>
+          </div>
+        )}
+      </Layout>
+    </>
+  );
+};
+
+export default Home;
