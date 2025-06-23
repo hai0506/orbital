@@ -10,21 +10,7 @@ class Vendor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='vendor_user')
     
 class Category(models.Model):
-    # categories = ["Food & Beverages",
-    #     "Accessories",
-    #     "Stationery",
-    #     "Clothing",
-    #     "Toys",
-    #     "Books",
-    #     "Home Decor",
-    #     "Art & Crafts",
-    #     "Tech Gadgets",
-    #     "Skincare & Beauty",
-    #     "Plants",
-    #     "Pet Supplies",]
-
-    # value = models.CharField(choices=categories, primary_key=True)
-    value = models.CharField(primary_key=True)
+    value = models.CharField(max_length=50, primary_key=True)
 
     def __str__(self):
         return self.value

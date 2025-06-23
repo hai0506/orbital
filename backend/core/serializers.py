@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import *
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError as DjangoValidationError
-
+from datetime import datetime
 
 class UserSerializer(serializers.ModelSerializer):
     user_type = serializers.ChoiceField(choices=['Organization','Vendor'], write_only=True)
@@ -45,13 +45,42 @@ class JobPostSerializer(serializers.ModelSerializer):
             'attachment', 'author', 'categories', 'category_list'
         ]
 
+    def validate(self, data):
+        start_dt = datetime.combine(data.get('start_date'), data.get('start_time'))
+        end_dt = datetime.combine(data.get('end_date'), data.get('end_time'))
+        now=datetime.now()
+
+        if start_dt >= end_dt:
+            raise serializers.ValidationError("Start datetime must be before end datetime.")
+        
+        if start_dt < now:
+            raise serializers.ValidationError("Start datetime cannot be in the past.")
+        
+        return data 
+
     def create(self, validated_data):
         keyword_values = validated_data.pop('category_list', []) 
         
         post = JobPost.objects.create(**validated_data)
         k = []
+        categories = ["Food & Beverages",
+            "Accessories",
+            "Stationery",
+            "Clothing",
+            "Toys",
+            "Books",
+            "Home Decor",
+            "Art & Crafts",
+            "Tech Gadgets",
+            "Skincare & Beauty",
+            "Plants",
+            "Pet Supplies",]
         for value in keyword_values:
-            keyword_obj, _ = Category.objects.get_or_create(value=value)
-            k.append(keyword_obj)
+            if value in categories:
+                keyword_obj, _ = Category.objects.get_or_create(value=value)
+                k.append(keyword_obj)
+            else:
+                raise serializers.ValidationError("Category not in specified list.")
         post.categories.set(k)
         return post
+    
