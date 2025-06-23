@@ -29,8 +29,8 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 class JobPostSerializer(serializers.ModelSerializer):
-    keyword_list = serializers.ListField(write_only=True, required=False)
-    keywords = serializers.SlugRelatedField(  # for output
+    category_list = serializers.ListField(write_only=True, required=False)
+    categories = serializers.SlugRelatedField(  # for output
         many=True,
         read_only=True,
         slug_field='value'
@@ -42,17 +42,16 @@ class JobPostSerializer(serializers.ModelSerializer):
         fields = [
             'post_id', 'title', 'location', 'start_date', 'end_date',
             'start_time', 'end_time', 'remarks', 'commission',
-            'attachment', 'author', 'keywords', 'keyword_list'
+            'attachment', 'author', 'categories', 'category_list'
         ]
 
     def create(self, validated_data):
-        keyword_values = validated_data.pop('keyword_list', []) 
+        keyword_values = validated_data.pop('category_list', []) 
         
         post = JobPost.objects.create(**validated_data)
         k = []
-        for v in keyword_values:
-            value = v.strip().lower()
-            keyword_obj, _ = Keyword.objects.get_or_create(value=value)
+        for value in keyword_values:
+            keyword_obj, _ = Category.objects.get_or_create(value=value)
             k.append(keyword_obj)
-        post.keywords.set(k)
+        post.categories.set(k)
         return post
