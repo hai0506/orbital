@@ -17,6 +17,7 @@ const Home = () => {
         if (role === 'vendor') {
           const listingsRes = await api.get('core/posts/');
           setListings(listingsRes.data);
+          listings.map(listing => console.log(listing));
         }
       } catch (error) {
         console.error('Failed to load profile or listings:', error);
