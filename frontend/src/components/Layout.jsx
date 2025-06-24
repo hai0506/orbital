@@ -1,6 +1,6 @@
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -8,6 +8,7 @@ function classNames(...classes) {
 
 export default function Layout({ heading, children }) {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     localStorage.clear();
@@ -24,9 +25,9 @@ export default function Layout({ heading, children }) {
   }
 
   const vendorNavigation = [
-    { name: 'Listings', href: '/', current: true },
-    { name: 'Offers', href: '/offers', current: false },
-    { name: 'Fundraisers', href: '/fundraisers', current: false },
+    { name: 'Listings', href: '/' },
+    { name: 'Offers', href: '/offers' },
+    { name: 'Fundraisers', href: '/fundraisers' },
   ]
 
   const orgNavigation = [
@@ -60,19 +61,20 @@ export default function Layout({ heading, children }) {
                 </div>
                 <div className="hidden md:block">
                   <div className="ml-10 flex items-baseline space-x-4">
-                    {navigation.map((item) => (
-                      <Link
+                    {navigation.map((item) => {
+                      const isActive = location.pathname === item.href;
+                      return (<Link
                         key={item.name}
                         to={item.href}
-                        aria-current={item.current ? 'page' : undefined}
+                        aria-current={isActive ? 'page' : undefined}
                         className={classNames(
-                          item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                          isActive ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                           'rounded-md px-3 py-2 text-sm font-medium',
                         )}
                       >
                         {item.name}
-                      </Link>
-                    ))}
+                      </Link>)
+                    })}
                   </div>
                 </div>
               </div>
