@@ -3,13 +3,14 @@ import api from '../api';
 import Layout from "../components/Layout";
 import Listing from '../components/Listing';
 // JSON mock data
-import listings from '../data/Listings';
+import listings from '../data/Listings'; // comment this out
 
 const Home = () => {
-  //const [listings, setListings] = useState([]);
-  //const [loading, setLoading] = useState(true);
+  //const [listings, setListings] = useState([]); // uncomment this
+  //const [loading, setLoading] = useState(true); // this as well
   const role = localStorage.getItem("ROLE");
 
+  // uncomment this section to test job creation
   /*
   useEffect(() => {
     async function fetchListings() {
