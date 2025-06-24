@@ -92,6 +92,7 @@ const CreateListing = () => {
                         <Description className="text-sm/6 text-black/50">What do you want to call your fundraiser?</Description>
                         <div className="relative">
                             <Input 
+                                required
                                 type="text" 
                                 value={title}
                                 onChange={e => setTitle(e.target.value)}
@@ -111,6 +112,7 @@ const CreateListing = () => {
                         <Description className="text-sm/6 text-black/50">Where will the fundraiser be held?</Description>
                         <div className="relative">
                             <Input 
+                                required
                                 type="text" 
                                 value={location}
                                 onChange={e => setLocation(e.target.value)}
@@ -130,6 +132,7 @@ const CreateListing = () => {
                         <Description className="text-sm/6 text-black/50">Start date of the fundraiser</Description>
                         <div className="relative">
                             <Input 
+                                required
                                 type="date" 
                                 value={startDate}
                                 onChange={e => setStartDate(e.target.value)}
@@ -147,6 +150,7 @@ const CreateListing = () => {
                         <Description className="text-sm/6 text-black/50">End date of the fundraiser</Description>
                         <div className="relative">
                             <Input 
+                                required
                                 type="date" 
                                 value={endDate}
                                 min={startDate}
@@ -168,6 +172,7 @@ const CreateListing = () => {
                         <Description className="text-sm/6 text-black/50">Start time of the fundraiser</Description>
                         <div className="relative">
                             <Input 
+                                required
                                 type="time" 
                                 value={startTime}
                                 min={minTime}
@@ -186,6 +191,7 @@ const CreateListing = () => {
                         <Description className="text-sm/6 text-black/50">End time of the fundraiser</Description>
                         <div className="relative">
                             <Input 
+                                required
                                 type="time" 
                                 value={endTime}
                                 min={startTime}
@@ -226,6 +232,7 @@ const CreateListing = () => {
                             What % of revenue do you want as commission?
                         </Description>
                         <Input 
+                            required
                             type="number" 
                             value={commission}
                             min={1}
