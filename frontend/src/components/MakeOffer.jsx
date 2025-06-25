@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Description, Field, Fieldset, Input, Label, Button, Select, Textarea, Checkbox } from '@headlessui/react'
 import { ChevronDownIcon, CheckIcon } from '@heroicons/react/20/solid'
+import { useNavigate } from 'react-router-dom'
 import clsx from 'clsx'
 
 export default function MakeOffer({ dates, categories }) {
@@ -10,13 +11,43 @@ export default function MakeOffer({ dates, categories }) {
     const [otherCategories, setOtherCategories] = useState("");
     const [commission, setCommission] = useState(30);
     const [remarks, setRemarks] = useState("");
+    const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(false);
 
+    const navigate = useNavigate();
     const toggle = (target, arr, setArr) => {
         arr.includes(target) ? setArr(arr.filter(item => item !== target)) : setArr([...arr, target]);
     }
 
+    const handleSubmit = async (e) => {
+        setLoading(true);
+        e.preventDefault();
+        console.log("Making offer")
+
+        try {
+            const info = {
+                all_days: allDays, 
+                selected_days: selectedDays,
+                selected_categories: selectedCategories,
+                other_categories: otherCategories,
+                commission,
+                remarks,
+            }
+
+            console.log("Sending info:", info);
+            const route = "core/make-offer/"; // change this if needed
+            const res = await api.post(route, info)
+            navigate("/")
+        } catch (error) {
+            console.log(error)
+            setErrors(error.response.data)
+        } finally {
+            setLoading(false)
+        }
+    }
+
     return (
-        <form className="w-full max-w-lg px-4">
+        <form onSubmit={handleSubmit} className="w-full max-w-lg px-4">
             <Fieldset>
                 <Field>
                     <Label className="text-base/7 font-medium text-black">Dates</Label>
@@ -38,6 +69,9 @@ export default function MakeOffer({ dates, categories }) {
                             className="group pointer-events-none absolute top-2.5 right-2.5 size-4 fill-black/60"
                             aria-hidden="true"
                         />
+                        {errors.all_days && (
+                            <p className="mt-1 text-sm text-red-600">{errors.all_days[0]}</p>
+                        )}
                     </div>
                 </Field>
                 {allDays === "No" && (
@@ -57,6 +91,9 @@ export default function MakeOffer({ dates, categories }) {
                                 </label>
                             ))}
                         </div>
+                        {errors.selected_days && (
+                            <p className="mt-1 text-sm text-red-600">{errors.selected_days[0]}</p>
+                        )}
                     </Field>
                 )}
                 <Field>
@@ -86,6 +123,9 @@ export default function MakeOffer({ dates, categories }) {
                             <span className="text-sm text-gray-700">Others</span>
                         </label>
                     </div>
+                    {errors.selected_categories && (
+                        <p className="mt-1 text-sm text-red-600">{errors.selected_categories[0]}</p>
+                    )}
                 </Field>
                 <Field>
                         {selectedCategories.includes("Others") && (
@@ -98,6 +138,9 @@ export default function MakeOffer({ dates, categories }) {
                                 )}
                                 rows={2}
                             />
+                        )}
+                        {errors.other_categories && (
+                            <p className="mt-1 text-sm text-red-600">{errors.other_categories[0]}</p>
                         )}
                 </Field>
                 <Field>
@@ -115,6 +158,9 @@ export default function MakeOffer({ dates, categories }) {
                                 '*:text-black'
                             )}
                     />
+                    {errors.commission && (
+                        <p className="mt-1 text-sm text-red-600">{errors.other_categories[0]}</p>
+                    )}
                 </Field>
                 <Field>
                     <Label className="text-base/7 font-medium text-black">Remarks</Label>
@@ -131,10 +177,10 @@ export default function MakeOffer({ dates, categories }) {
                         rows={3}
                     />
                 </Field>
+                <Button type="submit" style={{ marginTop: "10px" }} className="inline-flex items-center gap-2 rounded-md bg-gray-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-gray-600 data-open:bg-gray-700">
+                    Make Offer
+                </Button>
             </Fieldset>
-            <Button style={{ marginTop: "10px" }} className="inline-flex items-center gap-2 rounded-md bg-gray-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-gray-600 data-open:bg-gray-700">
-                Make Offer
-            </Button>
         </form>
     )
 }
