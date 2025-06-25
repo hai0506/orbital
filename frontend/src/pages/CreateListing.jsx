@@ -92,7 +92,6 @@ const CreateListing = () => {
                         <Description className="text-sm/6 text-black/50">What do you want to call your fundraiser?</Description>
                         <div className="relative">
                             <Input 
-                                required
                                 type="text" 
                                 value={title}
                                 onChange={e => setTitle(e.target.value)}
@@ -112,7 +111,6 @@ const CreateListing = () => {
                         <Description className="text-sm/6 text-black/50">Where will the fundraiser be held?</Description>
                         <div className="relative">
                             <Input 
-                                required
                                 type="text" 
                                 value={location}
                                 onChange={e => setLocation(e.target.value)}
@@ -132,7 +130,6 @@ const CreateListing = () => {
                         <Description className="text-sm/6 text-black/50">Start date of the fundraiser</Description>
                         <div className="relative">
                             <Input 
-                                required
                                 type="date" 
                                 value={startDate}
                                 onChange={e => setStartDate(e.target.value)}
@@ -145,12 +142,11 @@ const CreateListing = () => {
                             />
                         </div>
                         {errors.start_date && (
-                            <p className="mt-1 text-sm text-red-600">{errors.startDate[0]}</p>
+                            <p className="mt-1 text-sm text-red-600">{errors.start_date[0]}</p>
                         )}
                         <Description className="text-sm/6 text-black/50">End date of the fundraiser</Description>
                         <div className="relative">
                             <Input 
-                                required
                                 type="date" 
                                 value={endDate}
                                 // min={startDate}
@@ -163,8 +159,8 @@ const CreateListing = () => {
                                     )}
                             />
                         </div>
-                        {errors.endDate && (
-                            <p className="mt-1 text-sm text-red-600">{errors.endDate[0]}</p>
+                        {errors.end_date && (
+                            <p className="mt-1 text-sm text-red-600">{errors.end_date[0]}</p>
                         )}
                     </Field>
                     <Field>
@@ -172,7 +168,6 @@ const CreateListing = () => {
                         <Description className="text-sm/6 text-black/50">Start time of the fundraiser</Description>
                         <div className="relative">
                             <Input 
-                                required
                                 type="time" 
                                 value={startTime}
                                 // min={minTime}
@@ -185,13 +180,12 @@ const CreateListing = () => {
                                 )}
                             />
                         </div>
-                        {errors.startTime && (
-                            <p className="mt-1 text-sm text-red-600">{errors.startTime[0]}</p>
+                        {errors.start_time && (
+                            <p className="mt-1 text-sm text-red-600">{errors.start_time[0]}</p>
                         )}
                         <Description className="text-sm/6 text-black/50">End time of the fundraiser</Description>
                         <div className="relative">
                             <Input 
-                                required
                                 type="time" 
                                 value={endTime}
                                 // min={startTime}
@@ -204,8 +198,8 @@ const CreateListing = () => {
                                     )}
                             />
                         </div>
-                        {errors.endTime && (
-                            <p className="mt-1 text-sm text-red-600">{errors.endTime[0]}</p>
+                        {errors.end_time && (
+                            <p className="mt-1 text-sm text-red-600">{errors.end_time[0]}</p>
                         )}
                     </Field>
                     <Field>
@@ -232,7 +226,6 @@ const CreateListing = () => {
                             What % of revenue do you want as commission?
                         </Description>
                         <Input 
-                            required
                             type="number" 
                             value={commission}
                             min={0}
