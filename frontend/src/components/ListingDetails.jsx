@@ -14,7 +14,7 @@ const ListingDetails = ({ fields }) => {
     return (
         <>
             <h3 className="text-lg font-semibold text-gray-900 mb-3">{fields["title"]}</h3>
-            <CategoryTags categories={fields.categories}/>
+            <CategoryTags categories={fields.category_list}/>
             <dl style={{ marginTop: "10px" }} className="space-y-2">
                 <div className="flex text-sm text-gray-700">
                     <MapPinned className="mr-2" />
