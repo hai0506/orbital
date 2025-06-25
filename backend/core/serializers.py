@@ -50,7 +50,8 @@ class JobPostSerializer(serializers.ModelSerializer):
         if not data.get('title').strip():
             raise serializers.ValidationError({'title': "Title cannot be blank."})
         # location
-        if not data.get('title').strip():
+        # earlier it said 'title'
+        if not data.get('location').strip():
             raise serializers.ValidationError({'location': "Location cannot be blank."})
         # time
         start_date = data.get('start_date')
@@ -61,15 +62,17 @@ class JobPostSerializer(serializers.ModelSerializer):
         start_dt = datetime.combine(start_date, start_time)
         end_dt = datetime.combine(end_date, end_time)
         now=datetime.now()
+        # create a today date object also and have error msgs for start/end date cannot be in the past
+        # cos if the timing was not correct, user may be confused
 
         if start_date > end_date:
-            raise serializers.ValidationError({'endDate': "End date cannot be before start date."})
+            raise serializers.ValidationError({'end_date': "End date cannot be before start date."})
         else:
             if start_dt >= end_dt:
-                raise serializers.ValidationError({'endTime': "Start time cannot be after end time."})
+                raise serializers.ValidationError({'end_time': "Start time cannot be after end time."})
         
         if start_dt < now:
-            raise serializers.ValidationError({'startTime': "Start time cannot be in the past."})
+            raise serializers.ValidationError({'start_time': "Start time cannot be in the past."})
         
         return data 
 
@@ -95,7 +98,7 @@ class JobPostSerializer(serializers.ModelSerializer):
                 keyword_obj, _ = Category.objects.get_or_create(value=value)
                 k.append(keyword_obj)
             else:
-                raise serializers.ValidationError({'category': "Category not in specified list."})
+                raise serializers.ValidationError({'category_list': "Category not in specified list."})
         post.categories.set(k)
         return post
     
