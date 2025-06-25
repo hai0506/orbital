@@ -46,15 +46,30 @@ class JobPostSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, data):
-        start_dt = datetime.combine(data.get('start_date'), data.get('start_time'))
-        end_dt = datetime.combine(data.get('end_date'), data.get('end_time'))
+        # title
+        if not data.get('title').strip():
+            raise serializers.ValidationError({'title': "Title cannot be blank."})
+        # location
+        if not data.get('title').strip():
+            raise serializers.ValidationError({'location': "Location cannot be blank."})
+        # time
+        start_date = data.get('start_date')
+        end_date = data.get('end_date')
+        start_time = data.get('start_time')
+        end_time =data.get('end_time')
+        
+        start_dt = datetime.combine(start_date, start_time)
+        end_dt = datetime.combine(end_date, end_time)
         now=datetime.now()
 
-        if start_dt >= end_dt:
-            raise serializers.ValidationError("Start datetime must be before end datetime.")
+        if start_date > end_date:
+            raise serializers.ValidationError({'endDate': "End date cannot be before start date."})
+        else:
+            if start_dt >= end_dt:
+                raise serializers.ValidationError({'endTime': "Start time cannot be after end time."})
         
         if start_dt < now:
-            raise serializers.ValidationError("Start datetime cannot be in the past.")
+            raise serializers.ValidationError({'startTime': "Start time cannot be in the past."})
         
         return data 
 
@@ -80,7 +95,7 @@ class JobPostSerializer(serializers.ModelSerializer):
                 keyword_obj, _ = Category.objects.get_or_create(value=value)
                 k.append(keyword_obj)
             else:
-                raise serializers.ValidationError("Category not in specified list.")
+                raise serializers.ValidationError({'category': "Category not in specified list."})
         post.categories.set(k)
         return post
     

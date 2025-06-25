@@ -20,7 +20,7 @@ const CreateListing = () => {
     const [errors, setErrors] = useState({});
     const [currentTime, setCurrentTime] = useState(() => new Date().toTimeString().slice(0, 5)); 
     
-    const todayDate = new Date().toISOString().split("T")[0];
+    // const todayDate = new Date().toISOString().split("T")[0];
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -30,7 +30,7 @@ const CreateListing = () => {
         return () => clearInterval(interval); 
     }, []);
 
-    const minTime = startDate === todayDate ? currentTime : undefined;
+    // const minTime = startDate === todayDate ? currentTime : undefined;
 
     const toggle = (target, arr, setArr) => {
         arr.includes(target) ? setArr(arr.filter(item => item !== target)) : setArr([...arr, target]);
@@ -77,7 +77,7 @@ const CreateListing = () => {
             navigate("/")
         } catch (error) {
             console.log(error)
-            setErrors(error)
+            setErrors(error.response.data)
         } finally {
             setLoading(false)
         }
@@ -136,7 +136,7 @@ const CreateListing = () => {
                                 type="date" 
                                 value={startDate}
                                 onChange={e => setStartDate(e.target.value)}
-                                min={new Date().toISOString().split("T")[0]}
+                                // min={new Date().toISOString().split("T")[0]}
                                 className={clsx(
                                         'mt-3 block w-full appearance-none rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black',
                                         'focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25',
@@ -153,7 +153,7 @@ const CreateListing = () => {
                                 required
                                 type="date" 
                                 value={endDate}
-                                min={startDate}
+                                // min={startDate}
                                 disabled={!startDate}
                                 onChange={e => setEndDate(e.target.value)}
                                 className={clsx(
@@ -175,7 +175,7 @@ const CreateListing = () => {
                                 required
                                 type="time" 
                                 value={startTime}
-                                min={minTime}
+                                // min={minTime}
                                 disabled={!startDate}
                                 onChange={e => setStartTime(e.target.value)}
                                 className={clsx(
@@ -194,7 +194,7 @@ const CreateListing = () => {
                                 required
                                 type="time" 
                                 value={endTime}
-                                min={startTime}
+                                // min={startTime}
                                 disabled={!startTime}
                                 onChange={e => setEndTime(e.target.value)}
                                 className={clsx(
@@ -235,7 +235,7 @@ const CreateListing = () => {
                             required
                             type="number" 
                             value={commission}
-                            min={1}
+                            min={0}
                             max={100}
                             onChange={e => setCommission(e.target.value)}
                             className={clsx(
@@ -244,9 +244,9 @@ const CreateListing = () => {
                                     '*:text-black'
                                 )}
                         />
-                        {errors.commission && (
+                        {/* {errors.commission && (
                             <p className="mt-1 text-sm text-red-600">{errors.commission[0]}</p>
-                        )}
+                        )} */}
                     </Field>
                     <Field>
                         <Label className="text-base/7 font-medium text-black">Remarks</Label>  
