@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import api from '../api';
 import Layout from "../components/Layout";
 import Listing from '../components/Listing';
+import Offers from './Offers';
 // JSON mock data
 import listings from '../data/Listings'; // comment this out
 
@@ -43,11 +44,7 @@ const Home = () => {
           </Layout>
         )}
         {role === "organization" && (
-          <Layout heading="Offers">
-              <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                <p>Hello organization</p>
-              </div>
-          </Layout>
+          <Offers />
         )}
     </>
   );
