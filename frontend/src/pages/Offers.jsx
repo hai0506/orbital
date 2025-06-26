@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import Layout from '../components/Layout'
 import Offer from '../components/Offer'
+import VendorOffer from '../components/VendorOffer'
 import offers from '../data/Offers'
 
 const Offers = () => {
@@ -30,10 +31,16 @@ const Offers = () => {
 
     return (
         <Layout heading="Offers">
-            <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                {offers.map((offer, index) => (
-                    <Offer key={offer.id || index} fields={offer} />
-                ))}
+            <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 grid grid-cols-3 gap-4">
+                {offers.map((offer, index) => {
+                    if (role === "organization") {
+                        return <Offer key={offer.id || index} fields={offer} />;
+                    }
+                    if (role === "vendor") {
+                        return <VendorOffer key={offer.id || index} fields={offer} />;
+                    }
+                    return null;
+                })}
             </div>
         </Layout>
     )
