@@ -36,6 +36,30 @@ class JobPostSerializer(serializers.ModelSerializer):
         slug_field='value'
     )
     author = serializers.PrimaryKeyRelatedField(read_only=True)
+    start_date = serializers.DateField(
+        error_messages={
+            "invalid": "Enter a valid date in the format MM-DD-YYYY.",
+            "required": "This field is required."
+        }
+    )
+    end_date = serializers.DateField(
+        error_messages={
+            "invalid": "Enter a valid date in the format MM-DD-YYYY.",
+            "required": "End date is required."
+        }
+    )
+    start_time = serializers.TimeField(
+        error_messages={
+            "invalid": "Enter a valid time.",
+            "required": "Start time is required."
+        }
+    )
+    end_time = serializers.TimeField(
+        error_messages={
+            "invalid": "Enter a valid time.",
+            "required": "End time is required."
+        }
+    )
 
     class Meta:
         model = JobPost
@@ -62,8 +86,6 @@ class JobPostSerializer(serializers.ModelSerializer):
         start_dt = datetime.combine(start_date, start_time)
         end_dt = datetime.combine(end_date, end_time)
         now=datetime.now()
-        # create a today date object also and have error msgs for start/end date cannot be in the past
-        # cos if the timing was not correct, user may be confused
 
         if start_date > end_date:
             raise serializers.ValidationError({'end_date': "End date cannot be before start date."})
@@ -71,7 +93,9 @@ class JobPostSerializer(serializers.ModelSerializer):
             if start_dt >= end_dt:
                 raise serializers.ValidationError({'end_time': "Start time cannot be after end time."})
         
-        if start_dt < now:
+        if start_date < now.date():
+            raise serializers.ValidationError({'start_date': "Start date cannot be in the past."})
+        elif start_date == now.date() and start_dt < now:
             raise serializers.ValidationError({'start_time': "Start time cannot be in the past."})
         
         return data 
