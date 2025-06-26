@@ -109,8 +109,10 @@ class OfferListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self): 
-        # user = Organization.objects.get(user_id=1)
-        user = get_or_none(Organization, user=self.request.user)
-        if user:
-            return JobOffer.objects.filter(listing__author=user)
+        org = get_or_none(Organization, user=self.request.user)
+        vendor = get_or_none(Vendor, user=self.request.user)
+        if org:
+            return JobOffer.objects.filter(listing__author=org)
+        elif vendor:
+            return JobOffer.objects.filter(vendor=vendor)
         else: return JobOffer.objects.none()
