@@ -41,7 +41,6 @@ export default function Layout({ heading, children }) {
 
   const userNavigation = [
     { name: 'Your Profile', href: '/profile' },
-    { name: 'Settings', href: '/settings' },
     { name: 'Sign out', onClick: handleLogout },
   ];
 
