@@ -61,7 +61,8 @@ class PostListView(generics.ListAPIView): # view others posts and filters.
     serializer_class = JobPostSerializer
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self): # to filter: http://127.0.0.1:8000/core/posts/?categories=whatever1&categories=whatever2&...
+    def get_queryset(self):
+        # to filter: http://127.0.0.1:8000/core/posts/?categories=whatever1&categories=whatever2&...
         keyword_values = self.request.query_params.getlist('categories')
         combined_queryset = None
         if len(keyword_values) > 0:
@@ -71,10 +72,18 @@ class PostListView(generics.ListAPIView): # view others posts and filters.
                 if keyword:
                     if combined_queryset is None: combined_queryset = keyword.jobpost_set.all()
                     else: combined_queryset = combined_queryset.union(keyword.jobpost_set.all())
-            return combined_queryset
-        else: return JobPost.objects.all()
+        else: 
+            combined_queryset = JobPost.objects.all()
 
-class CreateOfferView(generics.ListCreateAPIView):
+        # hide posts that the vendor has already made offers for
+        vendor = get_or_none(Vendor, user=self.request.user)
+        if not vendor:
+            return combined_queryset
+        
+        offered_posts = JobPost.objects.filter(post_offers__vendor=vendor)
+        return combined_queryset.exclude(post_id__in=offered_posts.values_list('post_id', flat=True))
+
+class CreateOfferView(generics.ListCreateAPIView): # create and view own offers
     serializer_class = JobOfferSerializer
     permission_classes = [IsAuthenticated]
     
