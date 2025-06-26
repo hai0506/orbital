@@ -1,4 +1,4 @@
-import { MapPinned, Calendar1, Clock, HandCoins, X } from "lucide-react";
+import { MapPinned, Calendar1, Clock, HandCoins, Activity } from "lucide-react";
 import CategoryTags from "./CategoryTags";
 
 const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString("en-GB");
@@ -10,7 +10,7 @@ const formatTime = (timeStr) =>
         hour12: false,
     });
 
-const ListingDetails = ({ fields }) => {
+const ListingDetails = ({ fields, status }) => {
     return (
         <>
             <h3 className="text-lg font-semibold text-gray-900 mb-3">{fields["title"]}</h3>
@@ -32,6 +32,12 @@ const ListingDetails = ({ fields }) => {
                     <HandCoins className="mr-2" />
                     <dt className="font-medium">{fields.commission + "% of Total Revenue"}</dt>
                 </div>
+                {status && (
+                    <div className="flex text-sm text-gray-700">
+                        <Activity className="mr-2" />
+                        <dt className="font-medium">{status.charAt(0).toUpperCase() + status.slice(1)}</dt>
+                    </div>
+                )}
             </dl>
         </>
     )
