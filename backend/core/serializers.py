@@ -38,26 +38,26 @@ class JobPostSerializer(serializers.ModelSerializer):
     author = serializers.PrimaryKeyRelatedField(read_only=True)
     start_date = serializers.DateField(
         error_messages={
-            "invalid": "Enter a valid date in the format MM-DD-YYYY.",
-            "required": "This field is required."
+            'invalid': 'Enter a valid date in the format MM-DD-YYYY.',
+            'required': 'Start date is required.'
         }
     )
     end_date = serializers.DateField(
         error_messages={
-            "invalid": "Enter a valid date in the format MM-DD-YYYY.",
-            "required": "End date is required."
+            'invalid': 'Enter a valid date in the format MM-DD-YYYY.',
+            'required': 'End date is required.'
         }
     )
     start_time = serializers.TimeField(
         error_messages={
-            "invalid": "Enter a valid time.",
-            "required": "Start time is required."
+            'invalid': 'Enter a valid time.',
+            'required': 'Start time is required.'
         }
     )
     end_time = serializers.TimeField(
         error_messages={
-            "invalid": "Enter a valid time.",
-            "required": "End time is required."
+            'invalid': 'Enter a valid time.',
+            'required': 'End time is required.'
         }
     )
 
@@ -72,11 +72,11 @@ class JobPostSerializer(serializers.ModelSerializer):
     def validate(self, data):
         # title
         if not data.get('title').strip():
-            raise serializers.ValidationError({'title': "Title cannot be blank."})
+            raise serializers.ValidationError({'title': 'Title cannot be blank.'})
         # location
         # earlier it said 'title'
         if not data.get('location').strip():
-            raise serializers.ValidationError({'location': "Location cannot be blank."})
+            raise serializers.ValidationError({'location': 'Location cannot be blank.'})
         # time
         start_date = data.get('start_date')
         end_date = data.get('end_date')
@@ -88,16 +88,16 @@ class JobPostSerializer(serializers.ModelSerializer):
         now=datetime.now()
 
         if start_date > end_date:
-            raise serializers.ValidationError({'end_date': "End date cannot be before start date."})
+            raise serializers.ValidationError({'end_date': 'End date cannot be before start date.'})
         else:
             if start_dt >= end_dt:
-                raise serializers.ValidationError({'end_time': "Start time cannot be after end time."})
+                raise serializers.ValidationError({'end_time': 'Start time cannot be after end time.'})
         
         if start_date < now.date():
-            raise serializers.ValidationError({'start_date': "Start date cannot be in the past."})
+            raise serializers.ValidationError({'start_date': 'Start date cannot be in the past.'})
         elif start_date == now.date() and start_dt < now:
-            raise serializers.ValidationError({'start_time': "Start time cannot be in the past."})
-        
+            raise serializers.ValidationError({'start_time': 'Start time cannot be in the past.'})
+    
         return data 
 
     def create(self, validated_data):
@@ -122,7 +122,7 @@ class JobPostSerializer(serializers.ModelSerializer):
                 keyword_obj, _ = Category.objects.get_or_create(value=value)
                 k.append(keyword_obj)
             else:
-                raise serializers.ValidationError({'category_list': "Category not in specified list."})
+                raise serializers.ValidationError({'category_list': 'Category not in specified list.'})
         post = JobPost.objects.create(**validated_data)
         post.categories.set(k)
         return post
@@ -156,7 +156,18 @@ class JobOfferSerializer(serializers.ModelSerializer):
                 keyword_obj = Category.objects.get(value=value)
                 k.append(keyword_obj)
             else:
-                raise serializers.ValidationError({'category_list': "Category not in specified list."})
+                raise serializers.ValidationError({'category_list': 'Category not in specified list.'})
         offer = JobOffer.objects.create(**validated_data)
         offer.selectedCategories.set(k)
         return offer
+    
+    def validate(self, data):
+        # if not all days must select some days off
+        all_days = data.get('allDays')
+        selected_days = data.get('selectedDays') or []
+        if not all_days and not selected_days:
+            raise serializers.ValidationError({'selected_days': 'You must select at least one unavailable day.'})
+        
+        # status
+        if data.get('status') not in ['pending','approved','rejected']:
+            raise serializers.ValidationError({'status': 'Invalid status.'})

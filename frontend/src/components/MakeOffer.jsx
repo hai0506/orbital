@@ -159,7 +159,7 @@ export default function MakeOffer({ dates, categories }) {
                             )}
                     />
                     {errors.commission && (
-                        <p className="mt-1 text-sm text-red-600">{errors.other_categories[0]}</p>
+                        <p className="mt-1 text-sm text-red-600">{errors.commission[0]}</p>
                     )}
                 </Field>
                 <Field>

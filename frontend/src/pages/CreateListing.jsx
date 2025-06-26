@@ -228,8 +228,8 @@ const CreateListing = () => {
                         <Input 
                             type="number" 
                             value={commission}
-                            min={0}
-                            max={100}
+                            // min={0}
+                            // max={100}
                             onChange={e => setCommission(e.target.value)}
                             className={clsx(
                                     'mt-3 block w-full appearance-none rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black',
@@ -237,9 +237,9 @@ const CreateListing = () => {
                                     '*:text-black'
                                 )}
                         />
-                        {/* {errors.commission && (
+                        {errors.commission && (
                             <p className="mt-1 text-sm text-red-600">{errors.commission[0]}</p>
-                        )} */}
+                        )}
                     </Field>
                     <Field>
                         <Label className="text-base/7 font-medium text-black">Remarks</Label>  
