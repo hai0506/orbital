@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError
+from django.contrib.postgres.fields import ArrayField
 
 class Organization(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='organization_user')
@@ -37,6 +38,24 @@ class JobPost(models.Model):
     categories = models.ManyToManyField(Category, blank=True)
     author = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="job_posts")
 
-    def __str__(self):
-        return self.title
+    def delete(self, *args, **kwargs):
+        self.categories.clear()
+        super().delete(*args, **kwargs)
+
+class JobOffer(models.Model):
+    offer_id = models.AutoField(primary_key=True)
+    vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, related_name="vendor_offers")
+    listing = models.ForeignKey(JobPost, on_delete=models.CASCADE, related_name="post_offers")
+    allDays = models.BooleanField()
+    selectedDays = ArrayField(base_field=models.DateField(), blank=True, default=list)
+    selectedCategories = models.ManyToManyField(Category, blank=True, )
+    otherCategories = models.CharField(max_length=500)
+    commission = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)])
+    remarks = models.TextField(max_length=2000, blank=True)
+    status = models.CharField()
+    time_created = models.DateTimeField(auto_now_add=True)
+
+    def delete(self, *args, **kwargs):
+        self.selectedCategories.clear()
+        super().delete(*args, **kwargs)
 

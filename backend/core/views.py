@@ -74,3 +74,34 @@ class PostListView(generics.ListAPIView): # view others posts and filters.
             return combined_queryset
         else: return JobPost.objects.all()
 
+class CreateOfferView(generics.ListCreateAPIView):
+    serializer_class = JobOfferSerializer
+    permission_classes = [AllowAny]
+    
+    def get_queryset(self):
+        # vendor = get_or_none(Vendor, user=self.request.user)
+        # if vendor:
+        #     return JobOffer.filter(vendor=vendor)
+        # else: return JobOffer.objects.none()
+        return JobOffer.objects.none()
+
+    def perform_create(self, serializer):
+        vendor = Vendor.objects.get(user_id=2)
+        serializer.save(vendor=vendor)
+
+        # vendor = get_or_none(Vendor, user=self.request.user)
+        # if vendor:
+        #     serializer.save(vendor=vendor)
+        # else:
+        #     raise PermissionError('User cannot create offers')
+        
+class OfferListView(generics.ListAPIView):
+    serializer_class = JobOfferSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self): 
+        user = Organization.objects.get(user_id=1)
+        # user = get_or_none(Organization, user=self.request.user)
+        if user:
+            return JobOffer.objects.filter(listing__author=user)
+        else: return JobOffer.objects.none()

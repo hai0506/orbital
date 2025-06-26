@@ -7,12 +7,12 @@ import Offers from './Offers';
 import listings from '../data/Listings'; // comment this out
 
 const Home = () => {
-  //const [listings, setListings] = useState([]); // uncomment this
-  //const [loading, setLoading] = useState(true); // this as well
+  const [listings, setListings] = useState([]); // uncomment this
+  const [loading, setLoading] = useState(true); // this as well
   const role = localStorage.getItem("ROLE");
 
   // uncomment this section to test job creation
-  /*
+  // /*
   useEffect(() => {
     async function fetchListings() {
       try {
@@ -30,7 +30,7 @@ const Home = () => {
 
     fetchListings();
   }, []);
-  */
+  // */
 
   return (
     <>

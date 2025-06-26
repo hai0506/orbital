@@ -30,7 +30,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class JobPostSerializer(serializers.ModelSerializer):
     category_list = serializers.ListField(write_only=True, required=False)
-    categories = serializers.SlugRelatedField(  # for output
+    categories = serializers.SlugRelatedField(
         many=True,
         read_only=True,
         slug_field='value'
@@ -103,7 +103,6 @@ class JobPostSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         keyword_values = validated_data.pop('category_list', []) 
         
-        post = JobPost.objects.create(**validated_data)
         k = []
         categories = ["Food & Beverages",
             "Accessories",
@@ -117,12 +116,47 @@ class JobPostSerializer(serializers.ModelSerializer):
             "Skincare & Beauty",
             "Plants",
             "Pet Supplies",]
+    
         for value in keyword_values:
             if value in categories:
                 keyword_obj, _ = Category.objects.get_or_create(value=value)
                 k.append(keyword_obj)
             else:
                 raise serializers.ValidationError({'category_list': "Category not in specified list."})
+        post = JobPost.objects.create(**validated_data)
         post.categories.set(k)
         return post
     
+class JobOfferSerializer(serializers.ModelSerializer):
+    category_list = serializers.ListField(write_only=True, required=False)
+    selectedCategories = serializers.SlugRelatedField(
+        many=True,
+        read_only=True,
+        slug_field='value'
+    )
+
+    vendor = serializers.PrimaryKeyRelatedField(read_only=True)
+    listing = serializers.PrimaryKeyRelatedField(queryset=JobPost.objects.all())
+
+    class Meta:
+        model = JobOffer
+        fields = [
+            'offer_id', 'vendor', 'listing', 'allDays', 'selectedDays',
+            'selectedCategories', 'category_list', 'otherCategories', 'remarks', 'commission',
+            'status', 'time_created'
+        ]
+
+    def create(self, validated_data):
+        keyword_values = validated_data.pop('category_list', []) 
+        listing = validated_data.get('listing')
+        k = []
+        categories = [cat.value for cat in listing.categories.all()]
+        for value in keyword_values:
+            if value in categories:
+                keyword_obj = Category.objects.get(value=value)
+                k.append(keyword_obj)
+            else:
+                raise serializers.ValidationError({'category_list': "Category not in specified list."})
+        offer = JobOffer.objects.create(**validated_data)
+        offer.selectedCategories.set(k)
+        return offer
