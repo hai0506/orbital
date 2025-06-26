@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import *
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError as DjangoValidationError
-
+from datetime import datetime
 
 class UserSerializer(serializers.ModelSerializer):
     user_type = serializers.ChoiceField(choices=['Organization','Vendor'], write_only=True)
@@ -29,26 +29,100 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 class JobPostSerializer(serializers.ModelSerializer):
-    keyword_list = serializers.ListField(write_only=True, required=False)
-    keywords = serializers.SlugRelatedField(  # for output
+    category_list = serializers.ListField(write_only=True, required=False)
+    categories = serializers.SlugRelatedField(  # for output
         many=True,
         read_only=True,
         slug_field='value'
     )
     author = serializers.PrimaryKeyRelatedField(read_only=True)
+    start_date = serializers.DateField(
+        error_messages={
+            "invalid": "Enter a valid date in the format MM-DD-YYYY.",
+            "required": "This field is required."
+        }
+    )
+    end_date = serializers.DateField(
+        error_messages={
+            "invalid": "Enter a valid date in the format MM-DD-YYYY.",
+            "required": "End date is required."
+        }
+    )
+    start_time = serializers.TimeField(
+        error_messages={
+            "invalid": "Enter a valid time.",
+            "required": "Start time is required."
+        }
+    )
+    end_time = serializers.TimeField(
+        error_messages={
+            "invalid": "Enter a valid time.",
+            "required": "End time is required."
+        }
+    )
 
     class Meta:
         model = JobPost
-        fields = ['post_id','title','location','start_date','end_date','start_time','end_time','content','commission','time_created','attachment','author','keywords','keyword_list']
+        fields = [
+            'post_id', 'title', 'location', 'start_date', 'end_date',
+            'start_time', 'end_time', 'remarks', 'commission',
+            'attachment', 'author', 'categories', 'category_list'
+        ]
+
+    def validate(self, data):
+        # title
+        if not data.get('title').strip():
+            raise serializers.ValidationError({'title': "Title cannot be blank."})
+        # location
+        # earlier it said 'title'
+        if not data.get('location').strip():
+            raise serializers.ValidationError({'location': "Location cannot be blank."})
+        # time
+        start_date = data.get('start_date')
+        end_date = data.get('end_date')
+        start_time = data.get('start_time')
+        end_time =data.get('end_time')
+        
+        start_dt = datetime.combine(start_date, start_time)
+        end_dt = datetime.combine(end_date, end_time)
+        now=datetime.now()
+
+        if start_date > end_date:
+            raise serializers.ValidationError({'end_date': "End date cannot be before start date."})
+        else:
+            if start_dt >= end_dt:
+                raise serializers.ValidationError({'end_time': "Start time cannot be after end time."})
+        
+        if start_date < now.date():
+            raise serializers.ValidationError({'start_date': "Start date cannot be in the past."})
+        elif start_date == now.date() and start_dt < now:
+            raise serializers.ValidationError({'start_time': "Start time cannot be in the past."})
+        
+        return data 
 
     def create(self, validated_data):
-        keyword_values = validated_data.pop('keyword_list', []) 
+        keyword_values = validated_data.pop('category_list', []) 
         
         post = JobPost.objects.create(**validated_data)
         k = []
-        for v in keyword_values:
-            value = v.strip().lower()
-            keyword_obj, _ = Keyword.objects.get_or_create(value=value)
-            k.append(keyword_obj)
-        post.keywords.set(k)
+        categories = ["Food & Beverages",
+            "Accessories",
+            "Stationery",
+            "Clothing",
+            "Toys",
+            "Books",
+            "Home Decor",
+            "Art & Crafts",
+            "Tech Gadgets",
+            "Skincare & Beauty",
+            "Plants",
+            "Pet Supplies",]
+        for value in keyword_values:
+            if value in categories:
+                keyword_obj, _ = Category.objects.get_or_create(value=value)
+                k.append(keyword_obj)
+            else:
+                raise serializers.ValidationError({'category_list': "Category not in specified list."})
+        post.categories.set(k)
         return post
+    

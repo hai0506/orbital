@@ -1,20 +1,21 @@
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import { Link, useNavigate } from 'react-router-dom';
-import Listing from './Listing'
-import listings from '../data/Listings'
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-export default function Layout({ method, children }) {
+export default function Layout({ heading, children }) {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     localStorage.clear();
     navigate('/login');
   };
+
+  const role = localStorage.getItem("ROLE");
 
   const user = {
     name: 'Tom Cook',
@@ -23,10 +24,19 @@ export default function Layout({ method, children }) {
       'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
   }
 
-  const navigation = [
-    { name: 'Listings', href: '#', current: true },
-    { name: 'Fundraisers', href: '#', current: false },
+  const vendorNavigation = [
+    { name: 'Listings', href: '/' },
+    { name: 'Offers', href: '/offers' },
+    { name: 'Fundraisers', href: '/fundraisers' },
   ]
+
+  const orgNavigation = [
+    { name: 'Offers', href: '/', current: true },
+    { name: 'Create Listing', href: '/create', current: false },
+    { name: 'Fundraisers', href: '/fundraisers', current: false },
+  ]
+
+  const navigation = role === 'vendor' ? vendorNavigation : orgNavigation;
       
 
   const userNavigation = [
@@ -51,19 +61,20 @@ export default function Layout({ method, children }) {
                 </div>
                 <div className="hidden md:block">
                   <div className="ml-10 flex items-baseline space-x-4">
-                    {navigation.map((item) => (
-                      <a
+                    {navigation.map((item) => {
+                      const isActive = location.pathname === item.href;
+                      return (<Link
                         key={item.name}
-                        href={item.href}
-                        aria-current={item.current ? 'page' : undefined}
+                        to={item.href}
+                        aria-current={isActive ? 'page' : undefined}
                         className={classNames(
-                          item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                          isActive ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                           'rounded-md px-3 py-2 text-sm font-medium',
                         )}
                       >
                         {item.name}
-                      </a>
-                    ))}
+                      </Link>)
+                    })}
                   </div>
                 </div>
               </div>
@@ -179,7 +190,7 @@ export default function Layout({ method, children }) {
 
         <header className="bg-white shadow-sm">
           <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-bold tracking-tight text-gray-900">{method}</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-gray-900">{heading}</h1>
           </div>
         </header>
         <main>

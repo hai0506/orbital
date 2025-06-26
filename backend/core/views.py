@@ -61,13 +61,13 @@ class PostListView(generics.ListAPIView): # view others posts and filters.
     serializer_class = JobPostSerializer
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self): # to filter: http://127.0.0.1:8000/core/posts/?keywords=whatever1&keywords=whatever2&...
-        keyword_values = self.request.query_params.getlist('keywords')
+    def get_queryset(self): # to filter: http://127.0.0.1:8000/core/posts/?categories=whatever1&categories=whatever2&...
+        keyword_values = self.request.query_params.getlist('categories')
         combined_queryset = None
         if len(keyword_values) > 0:
             for v in keyword_values:
                 value = v.strip().lower()
-                keyword = get_or_none(Keyword, value = value)
+                keyword = get_or_none(Category, value = value)
                 if keyword:
                     if combined_queryset is None: combined_queryset = keyword.jobpost_set.all()
                     else: combined_queryset = combined_queryset.union(keyword.jobpost_set.all())

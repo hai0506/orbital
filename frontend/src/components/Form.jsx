@@ -37,7 +37,17 @@ const Form = ({route, method}) => {
                 localStorage.setItem(ACCESS_TOKEN, res.data.access)
                 localStorage.setItem(REFRESH_TOKEN, res.data.refresh)
                 localStorage.setItem("username", username)
+
+                try {
+                    const profileRes = await api.get("core/user/profile/");
+                    const role = profileRes.data.role;
+                    localStorage.setItem("ROLE", role);  
+                } catch (err) {
+                    console.error("Failed to fetch user profile after login:", err);
+                }
+
                 navigate("/")
+                console.log("Going home")
             } else {
                 navigate("/login")
             }
