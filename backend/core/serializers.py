@@ -174,7 +174,7 @@ class JobOfferSerializer(serializers.ModelSerializer):
         
         # status
         if data.get('status') not in ['pending','approved','rejected']:
-            raise serializers.ValidationError({'status': 'Invalid status.'})\
+            raise serializers.ValidationError({'status': 'Invalid status.'}) 
             
         return data
     
@@ -183,4 +183,11 @@ class JobOfferSerializer(serializers.ModelSerializer):
             "id": obj.vendor.id,
             "username": obj.vendor.user.username,
             "email": obj.vendor.user.email
+        }
+    
+    def get_listing_details(self, obj):
+        return {
+            "title": obj.listing_details.title,
+            "location": obj.listing_details.location,
+            "commission": obj.listing_details.commission
         }
