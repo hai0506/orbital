@@ -148,6 +148,9 @@ class JobOfferSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         keyword_values = validated_data.pop('category_list', []) 
+        allDays_data = validated_data.pop('allDays') 
+        if allDays_data == 'Yes': allDays=True
+        else: allDays=False
         listing = validated_data.get('listing')
         k = []
         categories = [cat.value for cat in listing.categories.all()]
@@ -157,7 +160,7 @@ class JobOfferSerializer(serializers.ModelSerializer):
                 k.append(keyword_obj)
             else:
                 raise serializers.ValidationError({'category_list': 'Category not in specified list.'})
-        offer = JobOffer.objects.create(**validated_data)
+        offer = JobOffer.objects.create(**validated_data,allDays=allDays)
         offer.selectedCategories.set(k)
         return offer
     
