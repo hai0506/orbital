@@ -80,7 +80,7 @@ const VendorOffer = ({fields}) => {
                                         <div className="flex flex-wrap gap-3">
                                             {(fields.selectedCategories ?? []).map((category) => (
                                                 <span
-                                                    className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${fields.listing.category_list.includes(category) ? "bg-green-100 text-green-800" : "bg-orange-100 text-orange-800"}`}
+                                                    className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${fields.listing.categories.includes(category) ? "bg-green-100 text-green-800" : "bg-orange-100 text-orange-800"}`}
                                                 >
                                                     {category}
                                                 </span>
