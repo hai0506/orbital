@@ -4,10 +4,10 @@ import { Description, Field, Fieldset, Input, Label, Button, Select, Textarea, C
 import MakeOffer from "./MakeOffer";
 import ListingDetails from "./ListingDetails";
 
-const VendorOffer = ({fields}) => {
+const VendorOffer = ({offer}) => {
     const [hovered, setHovered] = useState(false);
     const [open, setOpen] = useState(false);
-    const status = fields.status;
+    const status = offer.status;
     const statusColours = {
         pending: "bg-yellow-300",
         approved: "bg-green-300",
@@ -20,7 +20,7 @@ const VendorOffer = ({fields}) => {
                 onMouseLeave={() => setHovered(false)} 
                 className={`border border-gray-300 rounded-lg p-4 shadow-sm ${statusColours[status]} max-w-md`}
             >
-                <ListingDetails fields={fields.listing} status={status} />
+                <ListingDetails fields={offer.listing} status={status} />
 
 
                 <button
@@ -47,14 +47,14 @@ const VendorOffer = ({fields}) => {
                     >
                         <div className="flex h-full w-full">
                             <div className="w-[50%] p-4">
-                                <ListingDetails fields={fields.listing} />
+                                <ListingDetails fields={offer.listing} />
                             </div>
 
                             <div className="w-[70%] border-l border-gray-300 p-4">
                                 <Fieldset className="w-full max-w-lg px-4">
                                     <Field>
                                         <Label className="text-base/7 font-medium text-black">Dates</Label>
-                                        {fields.allDays === "Yes" ? (
+                                        {offer.allDays === "Yes" ? (
                                             <div className="flex items-center gap-2 text-sm text-green-600">
                                                 <CircleCheckBig className="size-4" />
                                                 <span>Able to make it on all days</span>
@@ -66,7 +66,7 @@ const VendorOffer = ({fields}) => {
                                                     <span>Unable to make it on these days:</span>
                                                 </div>
                                                     <ul className="pl-6 list-none space-y-1">
-                                                        {fields.selectedDays.map((day, index) => (
+                                                        {offer.selectedDays.map((day, index) => (
                                                             <li key={index} className="flex items-center gap-2">
                                                             <span>{new Intl.DateTimeFormat('en-GB').format(day)}</span>
                                                             </li>
@@ -78,9 +78,9 @@ const VendorOffer = ({fields}) => {
                                     <Field>
                                         <Label className="text-base/7 font-medium text-black">Products</Label>
                                         <div className="flex flex-wrap gap-3">
-                                            {(fields.selectedCategories ?? []).map((category) => (
+                                            {(offer.selectedCategories ?? []).map((category) => (
                                                 <span
-                                                    className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${fields.listing.categories.includes(category) ? "bg-green-100 text-green-800" : "bg-orange-100 text-orange-800"}`}
+                                                    className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${offer.listing.categories.includes(category) ? "bg-green-100 text-green-800" : "bg-orange-100 text-orange-800"}`}
                                                 >
                                                     {category}
                                                 </span>
@@ -89,27 +89,27 @@ const VendorOffer = ({fields}) => {
                                     </Field>
                                     <Field>
                                         <Label className="text-base/7 font-medium text-black">Commission</Label>
-                                        {fields.commission >= fields.listing.commission 
+                                        {offer.commission >= offer.listing.commission 
                                             ?   ( 
                                                     <div className="flex items-center gap-2 text-sm text-green-600">
                                                         <CircleCheckBig className="size-4" />
-                                                        <span>{fields.commission}% of revenue</span>
+                                                        <span>{offer.commission}% of revenue</span>
                                                     </div>
                                                 )
                                             :   ( 
                                                     <div className="flex items-center gap-2 text-sm text-red-600">
                                                         <CircleX className="size-4" />
-                                                        <span>{fields.commission}% of revenue ({fields.listing.commission - fields.commission}% less)</span>
+                                                        <span>{offer.commission}% of revenue ({offer.listing.commission - offer.commission}% less)</span>
                                                     </div>
                                                 )
                                         }
                                     </Field>
                                     <Field>
-                                        {fields.remarks && (
+                                        {offer.remarks && (
                                             <>
                                                 <Label className="text-base/7 font-medium text-black">Remarks</Label>
                                                 <div className="flex items-center gap-2 text-sm">
-                                                    {fields.remarks}
+                                                    {offer.remarks}
                                                 </div>
                                             </>
                                         )}
