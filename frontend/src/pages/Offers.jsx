@@ -2,32 +2,30 @@ import { useState, useEffect } from 'react'
 import Layout from '../components/Layout'
 import Offer from '../components/Offer'
 import VendorOffer from '../components/VendorOffer'
-import offers from '../data/Offers'
+import api from '../api'
+//import offers from '../data/Offers'
 
 const Offers = () => {
     const role = localStorage.getItem("ROLE");
-    //const [offers, setOffers] = useState([]);
+    const [offers, setOffers] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     // uncomment this section to test job creation
-    /*
     useEffect(() => {
         async function fetchOffers() {
-        try {
-            if (role === 'organization') {
+            try {
                 const offersRes = await api.get('core/offers/');
                 setOffers(offersRes.data);
-                offers.map(offer => console.log(offer));
+                console.log('Offers received:', offersRes.data); 
+            } catch (error) {
+                console.error('Failed to load offers:', error);
+            } finally {
+                setLoading(false);
             }
-        } catch (error) {
-            console.error('Failed to load offers:', error);
-        } finally {
-            setLoading(false);
-        }
         }
 
         fetchOffers();
     }, []);
-    */
 
     return (
         <Layout heading="Offers">
