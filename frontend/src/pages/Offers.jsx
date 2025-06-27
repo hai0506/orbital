@@ -11,6 +11,7 @@ const Offers = () => {
     const [loading, setLoading] = useState(false);
 
     // uncomment this section to test job creation
+    // /*
     useEffect(() => {
         async function fetchOffers() {
             try {
@@ -26,16 +27,17 @@ const Offers = () => {
 
         fetchOffers();
     }, []);
+    // */
 
     return (
         <Layout heading="Offers">
             <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 grid grid-cols-3 gap-4">
                 {offers.map((offer, index) => {
                     if (role === "organization") {
-                        return <Offer key={offer.id || index} fields={offer} />;
+                        return <Offer key={offer.id || index} offer={offer} />;
                     }
                     if (role === "vendor") {
-                        return <VendorOffer key={offer.id || index} fields={offer} />;
+                        return <VendorOffer key={offer.id || index} offer={offer} />;
                     }
                     return null;
                 })}
