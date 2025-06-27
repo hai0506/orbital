@@ -116,3 +116,16 @@ class OfferListView(generics.ListAPIView):
         elif vendor:
             return JobOffer.objects.filter(vendor=vendor)
         else: return JobOffer.objects.none()
+
+class UpdateOfferStatusView(generics.RetrieveUpdateAPIView):
+    serializer_class = OfferStatusSerializer
+    permission_classes = [AllowAny]
+    def get_queryset(self): 
+        return JobOffer.objects.all()
+        org = get_or_none(Organization, user=self.request.user)
+        if org:
+            return JobOffer.objects.filter(listing__author=org)
+        else: return JobOffer.objects.none()
+
+    lookup_field = 'offer_id' # to edit: go http://127.0.0.1:8000/core/edit-offer/<whatever product id>/
+    

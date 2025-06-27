@@ -7,4 +7,5 @@ urlpatterns = [
     path('user/profile/', get_user_profile, name='user-profile'),
     path("create-offer/", CreateOfferView.as_view(), name="create-offer"),
     path("offers/", OfferListView.as_view(), name="offer-list"),
+    path('edit-offer-status/<int:offer_id>/', UpdateOfferStatusView.as_view(), name='edit-offer-status'),
 ]

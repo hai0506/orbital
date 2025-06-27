@@ -188,10 +188,6 @@ class JobOfferSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'selectedDays': 'You must select at least one unavailable day.'})
         elif all_days and selected_days:
             raise serializers.ValidationError({'selectedDays': 'Are you available for every day of the event?'})
-        
-        # status validate on update
-        if self.instance and data.get('status') not in ['pending','approved','rejected']:
-            raise serializers.ValidationError({'status': 'Invalid status.'})
             
         return data
     
@@ -206,3 +202,13 @@ class JobOfferSerializer(serializers.ModelSerializer):
                 "email": vendor.user.email,
             }
         return rep
+
+class OfferStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = JobOffer
+        fields = ['status']
+
+    def validate_status(self, value):
+        if value not in ['pending', 'approved', 'rejected']:
+            raise serializers.ValidationError({'status': 'Invalid status.'})
+        return value
