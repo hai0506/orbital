@@ -14,7 +14,7 @@ const Offer = ({fields}) => {
                 onMouseLeave={() => setHovered(false)} 
                 className="border border-gray-300 rounded-lg p-4 shadow-sm bg-white max-w-md"
             >
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">{fields.vendor}</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">{fields.vendor.username}</h3>
                 <dl style={{ marginTop: "10px" }} className="space-y-2">
                     <div className="flex text-sm text-gray-700">
                         <BriefcaseBusiness className="mr-2" />
@@ -79,7 +79,7 @@ const Offer = ({fields}) => {
                                         <div className="flex flex-wrap gap-3">
                                             {(fields.selectedCategories ?? []).map((category) => (
                                                 <span
-                                                    className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${fields.listing.category_list.includes(category) ? "bg-green-100 text-green-800" : "bg-orange-100 text-orange-800"}`}
+                                                    className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${fields.listing.categories.includes(category) ? "bg-green-100 text-green-800" : "bg-orange-100 text-orange-800"}`}
                                                 >
                                                     {category}
                                                 </span>
