@@ -135,8 +135,9 @@ class JobOfferSerializer(serializers.ModelSerializer):
         slug_field='value'
     )
 
-    vendor = serializers.PrimaryKeyRelatedField(read_only=True)
+    vendor = serializers.SerializerMethodField(read_only=True)
     listing = serializers.PrimaryKeyRelatedField(queryset=JobPost.objects.all())
+    listing_details = JobPostSerializer(source="listing",read_only=True)
 
     class Meta:
         model = JobOffer
@@ -176,3 +177,10 @@ class JobOfferSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'status': 'Invalid status.'})\
             
         return data
+    
+    def get_vendor(self, obj):
+        return {
+            "id": obj.vendor.id,
+            "username": obj.vendor.user.username,
+            "email": obj.vendor.user.email
+        }
