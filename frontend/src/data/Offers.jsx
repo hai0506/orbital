@@ -1,18 +1,21 @@
 const listing = {
     title: "Project 1",
     location: "National University of Singapore",
-    start_date: "2025-06-17",
-    end_date: "2025-06-29",
-    start_time: "08:45:00",
-    end_time: "13:45:00",
-    commission: "30",
-    categories: ["Art & Crafts", "Accessories", "Books"]
-}
+    start_date: new Date("2025-06-17"),
+    end_date: new Date("2025-06-29"),
+    start_time: new Date("2025-06-17T08:45:00"),
+    end_time: new Date("2025-06-17T13:45:00"),
+    commission: 30,
+    category_list: ["Art & Crafts", "Accessories", "Books"]
+  }
 
 const offers = [
   {
     listing: listing,
-    vendor: "Bob",
+    vendor: {
+      username: "Bob",
+      email: "test@test.com"
+    },
     allDays: "No",
     selectedDays: [new Date("2025-06-19"), new Date("2025-06-20")],
     selectedCategories: ["Art & Crafts", "Accessories"],
@@ -23,7 +26,10 @@ const offers = [
   },
   {
     listing: listing,
-    vendor: "Alice",
+    vendor: {
+      username: "vendor",
+      email: "test@test.com"
+    },
     allDays: "Yes",
     selectedDays: [],
     selectedCategories: ["Food & Beverages", "Tech Gadgets"],
@@ -34,7 +40,10 @@ const offers = [
   },
   {
     listing: listing,
-    vendor: "Charlie",
+    vendor: {
+      username: "Charlie",
+      email: "test@test.com"
+    },
     allDays: "No",
     selectedDays: [new Date("2025-06-21")],
     selectedCategories: ["Clothing", "Books"],
@@ -45,7 +54,10 @@ const offers = [
   },
   {
     listing: listing,
-    vendor: "Diana",
+    vendor: {
+      username: "Diana",
+      email: "test@test.com"
+    },
     allDays: "Yes",
     selectedDays: [],
     selectedCategories: ["Plants", "Home Decor"],
@@ -56,7 +68,10 @@ const offers = [
   },
   {
     listing: listing,
-    vendor: "Ethan",
+    vendor: {
+      username: "Ethan",
+      email: "test@test.com"
+    },
     allDays: "No",
     selectedDays: [new Date("2025-06-22"), new Date("2025-06-23")],
     selectedCategories: ["Skincare & Beauty", "Stationery"],
@@ -66,6 +81,7 @@ const offers = [
     status: "approved"
   }
 ];
+
 
 
 export default offers;
