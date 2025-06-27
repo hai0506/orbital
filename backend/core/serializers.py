@@ -144,7 +144,7 @@ class JobOfferSerializer(serializers.ModelSerializer):
         fields = [
             'offer_id', 'vendor', 'listing', 'allDays', 'selectedDays',
             'selectedCategories', 'category_list', 'otherCategories', 'remarks', 'commission',
-            'status', 'time_created'
+            'status', 'time_created','listing_details'
         ]
 
     def create(self, validated_data):
