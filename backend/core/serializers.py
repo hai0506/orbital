@@ -127,6 +127,15 @@ class JobPostSerializer(serializers.ModelSerializer):
         post.categories.set(k)
         return post
     
+class CharBooleanSerializer(serializers.BooleanField):
+    def to_internal_value(self, data):
+        if data == 'Yes': return True
+        elif data == 'No': return False
+        else: raise ValidationError({'char_boolean':'This field can only be Yes or No.'})
+
+    def to_representation(self, value):
+        return 'Yes' if value else 'No'
+
 class JobOfferSerializer(serializers.ModelSerializer):
     category_list = serializers.ListField(write_only=True, required=False)
     selectedCategories = serializers.SlugRelatedField(
@@ -135,23 +144,26 @@ class JobOfferSerializer(serializers.ModelSerializer):
         slug_field='value'
     )
 
-    vendor = serializers.SerializerMethodField(read_only=True)
+    vendor = serializers.PrimaryKeyRelatedField(read_only=True)
     listing = serializers.PrimaryKeyRelatedField(queryset=JobPost.objects.all())
-    listing_details = JobPostSerializer(source="listing",read_only=True)
+    allDays = CharBooleanSerializer()
 
     class Meta:
         model = JobOffer
         fields = [
             'offer_id', 'vendor', 'listing', 'allDays', 'selectedDays',
             'selectedCategories', 'category_list', 'otherCategories', 'remarks', 'commission',
-            'status', 'time_created','listing_details'
+            'status', 'time_created',
         ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance is None:
+            self.fields.pop('status') # dont query status on creation
 
     def create(self, validated_data):
         keyword_values = validated_data.pop('category_list', []) 
-        allDays_data = validated_data.pop('allDays') 
-        if allDays_data == 'Yes': allDays=True
-        else: allDays=False
+        validated_data['status'] = 'pending' # set default status
         listing = validated_data.get('listing')
         k = []
         categories = [cat.value for cat in listing.categories.all()]
@@ -161,7 +173,7 @@ class JobOfferSerializer(serializers.ModelSerializer):
                 k.append(keyword_obj)
             else:
                 raise serializers.ValidationError({'category_list': 'Category not in specified list.'})
-        offer = JobOffer.objects.create(**validated_data,allDays=allDays)
+        offer = JobOffer.objects.create(**validated_data)
         offer.selectedCategories.set(k)
         return offer
     
@@ -170,24 +182,24 @@ class JobOfferSerializer(serializers.ModelSerializer):
         all_days = data.get('allDays')
         selected_days = data.get('selectedDays') or []
         if not all_days and not selected_days:
-            raise serializers.ValidationError({'selected_days': 'You must select at least one unavailable day.'})
+            raise serializers.ValidationError({'selectedDays': 'You must select at least one unavailable day.'})
+        elif all_days and selected_days:
+            raise serializers.ValidationError({'selectedDays': 'Are you available for every day of the event?'})
         
-        # status
-        if data.get('status') not in ['pending','approved','rejected']:
-            raise serializers.ValidationError({'status': 'Invalid status.'}) 
+        # status validate on update
+        if self.instance and data.get('status') not in ['pending','approved','rejected']:
+            raise serializers.ValidationError({'status': 'Invalid status.'})
             
         return data
     
-    def get_vendor(self, obj):
-        return {
-            "id": obj.vendor.id,
-            "username": obj.vendor.user.username,
-            "email": obj.vendor.user.email
-        }
-    
-    def get_listing_details(self, obj):
-        return {
-            "title": obj.listing_details.title,
-            "location": obj.listing_details.location,
-            "commission": obj.listing_details.commission
-        }
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        rep['listing'] = JobPostSerializer(instance.listing).data
+        vendor = instance.vendor
+        if vendor:
+            rep['vendor'] = {
+                "id": vendor.id,
+                "username": vendor.user.username,
+                "email": vendor.user.email,
+            }
+        return rep
