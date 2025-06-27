@@ -80,7 +80,7 @@ export default function MakeOffer({ dates, listing }) {
                 {allDays === "No" && (
                     <Field>
                         <Description style={{ marginTop: "10px" }} className="text-sm/6 text-black/50">Which days are you unable to make it?</Description>
-                        <div className="grid grid-cols-2 gap-1 mt-2 max-h-35 overflow-y-auto">
+                        <div className="grid grid-cols-2 gap-1 mt-2 max-h-25 overflow-y-auto">
                             {dates.map(date => (
                                 <label key={date} className="flex items-center space-x-2 cursor-pointer mt-2">
                                     <Checkbox
@@ -102,7 +102,7 @@ export default function MakeOffer({ dates, listing }) {
                 <Field>
                     <Label className="text-base/7 font-medium text-black">Products</Label>
                     <Description className="text-sm/6 text-black/50">What will you be selling?</Description>
-                    <div className="grid grid-cols-2 gap-1 mt-2 max-h-35 overflow-y-auto">
+                    <div className="grid grid-cols-2 gap-1 mt-2 max-h-25 overflow-y-auto">
                         {(listing.categories ?? []).map(category => (
                             <label key={category} className="flex items-center space-x-2 cursor-pointer mt-2">
                                 <Checkbox
