@@ -170,4 +170,6 @@ class JobOfferSerializer(serializers.ModelSerializer):
         
         # status
         if data.get('status') not in ['pending','approved','rejected']:
-            raise serializers.ValidationError({'status': 'Invalid status.'})
+            raise serializers.ValidationError({'status': 'Invalid status.'})\
+            
+        return data

@@ -48,7 +48,7 @@ class JobOffer(models.Model):
     listing = models.ForeignKey(JobPost, on_delete=models.CASCADE, related_name="post_offers")
     allDays = models.BooleanField()
     selectedDays = ArrayField(base_field=models.DateField(), blank=True, default=list)
-    selectedCategories = models.ManyToManyField(Category, blank=True, )
+    selectedCategories = models.ManyToManyField(Category, blank=True)
     otherCategories = models.CharField(max_length=500)
     commission = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)])
     remarks = models.TextField(max_length=2000, blank=True)
