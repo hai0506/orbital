@@ -4,7 +4,7 @@ import Layout from "../components/Layout";
 import Listing from '../components/Listing';
 import Offers from './Offers';
 // JSON mock data
-import listings from '../data/Listings'; // comment this out
+//import listings from '../data/Listings'; // comment this out
 
 const Home = () => {
   const [listings, setListings] = useState([]); // uncomment this
@@ -22,7 +22,7 @@ const Home = () => {
           listings.map(listing => console.log(listing));
         }
       } catch (error) {
-        console.error('Failed to load profile or listings:', error);
+        console.error('Failed to load listings:', error);
       } finally {
         setLoading(false);
       }
