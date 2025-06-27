@@ -25,11 +25,15 @@ export default function MakeOffer({ dates, listing }) {
         e.preventDefault();
         console.log("Making offer")
 
+        const selectedDaysFormatted = selectedDays.map(d =>
+            d instanceof Date ? d.toISOString().split('T')[0] : d
+        );
+
         try {
             const info = {
                 listing: listing.post_id,
                 allDays, 
-                selectedDays,
+                selectedDays: selectedDaysFormatted,
                 category_list: selectedCategories,
                 otherCategories,
                 commission,
@@ -143,7 +147,7 @@ export default function MakeOffer({ dates, listing }) {
                             />
                         )}
                         {errors.otherCategories && (
-                            <p className="mt-1 text-sm text-red-600">{errors.otherCategories[0]}</p>
+                            <p className="mt-1 text-sm text-red-600">{errors.otherCategories}</p>
                         )}
                 </Field>
                 <Field>

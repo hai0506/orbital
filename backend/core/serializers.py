@@ -172,7 +172,10 @@ class JobOfferSerializer(serializers.ModelSerializer):
                 keyword_obj = Category.objects.get(value=value)
                 k.append(keyword_obj)
             else:
-                raise serializers.ValidationError({'category_list': 'Category not in specified list.'})
+                if value == 'Others':
+                    if validated_data.get('otherCategories') == '':
+                        raise serializers.ValidationError({'otherCategories': 'Please specify other products.'})
+                else: raise serializers.ValidationError({'category_list': 'Category not in specified list.'})
         offer = JobOffer.objects.create(**validated_data)
         offer.selectedCategories.set(k)
         return offer
