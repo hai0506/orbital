@@ -6,7 +6,7 @@ const listing = {
     start_time: "08:45:00",
     end_time: "13:45:00",
     commission: "30",
-    category_list: ["Art & Crafts", "Accessories", "Books"]
+    categories: ["Art & Crafts", "Accessories", "Books"]
 }
 
 const offers = [
