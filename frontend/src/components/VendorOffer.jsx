@@ -68,7 +68,7 @@ const VendorOffer = ({offer}) => {
                                                     <ul className="pl-6 list-none space-y-1">
                                                         {offer.selectedDays.map((day, index) => (
                                                             <li key={index} className="flex items-center gap-2">
-                                                            <span>{new Intl.DateTimeFormat('en-GB').format(day)}</span>
+                                                            <span>{new Intl.DateTimeFormat('en-GB').format(new Date(day))}</span>
                                                             </li>
                                                         ))}
                                                     </ul>
