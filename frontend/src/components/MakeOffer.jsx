@@ -2,9 +2,10 @@ import { useState } from 'react'
 import { Description, Field, Fieldset, Input, Label, Button, Select, Textarea, Checkbox } from '@headlessui/react'
 import { ChevronDownIcon, CheckIcon } from '@heroicons/react/20/solid'
 import { useNavigate } from 'react-router-dom'
+import api from '../api'
 import clsx from 'clsx'
 
-export default function MakeOffer({ dates, categories }) {
+export default function MakeOffer({ dates, listing }) {
     const [allDays, setAllDays] = useState("Yes");
     const [selectedDays, setSelectedDays] = useState([]);
     const [selectedCategories, setSelectedCategories] = useState([]);
@@ -26,18 +27,20 @@ export default function MakeOffer({ dates, categories }) {
 
         try {
             const info = {
-                all_days: allDays, 
-                selected_days: selectedDays,
-                selected_categories: selectedCategories,
-                other_categories: otherCategories,
+                listing: listing.post_id,
+                allDays, 
+                selectedDays,
+                category_list: selectedCategories,
+                otherCategories,
                 commission,
                 remarks,
+                status: "pending"
             }
 
             console.log("Sending info:", info);
-            const route = "core/make-offer/"; // change this if needed
+            const route = "core/create-offer/"; // change this if needed
             const res = await api.post(route, info)
-            navigate("/")
+            navigate("/offers")
         } catch (error) {
             console.log(error)
             setErrors(error.response.data)
@@ -69,8 +72,8 @@ export default function MakeOffer({ dates, categories }) {
                             className="group pointer-events-none absolute top-2.5 right-2.5 size-4 fill-black/60"
                             aria-hidden="true"
                         />
-                        {errors.all_days && (
-                            <p className="mt-1 text-sm text-red-600">{errors.all_days[0]}</p>
+                        {errors.allDays && (
+                            <p className="mt-1 text-sm text-red-600">{errors.allDays[0]}</p>
                         )}
                     </div>
                 </Field>
@@ -91,8 +94,8 @@ export default function MakeOffer({ dates, categories }) {
                                 </label>
                             ))}
                         </div>
-                        {errors.selected_days && (
-                            <p className="mt-1 text-sm text-red-600">{errors.selected_days[0]}</p>
+                        {errors.selectedDays && (
+                            <p className="mt-1 text-sm text-red-600">{errors.selectedDays[0]}</p>
                         )}
                     </Field>
                 )}
@@ -100,7 +103,7 @@ export default function MakeOffer({ dates, categories }) {
                     <Label className="text-base/7 font-medium text-black">Products</Label>
                     <Description className="text-sm/6 text-black/50">What will you be selling?</Description>
                     <div className="grid grid-cols-2 gap-1 mt-2 max-h-35 overflow-y-auto">
-                        {(categories ?? []).map(category => (
+                        {(listing.categories ?? []).map(category => (
                             <label key={category} className="flex items-center space-x-2 cursor-pointer mt-2">
                                 <Checkbox
                                     checked={selectedCategories.includes(category)}
@@ -123,8 +126,8 @@ export default function MakeOffer({ dates, categories }) {
                             <span className="text-sm text-gray-700">Others</span>
                         </label>
                     </div>
-                    {errors.selected_categories && (
-                        <p className="mt-1 text-sm text-red-600">{errors.selected_categories[0]}</p>
+                    {errors.selectedCategories && (
+                        <p className="mt-1 text-sm text-red-600">{errors.selectedCategories[0]}</p>
                     )}
                 </Field>
                 <Field>
@@ -139,8 +142,8 @@ export default function MakeOffer({ dates, categories }) {
                                 rows={2}
                             />
                         )}
-                        {errors.other_categories && (
-                            <p className="mt-1 text-sm text-red-600">{errors.other_categories[0]}</p>
+                        {errors.otherCategories && (
+                            <p className="mt-1 text-sm text-red-600">{errors.otherCategories[0]}</p>
                         )}
                 </Field>
                 <Field>
