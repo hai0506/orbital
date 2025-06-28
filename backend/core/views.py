@@ -83,7 +83,7 @@ class PostListView(generics.ListAPIView): # view others posts and filters.
         offered_posts = JobPost.objects.filter(post_offers__vendor=vendor)
         return combined_queryset.exclude(post_id__in=offered_posts.values_list('post_id', flat=True))
 
-class CreateOfferView(generics.ListCreateAPIView): # create and view own offers
+class CreateOfferView(generics.CreateAPIView): # create offers
     serializer_class = JobOfferSerializer
     permission_classes = [IsAuthenticated]
     
@@ -112,7 +112,7 @@ class OfferListView(generics.ListAPIView):
         org = get_or_none(Organization, user=self.request.user)
         vendor = get_or_none(Vendor, user=self.request.user)
         if org:
-            return JobOffer.objects.filter(listing__author=org)
+            return JobOffer.objects.filter(listing__author=org, status='pending')
         elif vendor:
             return JobOffer.objects.filter(vendor=vendor)
         else: return JobOffer.objects.none()
@@ -122,12 +122,20 @@ class UpdateOfferStatusView(generics.RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated]
     def get_queryset(self): 
         org = get_or_none(Organization, user=self.request.user)
-        vendor = get_or_none(Vendor, user=self.request.user)
+        # vendor = get_or_none(Vendor, user=self.request.user)
         if org:
             return JobOffer.objects.filter(listing__author=org, status='pending')
-        elif vendor:
-            return JobOffer.objects.filter(vendor=vendor)
-        else: return JobOffer.objects.none()
+        # elif vendor:
+        #     return JobOffer.objects.filter(vendor=vendor)
+        else: 
+            raise PermissionError('User cannot edit offer status')
 
-    lookup_field = 'offer_id' # to edit: go http://127.0.0.1:8000/core/edit-offer/<whatever product id>/
+    lookup_field = 'offer_id' # to edit: go http://127.0.0.1:8000/core/edit-offer-status/<whatever product id>/
     
+class DeleteOfferView(generics.RetrieveDestroyAPIView):
+    serializer_class = JobOfferSerializer
+    permission_classes = [AllowAny]
+    def get_queryset(self): 
+        return JobOffer.objects.all()
+
+    lookup_field = 'offer_id' # http://127.0.0.1:8000/core/delete-offer/<product id>/
