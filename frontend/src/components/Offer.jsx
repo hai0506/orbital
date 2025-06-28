@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { X, BriefcaseBusiness, CircleCheckBig, CircleX } from "lucide-react";
 import api from "../api";
-import { Field, Label, Button } from '@headlessui/react'
+import { Field, Fieldset, Label, Button } from '@headlessui/react'
 import ListingDetails from "./ListingDetails";
 
-const Offer = ({offer}) => {
+const Offer = ({ offer, onChangeStatus }) => {
     const [hovered, setHovered] = useState(false);
     const [open, setOpen] = useState(false);
     const [errors, setErrors] = useState({});
@@ -16,13 +16,13 @@ const Offer = ({offer}) => {
 
         try {
             const info = {
-                offer: offer.offer_id,
                 status: status
             }
 
             console.log("Sending info:", info);
-            const route = ""; // change this if needed
-            const res = await api.post(route, info);
+            const route = `core/edit-offer-status/${offer.offer_id}/`; // change this if needed
+            const res = await api.patch(route, info);
+            onChangeStatus(offer.offer_id);
             setOpen(false);
         } catch (error) {
             console.log(error)
@@ -74,7 +74,7 @@ const Offer = ({offer}) => {
                             </div>
 
                             <div className="w-[70%] border-l border-gray-300 p-4">
-                                <offeret className="w-full max-w-lg px-4">
+                                <Fieldset className="w-full max-w-lg px-4">
                                     <Field>
                                         <Label className="text-base/7 font-medium text-black">Dates</Label>
                                         {offer.allDays === "Yes" ? (
@@ -138,14 +138,14 @@ const Offer = ({offer}) => {
                                         )}
                                     </Field>
 
-                                    <Button onClick={() => handleSubmit("accepted")} style={{ marginTop: "10px", marginRight: "10px" }} className="inline-flex items-center gap-2 rounded-md bg-green-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-green-600 data-open:bg-green-700">
-                                        Accept Offer
+                                    <Button onClick={() => handleSubmit("approved")} style={{ marginTop: "10px", marginRight: "10px" }} className="inline-flex items-center gap-2 rounded-md bg-green-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-green-600 data-open:bg-green-700">
+                                        Approve Offer
                                     </Button>
 
                                     <Button onClick={() => handleSubmit("rejected")} style={{ marginTop: "10px" }} className="inline-flex items-center gap-2 rounded-md bg-red-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-red-600 data-open:bg-red-700">
                                         Reject Offer
                                     </Button>
-                                </offeret>
+                                </Fieldset>
                             </div>
                         </div>
 
