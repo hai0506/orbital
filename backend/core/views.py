@@ -112,7 +112,7 @@ class OfferListView(generics.ListAPIView):
         org = get_or_none(Organization, user=self.request.user)
         vendor = get_or_none(Vendor, user=self.request.user)
         if org:
-            return JobOffer.objects.filter(listing__author=org)
+            return JobOffer.objects.filter(listing__author=org, status='pending')
         elif vendor:
             return JobOffer.objects.filter(vendor=vendor)
         else: return JobOffer.objects.none()
