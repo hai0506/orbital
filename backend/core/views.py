@@ -123,7 +123,7 @@ class UpdateOfferStatusView(generics.RetrieveUpdateAPIView):
     def get_queryset(self): 
         org = get_or_none(Organization, user=self.request.user)
         if org:
-            return JobOffer.objects.filter(listing__author=org)
+            return JobOffer.objects.filter(listing__author=org, status='pending')
         else: return JobOffer.objects.none()
 
     lookup_field = 'offer_id' # to edit: go http://127.0.0.1:8000/core/edit-offer/<whatever product id>/
