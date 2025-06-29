@@ -115,7 +115,7 @@ class OfferListView(generics.ListAPIView):
         if org:
             return JobOffer.objects.filter(listing__author=org, status='pending')
         elif vendor:
-            return JobOffer.objects.filter(vendor=vendor)
+            return JobOffer.objects.filter(vendor=vendor).exclude(status='confirmed')
         else: return JobOffer.objects.none()
 
 class UpdateOfferStatusView(generics.RetrieveUpdateAPIView):
