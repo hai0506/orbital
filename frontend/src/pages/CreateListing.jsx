@@ -74,7 +74,7 @@ const CreateListing = () => {
             console.log("Sending info:", info);
             const route = "core/create-post/";
             const res = await api.post(route, info)
-            navigate("/fundraisers")
+            navigate("/")
         } catch (error) {
             console.log(error)
             setErrors(error.response.data)
