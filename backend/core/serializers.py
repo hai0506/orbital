@@ -203,17 +203,20 @@ class JobOfferSerializer(serializers.ModelSerializer):
         return rep
 
 class OfferStatusSerializer(serializers.ModelSerializer):
+    agreement = serializers.BooleanField(write_only=True)
     class Meta:
         model = JobOffer
-        fields = ['status','inventory_file']
+        fields = ['status','inventory_file','agreement']
 
     def validate(self, data):
         value = data.get('status')
         file = data.get('inventory_file')
-        if value not in ['pending', 'approved', 'rejected','confirmed']:
+        if value not in ['pending', 'approved', 'rejected','confirmed','cancelled']:
             raise serializers.ValidationError({'status': 'Invalid status.'})
         if value == 'confirmed' and not file:
             raise serializers.ValidationError({'inventory_file': 'Must upload product inventory.'})
+        if value == 'confirmed' and not data.get('agreement'):
+            raise serializers.ValidationError({'agreement': 'User must agree to the Terms and Conditions.'})
         return data
     
 class FundraiserSerializer(serializers.ModelSerializer):
