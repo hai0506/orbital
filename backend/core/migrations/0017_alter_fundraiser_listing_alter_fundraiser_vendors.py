@@ -6,7 +6,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("core", "0016_remove_joboffer_othercategories"),
+        ('core', '0016_merge_20250629_1536'),  
     ]
 
     operations = [
