@@ -213,10 +213,13 @@ class OfferStatusSerializer(serializers.ModelSerializer):
         file = data.get('inventory_file')
         if value not in ['pending', 'approved', 'rejected','confirmed','cancelled']:
             raise serializers.ValidationError({'status': 'Invalid status.'})
-        if value == 'confirmed' and not file:
-            raise serializers.ValidationError({'inventory_file': 'Please upload product inventory.'})
-        if value == 'confirmed' and not data.get('agreement'):
-            raise serializers.ValidationError({'agreement': 'Please agree to the Terms and Conditions.'})
+        if value == 'confirmed':
+            if not file:
+                raise serializers.ValidationError({'inventory_file': 'Please upload product inventory.'})
+            elif (not file.name.endswith('.xlsx')) and (not file.name.endswith('.csv')):
+                raise serializers.ValidationError({'inventory_file': 'Please ensure file format is either .xlsx or .csv.'})
+            if not data.get('agreement'):
+                raise serializers.ValidationError({'agreement': 'Please agree to the Terms and Conditions.'})
         return data
     
 class FundraiserSerializer(serializers.ModelSerializer):
