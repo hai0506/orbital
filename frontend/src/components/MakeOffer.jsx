@@ -1,19 +1,22 @@
 import { useState } from 'react'
 import { Description, Field, Fieldset, Input, Label, Button, Select, Textarea, Checkbox } from '@headlessui/react'
 import { ChevronDownIcon, CheckIcon } from '@heroicons/react/20/solid'
+import allCategories from './AllCategories'
 import { useNavigate } from 'react-router-dom'
 import api from '../api'
 import clsx from 'clsx'
 
 export default function MakeOffer({ dates, listing }) {
+    const [categories, setCategories] = useState(allCategories);  
     const [allDays, setAllDays] = useState("Yes");
     const [selectedDays, setSelectedDays] = useState([]);
     const [selectedCategories, setSelectedCategories] = useState([]);
-    const [otherCategories, setOtherCategories] = useState("");
     const [commission, setCommission] = useState(30);
     const [remarks, setRemarks] = useState("");
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
+    const [editingOther, setEditingOther] = useState(false);
+    const [otherDraft, setOtherDraft] = useState("");                
 
     const navigate = useNavigate();
     const toggle = (target, arr, setArr) => {
@@ -35,7 +38,6 @@ export default function MakeOffer({ dates, listing }) {
                 allDays, 
                 selectedDays: selectedDaysFormatted,
                 category_list: selectedCategories,
-                otherCategories,
                 commission,
                 remarks,
                 status: "pending"
@@ -107,7 +109,7 @@ export default function MakeOffer({ dates, listing }) {
                     <Label className="text-base/7 font-medium text-black">Products</Label>
                     <Description className="text-sm/6 text-black/50">What will you be selling?</Description>
                     <div className="grid grid-cols-2 gap-1 mt-2 max-h-25 overflow-y-auto">
-                        {(listing.categories ?? []).map(category => (
+                        {categories.map(category => (
                             <label key={category} className="flex items-center space-x-2 cursor-pointer mt-2">
                                 <Checkbox
                                     checked={selectedCategories.includes(category)}
@@ -119,36 +121,65 @@ export default function MakeOffer({ dates, listing }) {
                                 <span className="text-sm text-gray-700">{category}</span>
                             </label>
                         ))}
-                        <label key="Others" className="flex items-center space-x-2 cursor-pointer mt-2">
+                        <label className="flex items-center space-x-2 cursor-pointer mt-2">
                             <Checkbox
-                                checked={selectedCategories.includes("Others")}
-                                onChange={() => toggle("Others", selectedCategories, setSelectedCategories)}
+                                checked={
+                                    editingOther
+                                        ? true
+                                        : otherDraft.trim()
+                                        ? selectedCategories.includes(otherDraft.trim())
+                                        : false
+                                }
+                                onChange={() => {
+                                    if (editingOther) return; 
+                                    setEditingOther(true);    
+                                }}
                                 className="group size-6 rounded-md bg-white/10 p-1 ring-1 ring-gray-300 ring-inset focus:outline-none data-checked:bg-indigo-600"
                             >
-                            <CheckIcon className="hidden size-4 fill-black group-data-checked:block" />
+                                <CheckIcon className="hidden size-4 fill-black group-data-checked:block" />
                             </Checkbox>
-                            <span className="text-sm text-gray-700">Others</span>
+
+                            {editingOther ? (
+                                <Input
+                                    type="text"
+                                    placeholder="Enter custom category"
+                                    className="text-sm text-gray-700 border rounded px-2 py-1"
+                                    value={otherDraft}
+                                    autoFocus
+                                    onChange={e => setOtherDraft(e.target.value)}
+                                    onKeyDown={e => {
+                                        if (e.key === "Enter") e.target.blur();
+                                    }}
+                                    onBlur={() => {
+                                        const value = otherDraft.trim();
+
+                                        if (value) {
+                                            if (!categories.includes(value)) {
+                                                setCategories(prev => [...prev, value]);
+                                            }
+                                            setSelectedCategories(prev =>
+                                                prev.includes(value) ? prev : [...prev, value]
+                                            );
+                                        }
+
+                                        setOtherDraft("");
+                                        setEditingOther(false);
+                                    }}
+                                />
+                            ) : (
+                                <span
+                                    className="text-sm text-gray-700"
+                                    onClick={() => setEditingOther(true)}
+                                    >
+                                    {otherDraft.trim() || "Others"}
+                                </span>
+                            )}
                         </label>
+
                     </div>
-                    {errors.selectedCategories && (
-                        <p className="mt-1 text-sm text-red-600">{errors.selectedCategories[0]}</p>
+                    {errors.category_list && (
+                        <p className="mt-1 text-sm text-red-600">{errors.category_list[0]}</p>
                     )}
-                </Field>
-                <Field>
-                        {selectedCategories.includes("Others") && (
-                            <Textarea
-                                value={otherCategories}
-                                onChange={e => setOtherCategories(e.target.value)}
-                                className={clsx(
-                                'mt-3 block w-full resize-none rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black',
-                                'focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25'
-                                )}
-                                rows={2}
-                            />
-                        )}
-                        {errors.otherCategories && (
-                            <p className="mt-1 text-sm text-red-600">{errors.otherCategories}</p>
-                        )}
                 </Field>
                 <Field>
                     <Label className="text-base/7 font-medium text-black">Commission</Label>
