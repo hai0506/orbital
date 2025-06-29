@@ -121,7 +121,7 @@ class UpdateOfferStatusView(generics.RetrieveUpdateAPIView):
     serializer_class = OfferStatusSerializer
     permission_classes = [AllowAny]
     def get_queryset(self): 
-        return JobOffer.objects.all()
+        # return JobOffer.objects.all()
         org = get_or_none(Organization, user=self.request.user)
         vendor = get_or_none(Vendor, user=self.request.user)
         if org:
@@ -130,16 +130,6 @@ class UpdateOfferStatusView(generics.RetrieveUpdateAPIView):
             return JobOffer.objects.filter(vendor=vendor)
         else: 
             raise PermissionError('User cannot edit offer status')
-        
-    def update(self, request, *args, **kwargs):
-        if request.data.get('status') == 'confirmed':
-            instance = self.get_object()
-            fundraiser,_ = Fundraiser.objects.get_or_create(listing=instance.listing)
-            fundraiser.vendors.add(instance)
-
-        return super().update(request, *args, **kwargs)
-
-
         
     def update(self, request, *args, **kwargs):
         if request.data.get('status') == 'confirmed':
@@ -167,11 +157,6 @@ class DeleteOfferView(generics.RetrieveDestroyAPIView):
 
     lookup_field = 'offer_id' # http://127.0.0.1:8000/core/delete-offer/<product id>/
 
-class FundraiserListView(generics.ListAPIView):
-    serializer_class = FundraiserSerializer
-    permission_classes = [AllowAny]
-    def get_queryset(self): 
-        return Fundraiser.objects.all()
 class FundraiserListView(generics.ListAPIView):
     serializer_class = FundraiserSerializer
     permission_classes = [IsAuthenticated]
