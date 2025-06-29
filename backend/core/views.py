@@ -159,7 +159,7 @@ class DeleteOfferView(generics.RetrieveDestroyAPIView):
     lookup_field = 'offer_id' # http://127.0.0.1:8000/core/delete-offer/<product id>/
 
 class FundraiserListView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     def get(self, request, *args, **kwargs):
         org = get_or_none(Organization, user=self.request.user)
         vendor = get_or_none(Vendor, user=self.request.user)
