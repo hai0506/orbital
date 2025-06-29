@@ -158,7 +158,7 @@ const VendorOffer = ({ offer, deleteOffer }) => {
                                         )}
 
                                         {status === "approved" && (
-                                            <ConfirmOffer/>
+                                            <ConfirmOffer id={offer.offer_id} />
                                         )}
                                             
                                         {status === "rejected" && (

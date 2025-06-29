@@ -122,7 +122,7 @@ class UpdateOfferStatusView(generics.RetrieveUpdateAPIView):
     serializer_class = OfferStatusSerializer
     permission_classes = [AllowAny]
     def get_queryset(self): 
-        return JobOffer.objects.all()
+        # return JobOffer.objects.all()
         org = get_or_none(Organization, user=self.request.user)
         vendor = get_or_none(Vendor, user=self.request.user)
         if org:

@@ -214,9 +214,9 @@ class OfferStatusSerializer(serializers.ModelSerializer):
         if value not in ['pending', 'approved', 'rejected','confirmed','cancelled']:
             raise serializers.ValidationError({'status': 'Invalid status.'})
         if value == 'confirmed' and not file:
-            raise serializers.ValidationError({'inventory_file': 'Must upload product inventory.'})
+            raise serializers.ValidationError({'inventory_file': 'Please upload product inventory.'})
         if value == 'confirmed' and not data.get('agreement'):
-            raise serializers.ValidationError({'agreement': 'User must agree to the Terms and Conditions.'})
+            raise serializers.ValidationError({'agreement': 'Please agree to the Terms and Conditions.'})
         return data
     
 class FundraiserSerializer(serializers.ModelSerializer):
