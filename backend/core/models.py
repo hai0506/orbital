@@ -53,9 +53,13 @@ class JobOffer(models.Model):
     remarks = models.TextField(max_length=2000, blank=True)
     status = models.CharField()
     time_created = models.DateTimeField(auto_now_add=True)
-    inventory_file = models.FileField(null=True, blank=True,upload_to='inventory_file/')
+    inventory_file = models.FileField(null=True, blank=True,upload_to='inventory_files/')
 
     def delete(self, *args, **kwargs):
         self.selectedCategories.clear()
         super().delete(*args, **kwargs)
 
+class Fundraiser(models.Model):
+    fundraiser_id = models.AutoField(primary_key=True)
+    vendors = models.ManyToManyField(JobOffer, related_name='fundraisers')
+    listing = models.ForeignKey(JobPost, on_delete=models.CASCADE, related_name='fundraisers')

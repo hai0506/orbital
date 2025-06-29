@@ -156,7 +156,7 @@ class JobOfferSerializer(serializers.ModelSerializer):
         fields = [
             'offer_id', 'vendor', 'listing', 'allDays', 'selectedDays',
             'selectedCategories', 'category_list', 'remarks', 'commission',
-            'status', 'time_created',
+            'status', 'time_created','inventory_file'
         ]
 
     def __init__(self, *args, **kwargs):
@@ -203,15 +203,34 @@ class JobOfferSerializer(serializers.ModelSerializer):
         return rep
 
 class OfferStatusSerializer(serializers.ModelSerializer):
+    agreement = serializers.BooleanField(write_only=True)
     class Meta:
         model = JobOffer
-        fields = ['status','inventory_file']
+        fields = ['status','inventory_file','agreement']
 
     def validate(self, data):
         value = data.get('status')
         file = data.get('inventory_file')
-        if value not in ['pending', 'approved', 'rejected','confirmed']:
+        if value not in ['pending', 'approved', 'rejected','confirmed','cancelled']:
             raise serializers.ValidationError({'status': 'Invalid status.'})
-        if value == 'confirmed' and not file:
-            raise serializers.ValidationError({'inventory_file': 'Must upload product inventory.'})
+        if value == 'confirmed':
+            if not file:
+                raise serializers.ValidationError({'inventory_list': 'Please upload product inventory.'})
+            elif (not file.name.endswith('.xlsx')) and (not file.name.endswith('.csv')):
+                raise serializers.ValidationError({'inventory_list': 'Please ensure file format is either .xlsx or .csv.'})
+            if not data.get('agreement'):
+                raise serializers.ValidationError({'agreement': 'Please agree to the Terms and Conditions.'})
         return data
+    
+class FundraiserSerializer(serializers.ModelSerializer):
+    listing = serializers.PrimaryKeyRelatedField(read_only=True)
+    vendors = serializers.PrimaryKeyRelatedField(many=True, queryset=JobOffer.objects.all())
+    class Meta:
+        model = Fundraiser
+        fields = ['fundraiser_id','vendors','listing']
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        rep['listing'] = JobPostSerializer(instance.listing).data
+        rep['vendors'] = JobOfferSerializer(instance.vendors.all(), many=True).data
+        return rep

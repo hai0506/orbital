@@ -17,9 +17,11 @@ const VendorOffer = ({ offer, deleteOffer }) => {
         pending: "bg-yellow-300",
         approved: "bg-green-300",
         rejected: "bg-red-300",
+        confirmed: "bg-green-500",
+        cancelled: "bg-red-300",
     }
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async () => {
         setLoading(true);
         console.log("Deleting offer")
 
@@ -158,10 +160,10 @@ const VendorOffer = ({ offer, deleteOffer }) => {
                                         )}
 
                                         {status === "approved" && (
-                                            <ConfirmOffer/>
+                                            <ConfirmOffer id={offer.offer_id} deleteOffer={deleteOffer} />
                                         )}
                                             
-                                        {status === "rejected" && (
+                                        {(status === "rejected" || status === "cancelled") && (
                                             <Button onClick={() => handleSubmit()} style={{ marginTop: "10px" }} className="inline-flex items-center gap-2 rounded-md bg-red-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-red-600 data-open:bg-red-700">
                                                 Remove Offer
                                             </Button>

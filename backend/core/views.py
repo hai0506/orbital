@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from .serializers import *
 from itertools import chain
 from rest_framework.decorators import api_view
+from rest_framework.views import APIView
 
 
 @api_view(['GET'])
@@ -28,7 +29,7 @@ def get_user_profile(request):
 def get_or_none(classmodel, **kwargs):
     try:
         return classmodel.objects.get(**kwargs)
-    except classmodel.DoesNotExist:
+    except:
         return None
 
 class CreateUserView(generics.CreateAPIView): # register
@@ -114,7 +115,7 @@ class OfferListView(generics.ListAPIView):
         if org:
             return JobOffer.objects.filter(listing__author=org, status='pending')
         elif vendor:
-            return JobOffer.objects.filter(vendor=vendor)
+            return JobOffer.objects.filter(vendor=vendor).exclude(status='confirmed')
         else: return JobOffer.objects.none()
 
 class UpdateOfferStatusView(generics.RetrieveUpdateAPIView):
@@ -130,13 +131,42 @@ class UpdateOfferStatusView(generics.RetrieveUpdateAPIView):
             return JobOffer.objects.filter(vendor=vendor)
         else: 
             raise PermissionError('User cannot edit offer status')
+        
+    def update(self, request, *args, **kwargs):
+        if request.data.get('status') == 'confirmed':
+            instance = self.get_object()
+            fundraiser,_ = Fundraiser.objects.get_or_create(listing=instance.listing)
+            fundraiser.vendors.add(instance)
+
+        return super().update(request, *args, **kwargs)
+
 
     lookup_field = 'offer_id' # to edit: go http://127.0.0.1:8000/core/edit-offer-status/<whatever product id>/
     
 class DeleteOfferView(generics.RetrieveDestroyAPIView):
     serializer_class = JobOfferSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     def get_queryset(self): 
-        return JobOffer.objects.all()
+        org = get_or_none(Organization, user=self.request.user)
+        vendor = get_or_none(Vendor, user=self.request.user)
+        if org:
+            return JobOffer.objects.filter(listing__author=org)
+        elif vendor:
+            return JobOffer.objects.filter(vendor=vendor)
+        else: 
+            raise PermissionError('User cannot delete offers.')
 
     lookup_field = 'offer_id' # http://127.0.0.1:8000/core/delete-offer/<product id>/
+
+class FundraiserListView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request, *args, **kwargs):
+        org = get_or_none(Organization, user=self.request.user)
+        vendor = get_or_none(Vendor, user=self.request.user)
+        if org:
+            return Response(FundraiserSerializer(Fundraiser.objects.filter(listing__author=org), many=True).data)
+        elif vendor:
+            fundraisers = Fundraiser.objects.filter(vendors__vendor=vendor)
+            return Response(JobOfferSerializer(JobOffer.objects.filter(vendor=vendor, fundraisers__in=fundraisers).distinct(),many=True).data)
+        else: 
+            raise PermissionError('User cannot view fundraisers.')
