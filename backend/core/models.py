@@ -59,3 +59,7 @@ class JobOffer(models.Model):
         self.selectedCategories.clear()
         super().delete(*args, **kwargs)
 
+class Fundraiser(models.Model):
+    fundraiser_id = models.AutoField(primary_key=True)
+    vendors = models.ManyToManyField(JobOffer, related_name='vendors')
+    listing = models.ForeignKey(JobPost, on_delete=models.CASCADE, related_name='job_listings')
