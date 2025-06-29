@@ -156,7 +156,7 @@ class JobOfferSerializer(serializers.ModelSerializer):
         fields = [
             'offer_id', 'vendor', 'listing', 'allDays', 'selectedDays',
             'selectedCategories', 'category_list', 'remarks', 'commission',
-            'status', 'time_created',
+            'status', 'time_created','inventory_file'
         ]
 
     def __init__(self, *args, **kwargs):
@@ -215,9 +215,9 @@ class OfferStatusSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'status': 'Invalid status.'})
         if value == 'confirmed':
             if not file:
-                raise serializers.ValidationError({'inventory_file': 'Please upload product inventory.'})
+                raise serializers.ValidationError({'inventory_list': 'Please upload product inventory.'})
             elif (not file.name.endswith('.xlsx')) and (not file.name.endswith('.csv')):
-                raise serializers.ValidationError({'inventory_file': 'Please ensure file format is either .xlsx or .csv.'})
+                raise serializers.ValidationError({'inventory_list': 'Please ensure file format is either .xlsx or .csv.'})
             if not data.get('agreement'):
                 raise serializers.ValidationError({'agreement': 'Please agree to the Terms and Conditions.'})
         return data
