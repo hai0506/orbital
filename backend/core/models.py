@@ -61,5 +61,5 @@ class JobOffer(models.Model):
 
 class Fundraiser(models.Model):
     fundraiser_id = models.AutoField(primary_key=True)
-    vendors = models.ManyToManyField(JobOffer, related_name='vendors')
-    listing = models.ForeignKey(JobPost, on_delete=models.CASCADE, related_name='job_listings')
+    vendors = models.ManyToManyField(JobOffer, related_name='fundraisers')
+    listing = models.ForeignKey(JobPost, on_delete=models.CASCADE, related_name='fundraisers')

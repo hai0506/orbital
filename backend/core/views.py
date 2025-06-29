@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from .serializers import *
 from itertools import chain
 from rest_framework.decorators import api_view
+from rest_framework.views import APIView
 
 
 @api_view(['GET'])
@@ -28,7 +29,7 @@ def get_user_profile(request):
 def get_or_none(classmodel, **kwargs):
     try:
         return classmodel.objects.get(**kwargs)
-    except classmodel.DoesNotExist:
+    except:
         return None
 
 class CreateUserView(generics.CreateAPIView): # register
@@ -157,15 +158,15 @@ class DeleteOfferView(generics.RetrieveDestroyAPIView):
 
     lookup_field = 'offer_id' # http://127.0.0.1:8000/core/delete-offer/<product id>/
 
-class FundraiserListView(generics.ListAPIView):
-    serializer_class = FundraiserSerializer
-    permission_classes = [IsAuthenticated]
-    def get_queryset(self): 
+class FundraiserListView(APIView):
+    permission_classes = [AllowAny]
+    def get(self, request, *args, **kwargs):
         org = get_or_none(Organization, user=self.request.user)
         vendor = get_or_none(Vendor, user=self.request.user)
         if org:
-            return Fundraiser.objects.filter(listing__author=org)
+            return Response(FundraiserSerializer(Fundraiser.objects.filter(listing__author=org), many=True).data)
         elif vendor:
-            return Fundraiser.objects.filter(vendors__vendor=vendor).distinct()
+            fundraisers = Fundraiser.objects.filter(vendors__vendor=vendor)
+            return Response(JobOfferSerializer(JobOffer.objects.filter(vendor=vendor, fundraisers__in=fundraisers).distinct(),many=True).data)
         else: 
             raise PermissionError('User cannot view fundraisers.')
