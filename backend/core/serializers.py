@@ -216,3 +216,16 @@ class OfferStatusSerializer(serializers.ModelSerializer):
         if value == 'confirmed' and not file:
             raise serializers.ValidationError({'inventory_file': 'Must upload product inventory.'})
         return data
+    
+class FundraiserSerializer(serializers.ModelSerializer):
+    listing = serializers.PrimaryKeyRelatedField(read_only=True)
+    vendors = serializers.PrimaryKeyRelatedField(many=True, queryset=JobOffer.objects.all())
+    class Meta:
+        model = Fundraiser
+        fields = ['fundraiser_id','vendors','listing']
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        rep['listing'] = JobPostSerializer(instance.listing).data
+        rep['vendors'] = JobOfferSerializer(instance.vendors.all(), many=True).data
+        return rep
