@@ -144,14 +144,28 @@ class UpdateOfferStatusView(generics.RetrieveUpdateAPIView):
     
 class DeleteOfferView(generics.RetrieveDestroyAPIView):
     serializer_class = JobOfferSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     def get_queryset(self): 
-        return JobOffer.objects.all()
+        org = get_or_none(Organization, user=self.request.user)
+        vendor = get_or_none(Vendor, user=self.request.user)
+        if org:
+            return JobOffer.objects.filter(listing__author=org)
+        elif vendor:
+            return JobOffer.objects.filter(vendor=vendor)
+        else: 
+            raise PermissionError('User cannot delete offers.')
 
     lookup_field = 'offer_id' # http://127.0.0.1:8000/core/delete-offer/<product id>/
 
 class FundraiserListView(generics.ListAPIView):
     serializer_class = FundraiserSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     def get_queryset(self): 
-        return Fundraiser.objects.all()
+        org = get_or_none(Organization, user=self.request.user)
+        vendor = get_or_none(Vendor, user=self.request.user)
+        if org:
+            return Fundraiser.objects.filter(listing__author=org)
+        elif vendor:
+            return Fundraiser.objects.filter(vendors__vendor=vendor).distinct()
+        else: 
+            raise PermissionError('User cannot view fundraisers.')
