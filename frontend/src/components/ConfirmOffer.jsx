@@ -2,6 +2,8 @@ import { Radio, RadioGroup, Label, Description, Field, Checkbox, Button } from '
 import { CheckIcon } from '@heroicons/react/20/solid'
 import { CheckCircleIcon } from '@heroicons/react/24/solid'
 import { useState } from 'react'
+import api from '../api'
+import { useNavigate } from 'react-router-dom'
 
 const options = [
   {
@@ -14,13 +16,46 @@ const options = [
   },
 ]
 
-const ConfirmOffer = () => {
-  const [going, setGoing] = useState(null);
-  const [agreement, setAgreement] = useState(false);
-  const [inventory, setInventory] = useState(null);
+const ConfirmOffer = ({id}) => {
+    const navigate = useNavigate();
+    const [going, setGoing] = useState(null);
+    const [agreement, setAgreement] = useState(false);
+    const [inventory, setInventory] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [errors, setErrors] = useState({});
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        try {
+            const formData = new FormData();
+            formData.append('status', going ? "confirmed" : "cancelled");
+            formData.append('agreement', agreement);
+            if (inventory) {
+                formData.append('inventory_file', inventory);  
+            }
+
+            console.log("Sending formData:", formData);
+
+            const route = `core/edit-offer-status/${id}/`;
+
+            const res = await api.patch(route, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data', 
+                },
+            });
+            navigate("/fundraisers");
+        } catch (error) {
+            console.error(error);
+            setErrors(error.response?.data || {detail: "Unknown error"});
+        } finally {
+            setLoading(false);
+        }
+};
+
 
   return (
-    <>
+    <form onSubmit={handleSubmit}>
         <Field>
             <Label className="mb-2 text-base/7 font-medium text-black">Confirm Availability</Label>
             <Description className="text-sm/6 text-black/50">Kindly confirm your participation in the fundraiser.</Description>
@@ -38,6 +73,9 @@ const ConfirmOffer = () => {
                     </Radio>
                 ))}
             </RadioGroup>
+            {errors.status && (
+                <p className="mt-1 text-sm text-red-600">Please confirm or cancel your offer.</p>
+            )}
         </Field>
         {going === true && (
             <>
@@ -54,6 +92,9 @@ const ConfirmOffer = () => {
                         </Checkbox>
                         <span className="text-sm text-gray-700">I agree to the terms and conditions of the fundraiser.</span>
                     </label>
+                    {errors.agreement && (
+                        <p className="mt-1 text-sm text-red-600">{errors.agreement[0]}</p>
+                    )}
                 </Field>
                 <Field style={{ marginTop: "10px"}}>
                     <Label className="mb-2 text-base/7 font-medium text-black">Inventory</Label>
@@ -70,6 +111,9 @@ const ConfirmOffer = () => {
                         className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none"
                         style={{ marginTop: "10px" }}
                     />
+                    {errors.inventory_list && (
+                        <p className="mt-1 text-sm text-red-600">{errors.inventory_list[0]}</p>
+                    )}
                 </Field>
                 {(agreement === true && inventory !== null) && (
                     <Button type="submit" style={{ marginTop: "10px" }} className="inline-flex items-center gap-2 rounded-md bg-green-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-green-600 data-open:bg-green-700">
@@ -80,10 +124,10 @@ const ConfirmOffer = () => {
         )}
         {going === false && (
             <Button type="submit" style={{ marginTop: "10px" }} className="inline-flex items-center gap-2 rounded-md bg-red-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-green-600 data-open:bg-green-700">
-                Reject Offer
+                Cancel Offer
             </Button>
         )}
-    </>
+    </form>
   )
 }
 
