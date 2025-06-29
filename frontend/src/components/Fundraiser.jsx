@@ -195,7 +195,7 @@ const Fundraiser = ({ fundraiser, role }) => {
                                                             <div className="flex flex-wrap gap-3">
                                                                 {(fundraiser.selectedCategories ?? []).map((category) => (
                                                                     <span
-                                                                        className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${offer.listing.categories.includes(category) ? "bg-green-100 text-green-800" : "bg-orange-100 text-orange-800"}`}
+                                                                        className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${fundraiser.listing.categories.includes(category) ? "bg-green-100 text-green-800" : "bg-orange-100 text-orange-800"}`}
                                                                     >
                                                                         {category}
                                                                     </span>
