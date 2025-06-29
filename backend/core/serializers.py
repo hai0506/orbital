@@ -206,9 +206,13 @@ class JobOfferSerializer(serializers.ModelSerializer):
 class OfferStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobOffer
-        fields = ['status']
+        fields = ['status','inventory_file']
 
-    def validate_status(self, value):
-        if value not in ['pending', 'approved', 'rejected']:
+    def validate(self, data):
+        value = data.get('status')
+        file = data.get('inventory_file')
+        if value not in ['pending', 'approved', 'rejected','confirmed']:
             raise serializers.ValidationError({'status': 'Invalid status.'})
-        return value
+        if value == 'confirmed' and not file:
+            raise serializers.ValidationError({'inventory_file': 'Must upload product inventory.'})
+        return data
