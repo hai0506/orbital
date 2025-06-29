@@ -2,16 +2,17 @@ import React, { useEffect, useState } from 'react';
 import api from '../api';
 import Layout from "../components/Layout";
 import Listing from '../components/Listing';
+import Offers from './Offers';
 // JSON mock data
-import listings from '../data/Listings'; // comment this out
+//import listings from '../data/Listings'; // comment this out
 
 const Home = () => {
-  //const [listings, setListings] = useState([]); // uncomment this
-  //const [loading, setLoading] = useState(true); // this as well
+  const [listings, setListings] = useState([]); // uncomment this
+  const [loading, setLoading] = useState(true); // this as well
   const role = localStorage.getItem("ROLE");
 
   // uncomment this section to test job creation
-  /*
+  // /*
   useEffect(() => {
     async function fetchListings() {
       try {
@@ -21,7 +22,7 @@ const Home = () => {
           listings.map(listing => console.log(listing));
         }
       } catch (error) {
-        console.error('Failed to load profile or listings:', error);
+        console.error('Failed to load listings:', error);
       } finally {
         setLoading(false);
       }
@@ -29,7 +30,7 @@ const Home = () => {
 
     fetchListings();
   }, []);
-  */
+  // */
 
   return (
     <>
@@ -39,15 +40,14 @@ const Home = () => {
               {listings.map((listing, index) => (
                 <Listing key={listing.id || index} fields={listing} />
               ))}
+              {listings.length === 0 && (
+                <div>There are no listings available at this time.</div>
+              )}
             </div>
           </Layout>
         )}
         {role === "organization" && (
-          <Layout heading="Offers">
-              <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                <p>Hello organization</p>
-              </div>
-          </Layout>
+          <Offers />
         )}
     </>
   );

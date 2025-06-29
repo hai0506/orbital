@@ -54,7 +54,7 @@ const Listing = ({fields}) => {
                             </div>
 
                             <div className="w-[70%] border-l border-gray-300 p-4">
-                                <MakeOffer dates={dates} categories={fields.categories}  />
+                                <MakeOffer dates={dates} listing={fields}  />
                             </div>
                         </div>
 

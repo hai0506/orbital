@@ -6,6 +6,7 @@ import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import CreateListing from "./pages/CreateListing";
+import Offers from "./pages/Offers";
 
 function Logout() {
   localStorage.clear()
@@ -35,6 +36,14 @@ function App() {
             element={
               <ProtectedRoute authRoles={["organization"]}>
                 <CreateListing />
+              </ProtectedRoute>
+            }
+          />
+          <Route 
+            path="/offers"
+            element={
+              <ProtectedRoute>
+                <Offers />
               </ProtectedRoute>
             }
           />
