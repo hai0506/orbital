@@ -210,7 +210,7 @@ class OfferStatusSerializer(serializers.ModelSerializer):
     def validate(self, data):
         value = data.get('status')
         file = data.get('inventory_file')
-        if value not in ['pending', 'approved', 'rejected','confirmed']:
+        if value not in ['pending', 'approved', 'rejected','confirmed','cancelled']:
             raise serializers.ValidationError({'status': 'Invalid status.'})
         if value == 'confirmed' and not file:
             raise serializers.ValidationError({'inventory_file': 'Must upload product inventory.'})
