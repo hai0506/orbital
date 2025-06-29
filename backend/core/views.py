@@ -119,15 +119,15 @@ class OfferListView(generics.ListAPIView):
 
 class UpdateOfferStatusView(generics.RetrieveUpdateAPIView):
     serializer_class = OfferStatusSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     def get_queryset(self): 
-        return JobOffer.objects.all()
+        # return JobOffer.objects.all()
         org = get_or_none(Organization, user=self.request.user)
-        # vendor = get_or_none(Vendor, user=self.request.user)
+        vendor = get_or_none(Vendor, user=self.request.user)
         if org:
             return JobOffer.objects.filter(listing__author=org)
-        # elif vendor:
-        #     return JobOffer.objects.filter(vendor=vendor)
+        elif vendor:
+            return JobOffer.objects.filter(vendor=vendor)
         else: 
             raise PermissionError('User cannot edit offer status')
 
