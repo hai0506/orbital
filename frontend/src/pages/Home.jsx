@@ -40,6 +40,9 @@ const Home = () => {
               {listings.map((listing, index) => (
                 <Listing key={listing.id || index} fields={listing} />
               ))}
+              {listings.length === 0 && (
+                <div>There are no listings available at this time.</div>
+              )}
             </div>
           </Layout>
         )}
