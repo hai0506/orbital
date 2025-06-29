@@ -49,7 +49,6 @@ class JobOffer(models.Model):
     allDays = models.BooleanField()
     selectedDays = ArrayField(base_field=models.DateField(), blank=True, default=list)
     selectedCategories = models.ManyToManyField(Category, blank=True)
-    otherCategories = models.CharField(max_length=500, blank=True)
     commission = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)])
     remarks = models.TextField(max_length=2000, blank=True)
     status = models.CharField()

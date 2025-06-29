@@ -27,6 +27,20 @@ class UserSerializer(serializers.ModelSerializer):
         elif user_type == 'Vendor':
             Vendor.objects.create(user=user)
         return user
+    
+
+categories_options = ["Food & Beverages",
+            "Accessories",
+            "Stationery",
+            "Clothing",
+            "Toys",
+            "Books",
+            "Home Decor",
+            "Art & Crafts",
+            "Tech Gadgets",
+            "Skincare & Beauty",
+            "Plants",
+            "Pet Supplies",]
 
 class JobPostSerializer(serializers.ModelSerializer):
     category_list = serializers.ListField(write_only=True, required=False)
@@ -104,21 +118,10 @@ class JobPostSerializer(serializers.ModelSerializer):
         keyword_values = validated_data.pop('category_list', []) 
         
         k = []
-        categories = ["Food & Beverages",
-            "Accessories",
-            "Stationery",
-            "Clothing",
-            "Toys",
-            "Books",
-            "Home Decor",
-            "Art & Crafts",
-            "Tech Gadgets",
-            "Skincare & Beauty",
-            "Plants",
-            "Pet Supplies",]
+        
     
         for value in keyword_values:
-            if value in categories:
+            if value in categories_options:
                 keyword_obj, _ = Category.objects.get_or_create(value=value)
                 k.append(keyword_obj)
             else:
@@ -152,7 +155,7 @@ class JobOfferSerializer(serializers.ModelSerializer):
         model = JobOffer
         fields = [
             'offer_id', 'vendor', 'listing', 'allDays', 'selectedDays',
-            'selectedCategories', 'category_list', 'otherCategories', 'remarks', 'commission',
+            'selectedCategories', 'category_list', 'remarks', 'commission',
             'status', 'time_created',
         ]
 
@@ -164,18 +167,14 @@ class JobOfferSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         keyword_values = validated_data.pop('category_list', []) 
         validated_data['status'] = 'pending' # set default status
-        listing = validated_data.get('listing')
         k = []
-        categories = [cat.value for cat in listing.categories.all()]
         for value in keyword_values:
-            if value in categories:
-                keyword_obj = Category.objects.get(value=value)
+            if value in categories_options:
+                keyword_obj, _ = Category.objects.get_or_create(value=value)
                 k.append(keyword_obj)
             else:
-                if value == 'Others':
-                    if validated_data.get('otherCategories') == '':
-                        raise serializers.ValidationError({'otherCategories': 'Please specify other products.'})
-                else: raise serializers.ValidationError({'category_list': 'Category not in specified list.'})
+                keyword_obj, _ = Category.objects.get_or_create(value=value.lower().capitalize())
+                k.append(keyword_obj)
         offer = JobOffer.objects.create(**validated_data)
         offer.selectedCategories.set(k)
         return offer
