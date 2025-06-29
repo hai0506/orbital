@@ -32,3 +32,5 @@ const Fundraisers = [
         end_time: "13:45:00",
     }
 ]
+
+export default Fundraisers;
