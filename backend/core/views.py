@@ -140,13 +140,30 @@ class UpdateOfferStatusView(generics.RetrieveUpdateAPIView):
         return super().update(request, *args, **kwargs)
 
 
+        
+    def update(self, request, *args, **kwargs):
+        if request.data.get('status') == 'confirmed':
+            instance = self.get_object()
+            fundraiser,_ = Fundraiser.objects.get_or_create(listing=instance.listing)
+            fundraiser.vendors.add(instance)
+
+        return super().update(request, *args, **kwargs)
+
+
     lookup_field = 'offer_id' # to edit: go http://127.0.0.1:8000/core/edit-offer-status/<whatever product id>/
     
 class DeleteOfferView(generics.RetrieveDestroyAPIView):
     serializer_class = JobOfferSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     def get_queryset(self): 
-        return JobOffer.objects.all()
+        org = get_or_none(Organization, user=self.request.user)
+        vendor = get_or_none(Vendor, user=self.request.user)
+        if org:
+            return JobOffer.objects.filter(listing__author=org)
+        elif vendor:
+            return JobOffer.objects.filter(vendor=vendor)
+        else: 
+            raise PermissionError('User cannot delete offers.')
 
     lookup_field = 'offer_id' # http://127.0.0.1:8000/core/delete-offer/<product id>/
 
@@ -155,3 +172,15 @@ class FundraiserListView(generics.ListAPIView):
     permission_classes = [AllowAny]
     def get_queryset(self): 
         return Fundraiser.objects.all()
+class FundraiserListView(generics.ListAPIView):
+    serializer_class = FundraiserSerializer
+    permission_classes = [IsAuthenticated]
+    def get_queryset(self): 
+        org = get_or_none(Organization, user=self.request.user)
+        vendor = get_or_none(Vendor, user=self.request.user)
+        if org:
+            return Fundraiser.objects.filter(listing__author=org)
+        elif vendor:
+            return Fundraiser.objects.filter(vendors__vendor=vendor).distinct()
+        else: 
+            raise PermissionError('User cannot view fundraisers.')
