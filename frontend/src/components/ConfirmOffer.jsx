@@ -16,7 +16,7 @@ const options = [
   },
 ]
 
-const ConfirmOffer = ({id}) => {
+const ConfirmOffer = ({ id, deleteOffer }) => {
     const navigate = useNavigate();
     const [going, setGoing] = useState(null);
     const [agreement, setAgreement] = useState(false);
@@ -44,6 +44,7 @@ const ConfirmOffer = ({id}) => {
                     'Content-Type': 'multipart/form-data', 
                 },
             });
+            deleteOffer(id);
             navigate("/fundraisers");
         } catch (error) {
             console.error(error);
@@ -123,7 +124,7 @@ const ConfirmOffer = ({id}) => {
             </>
         )}
         {going === false && (
-            <Button type="submit" style={{ marginTop: "10px" }} className="inline-flex items-center gap-2 rounded-md bg-red-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-green-600 data-open:bg-green-700">
+            <Button type="submit" style={{ marginTop: "10px" }} className="inline-flex items-center gap-2 rounded-md bg-red-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-red-600 data-open:bg-red-700">
                 Cancel Offer
             </Button>
         )}
