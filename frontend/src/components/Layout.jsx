@@ -1,6 +1,7 @@
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import PV from "../styles/PV.png"
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -16,13 +17,9 @@ export default function Layout({ heading, children }) {
   };
 
   const role = localStorage.getItem("ROLE");
+  const username = localStorage.getItem("username");
 
-  const user = {
-    name: 'Tom Cook',
-    email: 'tom@example.com',
-    imageUrl:
-      'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-  }
+  const logo = username.charAt(0).toUpperCase();
 
   const vendorNavigation = [
     { name: 'Listings', href: '/' },
@@ -54,7 +51,7 @@ export default function Layout({ heading, children }) {
                 <div className="shrink-0">
                   <img
                     alt="Your Company"
-                    src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500"
+                    src={PV}
                     className="size-8"
                   />
                 </div>
@@ -91,11 +88,14 @@ export default function Layout({ heading, children }) {
                   {/* Profile dropdown */}
                   <Menu as="div" className="relative ml-3">
                     <div>
-                      <MenuButton className="relative flex max-w-xs items-center rounded-full bg-gray-800 text-sm focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden">
+                      <MenuButton className="relative flex max-w-xs items-center rounded-full bg-gray-800 text-sm focus:outline-hidden focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                         <span className="absolute -inset-1.5" />
                         <span className="sr-only">Open user menu</span>
-                        <img alt="" src={user.imageUrl} className="size-8 rounded-full" />
-                      </MenuButton>
+
+                        <div className="size-8 flex items-center justify-center rounded-full bg-pink-500 text-white font-medium">
+                          {logo}
+                        </div>
+                    </MenuButton>
                     </div>
                     <MenuItems
                       transition
@@ -155,12 +155,12 @@ export default function Layout({ heading, children }) {
             </div>
             <div className="border-t border-gray-700 pt-4 pb-3">
               <div className="flex items-center px-5">
-                <div className="shrink-0">
-                  <img alt="" src={user.imageUrl} className="size-10 rounded-full" />
+                <div className="size-8 flex items-center justify-center rounded-full bg-pink-500 text-white font-medium">
+                  {logo}
                 </div>
                 <div className="ml-3">
-                  <div className="text-base/5 font-medium text-white">{user.name}</div>
-                  <div className="text-sm font-medium text-gray-400">{user.email}</div>
+                  <div className="text-base/5 font-medium text-white">{username}</div>
+                  <div className="text-sm font-medium text-gray-400">{role}</div>
                 </div>
                 <button
                   type="button"
