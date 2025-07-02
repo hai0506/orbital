@@ -3,15 +3,7 @@ import api from "../api";
 import { useNavigate, Link } from "react-router-dom";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
 import '../styles/form.css';
-import {
-  Button,
-  Field,
-  Fieldset,
-  For,
-  Input,
-  NativeSelect,
-  Stack,
-} from "@chakra-ui/react"
+import PV from "../styles/PV.png"
 
 const Form = ({route, method}) => {
     const [username, setUsername] = useState("")
@@ -46,7 +38,17 @@ const Form = ({route, method}) => {
                 localStorage.setItem(ACCESS_TOKEN, res.data.access)
                 localStorage.setItem(REFRESH_TOKEN, res.data.refresh)
                 localStorage.setItem("username", username)
+
+                try {
+                    const profileRes = await api.get("core/user/profile/");
+                    const role = profileRes.data.role;
+                    localStorage.setItem("ROLE", role);  
+                } catch (err) {
+                    console.error("Failed to fetch user profile after login:", err);
+                }
+
                 navigate("/")
+                console.log("Going home")
             } else {
                 navigate("/login")
             }
@@ -66,126 +68,166 @@ const Form = ({route, method}) => {
 
     return (
         <form onSubmit={handleSubmit} className="center-container" autoComplete="off">
-            <Fieldset.Root size="lg" maxW="md" invalid={wrongLogin || Object.keys(wrongRegister).length > 0}>
-                <Stack>
-                    <Fieldset.Legend>{name}</Fieldset.Legend>
-                    <Fieldset.HelperText>
+            <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
+                <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+                    <img
+                        alt="Your Company"
+                        src={PV}
+                        className="mx-auto w-68 h-50"
+                    />
+                    <h2 className="mt-0.5 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
                         {
-                            method === "register" 
-                                ? "Please provide your details below."
-                                : "Please key in your credentials."
+                        method === "register" 
+                            ? "Register your account"
+                            : "Sign in to your account"
                         }
-                    </Fieldset.HelperText>
-                </Stack>
-
-                <Fieldset.Content>
-                    <Field.Root>
-                        <Field.Label invalid={wrongRegister.username?.length > 0}>Username</Field.Label>
-                        <Input
-                            name="username"
-                            type="text"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            placeholder="Username"
-                        />
-                        {wrongRegister.username && (
-                            <Fieldset.ErrorText>{wrongRegister.username[0]}</Fieldset.ErrorText>
-                        )}
-                    </Field.Root>
-
-
-                    <Field.Root>
-                        <Field.Label invalid = {wrongRegister.password?.length > 0}>Password</Field.Label>
-                        <Input 
-                            name="password"   
-                            type="password"
-                            autoComplete="new-password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="Password"
-                        />
-                        {wrongRegister.password && (
-                            <Fieldset.ErrorText>{wrongRegister.password[0]}</Fieldset.ErrorText>
-                        )}
-                    </Field.Root>
-
+                    </h2>
+                </div>
+                <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+                <div className="space-y-6">
                     {method === "register" && (
-                        <>
-                            {/*
-                                <Field.Root>
-                                <Field.Label>Confirm Password</Field.Label>
-                                <Input 
-                                    name="confirm-password"   
-                                    type="password"
-                                    value={confirmPassword}
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
-                                    placeholder="Confirm Password"
-                                />
-                                </Field.Root>
-                            */}
-                            
-                            <Field.Root>
-                                <Field.Label invalid = {wrongRegister.email?.length > 0}>Email address</Field.Label>
-                                <Input 
-                                    name="email" 
-                                    className="form-input"
+                        <div>
+                            <label htmlFor="email" className="block text-sm/6 font-medium text-gray-900">
+                                Email address
+                            </label>
+                            <div className="mt-2">
+                                <input
+                                    id="email"
+                                    name="email"
                                     type="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     placeholder="Email" 
+                                    required
+                                    autoComplete="email"
+                                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                                 />
-                                {wrongRegister.email && (
-                                    <Fieldset.ErrorText>{wrongRegister.email[0]}</Fieldset.ErrorText>
-                                )}
-                            </Field.Root>
-
-                            <Field.Root>
-                                <Field.Label>Are you an organization or vendor?</Field.Label>
-                                <NativeSelect.Root>
-                                    <NativeSelect.Field 
-                                        name="user-type"
-                                        className="form-input"
-                                        value={userType}
-                                        onChange={(e) => setUserType(e.target.value)}
-                                    >
-                                    <For each={["Organization", "Vendor"]}>
-                                        {(item) => (
-                                        <option key={item} value={item}>
-                                            {item}
-                                        </option>
-                                        )}
-                                    </For>
-                                    </NativeSelect.Field>
-                                    <NativeSelect.Indicator />
-                                </NativeSelect.Root>
-                            </Field.Root>
-                        </>
+                            </div>
+                            {wrongRegister.email && (
+                                <p className="mt-1 text-sm text-red-600">
+                                    {wrongRegister.email[0]}
+                                </p>
+                            )}
+                        </div>
                     )}
 
+                    <div>
+                        <div className="flex items-center justify-between">
+                            <label htmlFor="password" className="block text-sm/6 font-medium text-gray-900">
+                            Username
+                            </label>
+                        </div>
+                        <div className="mt-2">
+                            <input
+                                id="username"
+                                name="username"
+                                type="text"
+                                required
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                placeholder="Username"
+                                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                            />
+                        </div>
+                        {wrongRegister.username && (
+                            <p className="mt-1 text-sm text-red-600">
+                                {wrongRegister.username[0]}
+                            </p>
+                        )}
+                    </div>
+
+                    <div>
+                        <div className="flex items-center justify-between">
+                            <label htmlFor="password" className="block text-sm/6 font-medium text-gray-900">
+                            Password
+                            </label>
+                            <div className="text-sm">
+                            {/*method === "login" && (
+                                <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
+                                    Forgot password?
+                                </a>
+                            )*/}
+                            </div>
+                        </div>
+                        <div className="mt-2">
+                            <input
+                                id="password"
+                                name="password"
+                                type="password"
+                                required
+                                autoComplete="new-password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="Password"
+                                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                            />
+                        </div>
+                        {wrongRegister.password && (
+                            <p className="mt-1 text-sm text-red-600">
+                                {wrongRegister.password[0]}
+                            </p>
+                        )}
+                    </div>
+
+                    {method === "register" && (
+                        <div>
+                            <div className="flex items-center justify-between">
+                                <label htmlFor="user-type" className="block text-sm/6 font-medium text-gray-900">
+                                Are you an organization or vendor?
+                                </label>
+                            </div>
+
+                            <div className="mt-2">
+                                <select
+                                    id="user-type"
+                                    name="user-type"
+                                    value={userType}
+                                    onChange={(e) => setUserType(e.target.value)}
+                                    required
+                                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                                >
+                                {["Organization", "Vendor"].map((item) => (
+                                    <option key={item} value={item}>
+                                    {item}
+                                    </option>
+                                ))}
+                                </select>
+                            </div>
+                        </div>
+                    )}
+
+                    <div>
+                    <button
+                        type="submit"
+                        className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                    >
+                        {method === "register" ? "Register" : "Sign in"}
+                    </button>
                     {wrongLogin && (
-                        <Fieldset.ErrorText>
-                            Incorrect username or password!
-                        </Fieldset.ErrorText>
-                    )}
+                    <p className="mt-1 text-sm text-red-600">
+                        Incorrect username and/or password!
+                    </p>
+                )}
+                    </div>
+                </div>
 
-                </Fieldset.Content>
+                {method === "register"
+                     ?   (<p className="mt-10 text-center text-sm/6 text-gray-500">
+                            Already have an account?{' '}
+                            <Link to="/login" className="font-semibold text-indigo-600 hover:text-indigo-500">
+                                Sign in.
+                            </Link>
+                        </p>)
 
-                <Button type="submit" alignSelf="flex-start">
-                    {name}
-                </Button>
-
-                {method === "login"
-                    ? <p>
-                        Don't have an account? 
-                        <Link to="/register" className="link"> Register here</Link>
-                      </p>
-                    : <p>
-                        Already have an account? 
-                        <Link to="/login" className="link"> Login here</Link>
-                      </p>
+                     :   (<p className="mt-10 text-center text-sm/6 text-gray-500">
+                            Don't have an account?{' '}
+                            <Link to="/register" className="font-semibold text-indigo-600 hover:text-indigo-500">
+                                Register.
+                            </Link>
+                        </p>)
                 }
-
-            </Fieldset.Root>
+                </div>
+            </div>
         </form>
     )
 }
