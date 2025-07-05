@@ -113,7 +113,7 @@ const Form = ({route, method}) => {
 
                     <div>
                         <div className="flex items-center justify-between">
-                            <label htmlFor="password" className="block text-sm/6 font-medium text-gray-900">
+                            <label htmlFor="username" className="block text-sm/6 font-medium text-gray-900">
                             Username
                             </label>
                         </div>
