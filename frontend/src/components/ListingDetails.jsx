@@ -4,7 +4,7 @@ import CategoryTags from "./CategoryTags";
 const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString("en-GB");
 
 const formatTime = (timeStr) =>
-    new Date(`1970-01-01T${timeStr}Z`).toLocaleTimeString("en-GB", {
+    new Date(`1970-01-01T${timeStr}`).toLocaleTimeString("en-GB", {
         hour: "2-digit",
         minute: "2-digit",
         hour12: false,
