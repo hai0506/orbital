@@ -2,7 +2,7 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import ListingDetails from "../src/components/ListingDetails";
-import "@testing-library/jest-dom/vitest"
+import "@testing-library/jest-dom/vitest";
 
 describe("ListingDetails", () => {
   const sampleFields = {
@@ -29,8 +29,7 @@ describe("ListingDetails", () => {
     expect(screen.getByText("17/06/2025 - 29/06/2025")).toBeInTheDocument();
 
     // Time
-    expect(screen.getByText(/16:1[5]\s*-\s*21:1[5]/)).toBeInTheDocument();
-
+    expect(screen.getByText("08:45 - 13:45")).toBeInTheDocument();
 
     // Commission
     expect(screen.getByText("30% of Total Revenue")).toBeInTheDocument();

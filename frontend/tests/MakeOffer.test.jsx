@@ -17,6 +17,12 @@ vi.mock("../src/components/AllCategories", () => ({
   default: ["Food", "Drinks"]
 }))
 
+vi.mock("../src/api", () => ({
+  default: {
+    post: vi.fn().mockResolvedValue({ data: { success: true } }),
+    defaults: { baseURL: 'http://127.0.0.1:8000/' },
+  },
+}))
 
 vi.mock("react-router-dom", async () => {
   const actual = await vi.importActual("react-router-dom")
