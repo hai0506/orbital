@@ -62,13 +62,14 @@ class PostListView(generics.ListAPIView): # view others posts and filters.
     serializer_class = JobPostSerializer
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        # to filter: http://127.0.0.1:8000/core/posts/?categories=whatever1&categories=whatever2&...
+    def get_queryset(self):# to filter: http://127.0.0.1:8000/core/posts/?categories=whatever1&categories=whatever2&sortby=time_created&...
+        sort_field = self.request.query_params.get('sortby')
         keyword_values = self.request.query_params.getlist('categories')
+
+        # filter categories
         combined_queryset = None
         if len(keyword_values) > 0:
-            for v in keyword_values:
-                value = v.strip().lower()
+            for value in keyword_values:
                 keyword = get_or_none(Category, value = value)
                 if keyword:
                     if combined_queryset is None: combined_queryset = keyword.jobpost_set.all()
@@ -78,11 +79,18 @@ class PostListView(generics.ListAPIView): # view others posts and filters.
 
         # hide posts that the vendor has already made offers for
         vendor = get_or_none(Vendor, user=self.request.user)
+        # vendor = Vendor.objects.get(user_id=2)
         if not vendor:
             return combined_queryset
-        
         offered_posts = JobPost.objects.filter(post_offers__vendor=vendor)
-        return combined_queryset.exclude(post_id__in=offered_posts.values_list('post_id', flat=True))
+        final_qs = combined_queryset.exclude(post_id__in=offered_posts.values_list('post_id', flat=True))
+
+        # sort posts
+        if sort_field == 'start_date':
+            final_qs = final_qs.order_by(sort_field, 'start_time')
+        elif sort_field == 'time_created':
+            final_qs = final_qs.order_by(sort_field)
+        return final_qs
 
 class CreateOfferView(generics.CreateAPIView): # create offers
     serializer_class = JobOfferSerializer
