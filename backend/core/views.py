@@ -172,9 +172,11 @@ class FundraiserListView(APIView):
         org = get_or_none(Organization, user=self.request.user)
         vendor = get_or_none(Vendor, user=self.request.user)
         if org:
-            return Response(FundraiserSerializer(Fundraiser.objects.filter(listing__author=org), many=True).data)
+            return Response(FundraiserSerializer(Fundraiser.objects.filter(listing__author=org)
+                    .order_by('listing__start_date','listing__start_time'), many=True).data)
         elif vendor:
             fundraisers = Fundraiser.objects.filter(vendors__vendor=vendor)
-            return Response(JobOfferSerializer(JobOffer.objects.filter(vendor=vendor, fundraisers__in=fundraisers).distinct(),many=True).data)
+            return Response(JobOfferSerializer(JobOffer.objects.filter(vendor=vendor, fundraisers__in=fundraisers).distinct()
+                .order_by('listing__start_date','listing__start_time'),many=True).data)
         else: 
             raise PermissionError('User cannot view fundraisers.')
