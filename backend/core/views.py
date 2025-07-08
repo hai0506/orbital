@@ -40,10 +40,10 @@ class CreateUserView(generics.CreateAPIView): # register
 
 class EditProfileView(generics.RetrieveUpdateAPIView):
     serializer_class = ProfileSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     def get_object(self):
-        return User.objects.get(id=2).profile_user
-        # return self.request.user.profile_user
+        # return User.objects.get(id=2).profile_user
+        return self.request.user.profile_user
 
 class CreatePostView(generics.ListCreateAPIView): # create and view own posts
     serializer_class = JobPostSerializer
