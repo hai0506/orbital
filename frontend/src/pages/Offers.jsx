@@ -5,6 +5,7 @@ import VendorOffer from '../components/VendorOffer'
 import api from '../api'
 //import offers from '../data/Offers'
 import OfferFilter from '../components/OfferFilter'
+import VendorOfferFilter from '../components/VendorOfferFilter'
 
 const Offers = () => {
     const role = localStorage.getItem("ROLE");
@@ -46,7 +47,8 @@ const Offers = () => {
 
     return (
         <Layout heading="Offers">
-            <OfferFilter onApply={applyFilters} />
+            {role=="organization" && <OfferFilter onApply={applyFilters} />}
+            {role=="vendor" && <VendorOfferFilter onApply={applyFilters} />}
             <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 grid grid-cols-3 gap-4">
                 {offers.map((offer, index) => {
                     if (role === "organization") {

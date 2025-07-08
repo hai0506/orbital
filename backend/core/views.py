@@ -136,10 +136,20 @@ class OfferListView(generics.ListAPIView):
         sort_field = self.request.query_params.get('sortby')
         available = self.request.query_params.get('available')
         commission = self.request.query_params.get('commission')
+        status = self.request.query_params.get('status')
         if org:
             qs = JobOffer.objects.filter(listing__author=org, status='pending')
+            # available all only
+            if available == '1':
+                qs = qs.filter(allDays=True)
+            # same or higher commision only
+            if commission == '1':
+                qs = qs.annotate(required_commission=F('listing__commission')).filter(
+                    commission__gte=F('required_commission')
+                )
         elif vendor:
             qs = JobOffer.objects.filter(vendor=vendor).exclude(status='confirmed')
+            if status in ['approved','pending','rejected','cancelled']: qs = qs.filter(status=status)
         else: qs = JobOffer.objects.none()
 
         # sort
@@ -147,16 +157,6 @@ class OfferListView(generics.ListAPIView):
             qs = qs.order_by('listing__start_date', 'listing__start_time')
         else:
             qs = qs.order_by('-time_created')
-
-        # available all only
-        if available == '1':
-            qs = qs.filter(allDays=True)
-        
-        # same or higher commision only
-        if commission == '1':
-            qs = qs.annotate(required_commission=F('listing__commission')).filter(
-                commission__gte=F('required_commission')
-            )
         return qs
 
 class UpdateOfferStatusView(generics.RetrieveUpdateAPIView):
