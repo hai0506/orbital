@@ -7,6 +7,7 @@ from .serializers import *
 from itertools import chain
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
+from django.db.models import F
 
 
 @api_view(['GET'])
@@ -88,8 +89,8 @@ class PostListView(generics.ListAPIView): # view others posts and filters.
         # sort posts
         if sort_field == 'start_date':
             final_qs = final_qs.order_by(sort_field, 'start_time')
-        elif sort_field == 'time_created':
-            final_qs = final_qs.order_by(sort_field)
+        else:
+            final_qs = final_qs.order_by('-time_created')
         return final_qs
 
 class CreateOfferView(generics.CreateAPIView): # create offers
@@ -120,11 +121,32 @@ class OfferListView(generics.ListAPIView):
     def get_queryset(self): 
         org = get_or_none(Organization, user=self.request.user)
         vendor = get_or_none(Vendor, user=self.request.user)
+        sort_field = self.request.query_params.get('sortby')
+        available = self.request.query_params.get('available')
+        commission = self.request.query_params.get('commission')
         if org:
-            return JobOffer.objects.filter(listing__author=org, status='pending')
+            qs = JobOffer.objects.filter(listing__author=org, status='pending')
         elif vendor:
-            return JobOffer.objects.filter(vendor=vendor).exclude(status='confirmed')
-        else: return JobOffer.objects.none()
+            qs = JobOffer.objects.filter(vendor=vendor).exclude(status='confirmed')
+        else: qs = JobOffer.objects.none()
+
+        # sort
+        if sort_field == 'start_date':
+            qs = qs.order_by(sort_field, 'start_time')
+        else:
+            qs = qs.order_by('-time_created')
+
+        # available all only
+        if available == 1:
+            excludes = JobOffer.objects.filter(allDays='No')
+            qs = qs.exclude(offer_id__in=excludes.values_list('offer_id', flat=True))
+        
+        # same or higher commision only
+        if commission == 1:
+            qs = qs.annotate(required_commission=F('listing__commission')).filter(
+                commission__gte=F('required_commission')
+            )
+        return qs
 
 class UpdateOfferStatusView(generics.RetrieveUpdateAPIView):
     serializer_class = OfferStatusSerializer
