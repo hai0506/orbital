@@ -92,6 +92,18 @@ class PostListView(generics.ListAPIView): # view others posts and filters.
         else:
             final_qs = final_qs.order_by('-time_created')
         return final_qs
+    
+class DeletePostView(generics.RetrieveDestroyAPIView):
+    serializer_class = JobPostSerializer
+    permission_classes = [IsAuthenticated]
+    def get_queryset(self): 
+        org = get_or_none(Organization, user=self.request.user)
+        if org:
+            return JobPost.objects.filter(author=org)
+        else: 
+            raise PermissionError('User cannot delete offers.')
+
+    lookup_field = 'post_id' # http://127.0.0.1:8000/core/delete-post/<post id>/
 
 class CreateOfferView(generics.CreateAPIView): # create offers
     serializer_class = JobOfferSerializer
