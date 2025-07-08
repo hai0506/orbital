@@ -11,4 +11,5 @@ urlpatterns = [
     path('edit-offer-status/<int:offer_id>/', UpdateOfferStatusView.as_view(), name='edit-offer-status'),
     path('delete-offer/<int:offer_id>/', DeleteOfferView.as_view(), name='delete-offer'),
     path("fundraisers/", FundraiserListView.as_view(), name="fundraiser-list"),
+    path('profile/', EditProfileView.as_view(), name='profile')
 ]

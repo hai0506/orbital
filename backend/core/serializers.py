@@ -24,10 +24,18 @@ class UserSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(**validated_data)
         if user_type == 'Organization':
             Organization.objects.create(user=user)
+            Profile.objects.create(user=user, user_type='Organization')
         elif user_type == 'Vendor':
             Vendor.objects.create(user=user)
+            Profile.objects.create(user=user, user_type='Vendor')
         return user
     
+class ProfileSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
+    user_type = serializers.CharField(read_only=True)
+    class Meta:
+        model = Profile
+        fields = ['user','name','description','pfp','user_type']
 
 categories_options = ["Food & Beverages",
             "Accessories",
