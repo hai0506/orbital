@@ -5,11 +5,23 @@ import Listing from '../components/Listing';
 import Offers from './Offers';
 // JSON mock data
 //import listings from '../data/Listings'; // comment this out
+import ListingFilter from '../components/ListingFilter'
 
 const Home = () => {
   const [listings, setListings] = useState([]); // uncomment this
   const [loading, setLoading] = useState(true); // this as well
   const role = localStorage.getItem("ROLE");
+
+  const applyFilters = async (filters) => {
+    try {
+        const listingsRes = await api.get(`core/posts/?${filters}`);
+        setListings(listingsRes.data);
+    } catch (error) {
+        console.error('Filter failed:', error);
+    } finally {
+        setLoading(false);
+    }
+};
 
   // uncomment this section to test job creation
   // /*
@@ -36,6 +48,7 @@ const Home = () => {
     <>
         {role === "vendor" && (
           <Layout heading="Listings">
+            <ListingFilter onApply={applyFilters}/>
             <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 grid grid-cols-3 gap-4">
               {listings.map((listing, index) => (
                 <Listing key={listing.id || index} fields={listing} />
