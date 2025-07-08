@@ -132,7 +132,7 @@ class OfferListView(generics.ListAPIView):
 
         # sort
         if sort_field == 'start_date':
-            qs = qs.order_by(sort_field, 'start_time')
+            qs = qs.order_by('listing__start_date', 'listing__start_time')
         else:
             qs = qs.order_by('-time_created')
 
