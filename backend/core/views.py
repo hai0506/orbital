@@ -7,7 +7,7 @@ from .serializers import *
 from itertools import chain
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
-from django.db.models import F
+from django.db.models import F,Q
 
 
 @api_view(['GET'])
@@ -65,26 +65,26 @@ class PostListView(generics.ListAPIView): # view others posts and filters.
 
     def get_queryset(self):# to filter: http://127.0.0.1:8000/core/posts/?categories=whatever1&categories=whatever2&sortby=time_created&...
         sort_field = self.request.query_params.get('sortby')
-        keyword_values = self.request.query_params.getlist('categories')
+        category_values = self.request.query_params.getlist('categories')
 
         # filter categories
-        combined_queryset = None
-        if len(keyword_values) > 0:
-            for value in keyword_values:
-                keyword = get_or_none(Category, value = value)
-                if keyword:
-                    if combined_queryset is None: combined_queryset = keyword.jobpost_set.all()
-                    else: combined_queryset = combined_queryset.union(keyword.jobpost_set.all())
-        else: 
-            combined_queryset = JobPost.objects.all()
+        qs = JobPost.objects.all()
+        if len(category_values) > 0:
+            filters = Q()
+            for value in category_values:
+                category = get_or_none(Category, value = value)
+                if category:
+                    filters |= Q(categories=category)
+
+            qs = qs.filter(filters).distinct()
 
         # hide posts that the vendor has already made offers for
         vendor = get_or_none(Vendor, user=self.request.user)
         # vendor = Vendor.objects.get(user_id=2)
         if not vendor:
-            return combined_queryset
+            return qs
         offered_posts = JobPost.objects.filter(post_offers__vendor=vendor)
-        final_qs = combined_queryset.exclude(post_id__in=offered_posts.values_list('post_id', flat=True))
+        final_qs = qs.exclude(post_id__in=offered_posts.values_list('post_id', flat=True))
 
         # sort posts
         if sort_field == 'start_date':
