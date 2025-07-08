@@ -149,12 +149,11 @@ class OfferListView(generics.ListAPIView):
             qs = qs.order_by('-time_created')
 
         # available all only
-        if available == 1:
-            excludes = JobOffer.objects.filter(allDays='No')
-            qs = qs.exclude(offer_id__in=excludes.values_list('offer_id', flat=True))
+        if available == '1':
+            qs = qs.filter(allDays=True)
         
         # same or higher commision only
-        if commission == 1:
+        if commission == '1':
             qs = qs.annotate(required_commission=F('listing__commission')).filter(
                 commission__gte=F('required_commission')
             )
