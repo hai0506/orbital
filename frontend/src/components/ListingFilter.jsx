@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react'
 
 const categories_list=["Food & Beverages",
     "Accessories",
@@ -25,29 +26,40 @@ const Filter = ({ onApply }) => {
     }
 
     return (
-        <div className="mx-4">
-            {categories_list.map((category) => (
-                <label key={category}>
-                    <input className="mx-4" type="checkbox" value={category}
-                        checked={categories.includes(category)}
-                        onChange={(e) => {
-                            setCategories((all) =>
-                                e.target.checked ? ([...all, category]) : all.filter((c) => c !== category)
-                            );
-                          }}
-                        /> 
-                    {category}
-                </label>
-              ))}
-            <select value={sortby} onChange={e => setSortby(e.target.value)} className="border mx-4">
-                <option value="">Sort by...</option>
-                <option value="start_date">Event start date</option>
-                <option value="time_created">Latest</option>
-            </select>
+        <div className="flex justify-end max-w-[70%] mx-auto mt-3 -mb-4">
+            <Popover className="relative">
+                <PopoverButton className="flex items-center space-x-2 bg-white px-3 py-2 rounded-md hover:bg-gray-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
+                    </svg>
+                    Filter
+                </PopoverButton>
+                <PopoverPanel anchor="bottom" className="flex flex-col border rounded-lg bg-white p-5">
+                    <b>Categories</b>
+                    {categories_list.map((category) => (
+                        <label key={category}>
+                            <input className="mx-4" type="checkbox" value={category}
+                                checked={categories.includes(category)}
+                                onChange={(e) => {
+                                    setCategories((all) =>
+                                        e.target.checked ? ([...all, category]) : all.filter((c) => c !== category)
+                                    );
+                                }}
+                                /> 
+                            {category}
+                        </label>
+                    ))}
 
-            <button className="bg-blue-500 border mx-4 px-4"onClick={applyFilters}>
-                Apply
-            </button>
+                    <select value={sortby} onChange={e => setSortby(e.target.value)} className="border m-3 p-1 rounded-lg">
+                        <option value="">Sort by...</option>
+                        <option value="start_date">Event start date</option>
+                        <option value="time_created">Latest</option>
+                    </select>
+                    <button className="bg-gray-700 border p-2 rounded-lg text-white"onClick={applyFilters}>
+                        Apply
+                    </button>
+                </PopoverPanel>
+            </Popover>
         </div>
     )
 }
