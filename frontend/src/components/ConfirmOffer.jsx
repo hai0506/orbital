@@ -4,6 +4,10 @@ import { CheckCircleIcon } from '@heroicons/react/24/solid'
 import { useState } from 'react'
 import api from '../api'
 import { useNavigate } from 'react-router-dom'
+import { Button as ShadcnButton } from "./ui/button"
+import { Upload } from "lucide-react";
+import { read, utils } from 'xlsx';
+import InventoryModal from './InventoryModal'
 
 const options = [
   {
@@ -21,7 +25,9 @@ const ConfirmOffer = ({ id, deleteOffer }) => {
     const [going, setGoing] = useState(null);
     const [agreement, setAgreement] = useState(false);
     const [inventory, setInventory] = useState(null);
+    const [openInventory, setOpenInventory] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [rows, setRows] = useState([])
     const [errors, setErrors] = useState({});
 
     const handleSubmit = async (e) => {
@@ -100,18 +106,28 @@ const ConfirmOffer = ({ id, deleteOffer }) => {
                 <Field style={{ marginTop: "10px"}}>
                     <Label className="mb-2 text-base/7 font-medium text-black">Inventory</Label>
                     <Description className="text-sm/6 text-black/50">Upload your Excel sheet here</Description>
-                    <input
-                        type="file"
-                        accept=".xlsx,.xls"
-                        onChange={e => {
-                            const file = e.target.files?.[0];
-                            if (file) {
-                            setInventory(file); // save to state or handle file
-                            }
-                        }}
-                        className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none"
-                        style={{ marginTop: "10px" }}
-                    />
+                    <ShadcnButton variant="outline" size="sm">
+                        <Upload /> 
+                        <input
+                            type="file"
+                            accept=".xlsx,.xls"
+                            onChange={async e => {
+                                const file = e.target.files?.[0]
+                                if (!file) return
+
+                                setInventory(file)
+
+                                const ab = await file.arrayBuffer();
+                                const wb  = read(ab);
+                                const ws  = wb.Sheets[wb.SheetNames[0]];
+                                const data = utils.sheet_to_json(ws);
+
+                                setRows(data)         
+                                setOpenInventory(true)
+                            }}
+                            className="block w-full …"
+                        />
+                    </ShadcnButton>
                     {errors.inventory_list && (
                         <p className="mt-1 text-sm text-red-600">{errors.inventory_list[0]}</p>
                     )}
@@ -128,6 +144,12 @@ const ConfirmOffer = ({ id, deleteOffer }) => {
                 Cancel Offer
             </Button>
         )}
+        <InventoryModal
+            open={openInventory}
+            onClose={() => setOpenInventory(false)}
+            rows={rows}
+            setRows={setRows}
+        />
     </form>
   )
 }
