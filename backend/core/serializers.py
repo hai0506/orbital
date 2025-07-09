@@ -210,14 +210,9 @@ class OfferStatusSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         value = data.get('status')
-        file = data.get('inventory_file')
         if value not in ['pending', 'approved', 'rejected','confirmed','cancelled']:
             raise serializers.ValidationError({'status': 'Invalid status.'})
         if value == 'confirmed':
-            if not file:
-                raise serializers.ValidationError({'inventory_list': 'Please upload product inventory.'})
-            elif (not file.name.endswith('.xlsx')) and (not file.name.endswith('.csv')):
-                raise serializers.ValidationError({'inventory_list': 'Please ensure file format is either .xlsx or .csv.'})
             if not data.get('agreement'):
                 raise serializers.ValidationError({'agreement': 'Please agree to the Terms and Conditions.'})
         return data
@@ -240,7 +235,4 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['product_id','name', 'quantity', 'price', 'image', 'vendor']
-
-class MassProductUploadSerializer(serializers.ModelSerializer):
-    file = models.FileField()
     

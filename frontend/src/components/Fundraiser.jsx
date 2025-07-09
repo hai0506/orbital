@@ -150,15 +150,24 @@ const Fundraiser = ({ fundraiser, role }) => {
                                                                 <span className="text-sm text-gray-700">I agree to the terms and conditions of the fundraiser.</span>
                                                             </label>
                                                         </Field>
-                                                        <a
-                                                            href={offer.inventory_file} 
-                                                            download 
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className="text-sm text-blue-600 underline hover:text-blue-800"
-                                                        >
-                                                            Download Inventory File
-                                                        </a>
+                                                        {offer.inventory_file ? (
+                                                            <a
+                                                                href={offer.inventory_file} 
+                                                                download 
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="text-sm text-blue-600 underline hover:text-blue-800"
+                                                            >
+                                                                Download Inventory File
+                                                            </a>
+                                                        ) : (
+                                                            <a
+                                                                rel="noopener noreferrer"
+                                                                className="text-sm text-gray-600 underline hover:text-gray-800"
+                                                            >
+                                                                Vendor has not uploaded any inventory sheets
+                                                            </a>
+                                                        )}
                                                     </div>
                                                 )}
                                             </div>
@@ -244,15 +253,24 @@ const Fundraiser = ({ fundraiser, role }) => {
                                                                 <span className="text-sm text-gray-700">I agree to the terms and conditions of the fundraiser.</span>
                                                             </label>
                                                         </Field>
-                                                        <a
-                                                            href={fundraiser.inventory_file} 
-                                                            download 
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className="text-sm text-blue-600 underline hover:text-blue-800"
-                                                        >
-                                                            Download Inventory File
-                                                        </a>
+                                                        {fundraiser.inventory_file ? (
+                                                            <a
+                                                                href={fundraiser.inventory_file} 
+                                                                download 
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="text-sm text-blue-600 underline hover:text-blue-800"
+                                                            >
+                                                                Download Inventory File
+                                                            </a>
+                                                        ) : (
+                                                            <a
+                                                                rel="noopener noreferrer"
+                                                                className="text-sm text-gray-600 underline hover:text-gray-800"
+                                                            >
+                                                                Vendor has not uploaded any inventory sheets
+                                                            </a>
+                                                        )}
                                                     </div>
                                     </>
                                 )} 
