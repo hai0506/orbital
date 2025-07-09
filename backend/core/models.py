@@ -70,4 +70,4 @@ class Product(models.Model):
     quantity = models.IntegerField(validators=[MinValueValidator(0)])
     price = models.FloatField(validators=[MinValueValidator(0)])
     image = models.ImageField(upload_to='product_images/', blank=True, null=True, validators=[filesize_valid])
-    vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, related_name="products")
+    vendor = models.ForeignKey(JobOffer, on_delete=models.CASCADE, related_name="products")

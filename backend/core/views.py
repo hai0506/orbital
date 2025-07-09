@@ -95,12 +95,8 @@ class CreateOfferView(generics.CreateAPIView): # create offers
         if vendor:
             return JobOffer.filter(vendor=vendor)
         else: return JobOffer.objects.none()
-        # return JobOffer.objects.none()
 
     def perform_create(self, serializer):
-        # vendor = Vendor.objects.get(user_id=2)
-        # serializer.save(vendor=vendor)
-
         vendor = get_or_none(Vendor, user=self.request.user)
         if vendor:
             serializer.save(vendor=vendor)
@@ -124,7 +120,6 @@ class UpdateOfferStatusView(generics.RetrieveUpdateAPIView):
     serializer_class = OfferStatusSerializer
     permission_classes = [IsAuthenticated]
     def get_queryset(self): 
-        # return JobOffer.objects.all()
         org = get_or_none(Organization, user=self.request.user)
         vendor = get_or_none(Vendor, user=self.request.user)
         if org:
@@ -135,15 +130,41 @@ class UpdateOfferStatusView(generics.RetrieveUpdateAPIView):
             raise PermissionError('User cannot edit offer status')
         
     def update(self, request, *args, **kwargs):
-        if request.data.get('status') == 'confirmed':
+        status_value = request.data.get('status')
+        if status_value not in ['pending', 'approved', 'rejected','confirmed','cancelled']:
+            return Response({'status': 'Invalid status.'}, status=status.HTTP_400_BAD_REQUEST)            
+            
+        if status_value == 'confirmed':
+            if request.data.get('agreement') == 'false':
+                return Response({'agreement': 'Please agree to the Terms and Conditions.'}, status=status.HTTP_400_BAD_REQUEST)
+            
             instance = self.get_object()
+            file = request.FILES.get('inventory_file')
+            if file:
+                try: # parse file
+                    if file.name.endswith('.csv'):
+                        df = pd.read_csv(file)
+                    elif file.name.endswith('.xlsx'):
+                        df = pd.read_excel(file)
+                    else:
+                        return Response({"inventory_list": "Please ensure file format is either .xlsx or .csv."}, status=status.HTTP_400_BAD_REQUEST)
+                    if not {"name", "quantity", "price"}.issubset(df.columns):
+                        return Response({"inventory_list": "Failed to parse file. Ensure columns are: name, quantity, price."}, status=status.HTTP_400_BAD_REQUEST)
+                    else:
+                        for _, row in df.iterrows(): # create products
+                            try:
+                                Product.objects.create(name=row['name'], quantity=row.quantity, price=row.price, vendor=instance)
+                            except:
+                                return Response({"inventory_list": "Failed to parse file. Ensure that entries are formatted correctly."}, status=status.HTTP_400_BAD_REQUEST)
+                except:
+                    return Response({"inventory_list": "Failed to parse file."}, status=status.HTTP_400_BAD_REQUEST)
+            
             fundraiser,_ = Fundraiser.objects.get_or_create(listing=instance.listing)
             fundraiser.vendors.add(instance)
-
         return super().update(request, *args, **kwargs)
 
 
-    lookup_field = 'offer_id' # to edit: go http://127.0.0.1:8000/core/edit-offer-status/<whatever product id>/
+    lookup_field = 'offer_id' # to edit: go http://127.0.0.1:8000/core/edit-offer-status/<whatever offer id>/
     
 class DeleteOfferView(generics.RetrieveDestroyAPIView):
     serializer_class = JobOfferSerializer
@@ -158,7 +179,7 @@ class DeleteOfferView(generics.RetrieveDestroyAPIView):
         else: 
             raise PermissionError('User cannot delete offers.')
 
-    lookup_field = 'offer_id' # http://127.0.0.1:8000/core/delete-offer/<product id>/
+    lookup_field = 'offer_id' # http://127.0.0.1:8000/core/delete-offer/<offer id>/
 
 class FundraiserListView(APIView):
     permission_classes = [IsAuthenticated]
@@ -193,39 +214,6 @@ class CreateProductView(generics.ListCreateAPIView):
             serializer.save(vendor=vendor)
         else:
             raise PermissionError('User cannot create products')
-
-class MassProductUploadView(APIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = MassProductUploadSerializer
-    def post(self, request):
-        # vendor = Vendor.objects.get(user_id=2)
-
-        vendor = get_or_none(Vendor, user=self.request.user)
-        if not vendor:
-            raise PermissionError('User cannot create products')
-
-        file = request.FILES['file']
-        if not file:
-            return Response({"error": "No file uploaded."}, status=status.HTTP_400_BAD_REQUEST)
-
-        try: # parse file
-            if file.name.endswith('.csv'):
-                df = pd.read_csv(file)
-            elif file.name.endswith('.xlsx'):
-                df = pd.read_excel(file)
-            else:
-                return Response({"error": "Unsupported file format."}, status=status.HTTP_400_BAD_REQUEST)
-            if not {"name", "quantity", "price"}.issubset(df.columns):
-                return Response({"error": "Failed to parse file. Ensure columns are: name, quantity, price."}, status=status.HTTP_400_BAD_REQUEST)
-            else:
-                for _, row in df.iterrows(): # create products
-                    try:
-                        Product.objects.create(name=row['name'], quantity=row.quantity, price=row.price, vendor=vendor)
-                    except:
-                        return Response({"error": "Failed to parse file. Ensure that entries are formatted correctly."}, status=status.HTTP_400_BAD_REQUEST)
-                return Response(status=status.HTTP_201_CREATED)
-        except:
-            return Response({"error": "Failed to parse file."}, status=status.HTTP_400_BAD_REQUEST)
         
 class ProductEditView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ProductSerializer

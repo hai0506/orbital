@@ -100,7 +100,7 @@ const ConfirmOffer = ({ id, deleteOffer }) => {
                         <span className="text-sm text-gray-700">I agree to the terms and conditions of the fundraiser.</span>
                     </label>
                     {errors.agreement && (
-                        <p className="mt-1 text-sm text-red-600">{errors.agreement[0]}</p>
+                        <p className="mt-1 text-sm text-red-600">{errors.agreement}</p>
                     )}
                 </Field>
                 <Field style={{ marginTop: "10px"}}>
@@ -129,10 +129,10 @@ const ConfirmOffer = ({ id, deleteOffer }) => {
                         />
                     </ShadcnButton>
                     {errors.inventory_list && (
-                        <p className="mt-1 text-sm text-red-600">{errors.inventory_list[0]}</p>
+                        <p className="mt-1 text-sm text-red-600">{errors.inventory_list}</p>
                     )}
                 </Field>
-                {(agreement === true && inventory !== null) && (
+                {(agreement === true) && (
                     <Button type="submit" style={{ marginTop: "10px" }} className="inline-flex items-center gap-2 rounded-md bg-green-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-green-600 data-open:bg-green-700">
                         Confirm Offer
                     </Button>
