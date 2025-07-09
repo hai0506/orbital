@@ -94,7 +94,7 @@ const ConfirmOffer = ({ id, deleteOffer }) => {
                         <span className="text-sm text-gray-700">I agree to the terms and conditions of the fundraiser.</span>
                     </label>
                     {errors.agreement && (
-                        <p className="mt-1 text-sm text-red-600">{errors.agreement[0]}</p>
+                        <p className="mt-1 text-sm text-red-600">{errors.agreement}</p>
                     )}
                 </Field>
                 <Field style={{ marginTop: "10px"}}>

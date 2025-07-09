@@ -208,15 +208,6 @@ class OfferStatusSerializer(serializers.ModelSerializer):
         model = JobOffer
         fields = ['status','inventory_file','agreement']
 
-    def validate(self, data):
-        value = data.get('status')
-        if value not in ['pending', 'approved', 'rejected','confirmed','cancelled']:
-            raise serializers.ValidationError({'status': 'Invalid status.'})
-        if value == 'confirmed':
-            if not data.get('agreement'):
-                raise serializers.ValidationError({'agreement': 'Please agree to the Terms and Conditions.'})
-        return data
-    
 class FundraiserSerializer(serializers.ModelSerializer):
     listing = serializers.PrimaryKeyRelatedField(read_only=True)
     vendors = serializers.PrimaryKeyRelatedField(many=True, queryset=JobOffer.objects.all())
