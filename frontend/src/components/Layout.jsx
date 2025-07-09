@@ -179,9 +179,16 @@ export default function Layout({ heading, children }) {
             </div>
             <div className="border-t border-gray-700 pt-4 pb-3">
               <div className="flex items-center px-5">
-                <div className="size-8 flex items-center justify-center rounded-full bg-pink-500 text-white font-medium">
-                  {logo}
-                </div>
+                {profile && profile.pfp ? (
+                  <img
+                    src={`${profile.pfp}`}
+                    className="size-8 rounded-full"
+                  />
+                ) : (
+                  <div className="size-8 flex items-center justify-center rounded-full bg-pink-500 text-white font-medium">
+                    {logo}
+                  </div>
+                )}
                 <div className="ml-3">
                   <div className="text-base/5 font-medium text-white">{username}</div>
                   <div className="text-sm font-medium text-gray-400">{role}</div>
