@@ -8,7 +8,6 @@ from .serializers import *
 from itertools import chain
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
-import pandas as pd
 
 
 @api_view(['GET'])
@@ -140,32 +139,9 @@ class UpdateOfferStatusView(generics.RetrieveUpdateAPIView):
 
             if request.data.get('agreement') == 'false':
                 return Response({'agreement': 'Please agree to the Terms and Conditions.'}, status=status.HTTP_400_BAD_REQUEST)
+            
             instance = self.get_object()
-            file = request.FILES.get('inventory_file')
-            products = request.data.pop('inventory', None)
-            
-            if file:
-                try: # parse file
-                    if file.name.endswith('.csv'):
-                        df = pd.read_csv(file)
-                    elif file.name.endswith('.xlsx'):
-                        df = pd.read_excel(file)
-                    else:
-                        return Response({'inventory_list': 'Please ensure file format is either .xlsx or .csv.'}, status=status.HTTP_400_BAD_REQUEST)
-                    if not {'name', 'quantity', 'price', 'remarks'}.issubset(df.columns):
-                        return Response({'inventory_list': 'Failed to parse file. Ensure columns are: name, quantity, price, remarks.'}, status=status.HTTP_400_BAD_REQUEST)
-                    else:
-                        for _, row in df.iterrows(): # create products
-                            try:
-                                if pd.isna(row.remarks):
-                                    Product.objects.create(name=row['name'], quantity=row.quantity, price=row.price, remarks='', vendor=instance)
-                                else: 
-                                    Product.objects.create(name=row['name'], quantity=row.quantity, price=row.price, remarks=row.remarks, vendor=instance)
-                            except:
-                                return Response({'inventory_list': 'Failed to parse file. Ensure that entries are formatted correctly.'}, status=status.HTTP_400_BAD_REQUEST)
-                except:
-                    return Response({'inventory_list': 'Failed to parse file.'}, status=status.HTTP_400_BAD_REQUEST)
-            
+            products = request.data.pop('inventory', None)                 
             if products:
                 for product in products:
                     Product.objects.create(name=product['name'],quantity=product['quantity'],price=product['price'],remarks=product['remarks'],vendor=instance)
