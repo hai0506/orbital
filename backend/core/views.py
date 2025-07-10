@@ -137,12 +137,13 @@ class UpdateOfferStatusView(generics.RetrieveUpdateAPIView):
         if status_value == 'confirmed':
             vendor = get_or_none(Vendor, user=self.request.user)
             if not vendor: raise PermissionError('User cannot confirm offers.')
-            print(request.data)
+
             if request.data.get('agreement') == 'false':
                 return Response({'agreement': 'Please agree to the Terms and Conditions.'}, status=status.HTTP_400_BAD_REQUEST)
             instance = self.get_object()
             file = request.FILES.get('inventory_file')
-            products = request.data.pop('inventory')
+            products = request.data.pop('inventory', None)
+            
             if file:
                 try: # parse file
                     if file.name.endswith('.csv'):
@@ -156,15 +157,19 @@ class UpdateOfferStatusView(generics.RetrieveUpdateAPIView):
                     else:
                         for _, row in df.iterrows(): # create products
                             try:
-                                Product.objects.create(name=row['name'], quantity=row.quantity, price=row.price, remarks=row.remarks, vendor=instance)
+                                if pd.isna(row.remarks):
+                                    Product.objects.create(name=row['name'], quantity=row.quantity, price=row.price, remarks='', vendor=instance)
+                                else: 
+                                    Product.objects.create(name=row['name'], quantity=row.quantity, price=row.price, remarks=row.remarks, vendor=instance)
                             except:
-                                return Response({'inventory_list": "Failed to parse file. Ensure that entries are formatted correctly.'}, status=status.HTTP_400_BAD_REQUEST)
+                                return Response({'inventory_list': 'Failed to parse file. Ensure that entries are formatted correctly.'}, status=status.HTTP_400_BAD_REQUEST)
                 except:
-                    return Response({'inventory_list": "Failed to parse file.'}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({'inventory_list': 'Failed to parse file.'}, status=status.HTTP_400_BAD_REQUEST)
             
             if products:
                 for product in products:
                     Product.objects.create(name=product['name'],quantity=product['quantity'],price=product['price'],remarks=product['remarks'],vendor=instance)
+            
             fundraiser,_ = Fundraiser.objects.get_or_create(listing=instance.listing)
             fundraiser.vendors.add(instance)
         return super().update(request, *args, **kwargs)
