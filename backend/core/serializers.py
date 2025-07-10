@@ -204,10 +204,10 @@ class JobOfferSerializer(serializers.ModelSerializer):
 
 class OfferStatusSerializer(serializers.ModelSerializer):
     agreement = serializers.BooleanField(write_only=True)
-    products = serializers.ListField(write_only=True, required=False)
+    inventory = serializers.ListField(write_only=True, required=False)
     class Meta:
         model = JobOffer
-        fields = ['status','inventory_file','agreement','products']
+        fields = ['status','inventory_file','agreement','inventory']
 
 class FundraiserSerializer(serializers.ModelSerializer):
     listing = serializers.PrimaryKeyRelatedField(read_only=True)
@@ -226,5 +226,5 @@ class ProductSerializer(serializers.ModelSerializer):
     vendor=serializers.PrimaryKeyRelatedField(read_only=True)
     class Meta:
         model = Product
-        fields = ['product_id','name', 'quantity', 'price', 'image', 'vendor']
+        fields = ['product_id','name', 'quantity', 'price', 'image', 'vendor','remarks']
     

@@ -71,3 +71,4 @@ class Product(models.Model):
     price = models.FloatField(validators=[MinValueValidator(0)])
     image = models.ImageField(upload_to='product_images/', blank=True, null=True, validators=[filesize_valid])
     vendor = models.ForeignKey(JobOffer, on_delete=models.CASCADE, related_name="products")
+    remarks = models.TextField(max_length=1000, blank=True)
