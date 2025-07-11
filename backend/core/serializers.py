@@ -156,7 +156,7 @@ class JobOfferSerializer(serializers.ModelSerializer):
         fields = [
             'offer_id', 'vendor', 'listing', 'allDays', 'selectedDays',
             'selectedCategories', 'category_list', 'remarks', 'commission',
-            'status', 'time_created','inventory_file'
+            'status', 'time_created'
         ]
 
     def __init__(self, *args, **kwargs):
@@ -207,7 +207,7 @@ class OfferStatusSerializer(serializers.ModelSerializer):
     inventory = serializers.ListField(write_only=True, required=False)
     class Meta:
         model = JobOffer
-        fields = ['status','inventory_file','agreement','inventory']
+        fields = ['status','agreement','inventory']
 
 class FundraiserSerializer(serializers.ModelSerializer):
     listing = serializers.PrimaryKeyRelatedField(read_only=True)

@@ -53,7 +53,6 @@ class JobOffer(models.Model):
     remarks = models.TextField(max_length=2000, blank=True)
     status = models.CharField()
     time_created = models.DateTimeField(auto_now_add=True)
-    inventory_file = models.FileField(null=True, blank=True,upload_to='inventory_files/')
 
     def delete(self, *args, **kwargs):
         self.selectedCategories.clear()
