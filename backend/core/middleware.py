@@ -34,6 +34,7 @@ class JWTAuthMiddleware(BaseMiddleware): # send over to websocket
                 "type": "websocket.close",
                 "code": 4000
             })
+            return
         
         try:
             user = await authenticate_websocket(token[0])

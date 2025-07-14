@@ -44,7 +44,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 "message": message.content,
                 "sender": self.sender.id,
                 "receiver": self.receiver.id,
-                "time_created": str(message.time_created),
+                "time_created": message.time_created.isoformat(),
                 "read": message.read
             }
         )
