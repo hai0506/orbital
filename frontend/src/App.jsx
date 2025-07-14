@@ -5,7 +5,9 @@ import Register from "./pages/Register";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { Provider } from "./components/ui/provider";
+import CreateListing from "./pages/CreateListing";
+import Offers from "./pages/Offers";
+import Fundraisers from "./pages/Fundraisers";
 
 function Logout() {
   localStorage.clear()
@@ -27,6 +29,30 @@ function App() {
             element={
               <ProtectedRoute>
                 <Home />
+              </ProtectedRoute>
+            }
+          />
+          <Route 
+            path="/create"
+            element={
+              <ProtectedRoute authRoles={["organization"]}>
+                <CreateListing />
+              </ProtectedRoute>
+            }
+          />
+          <Route 
+            path="/offers"
+            element={
+              <ProtectedRoute>
+                <Offers />
+              </ProtectedRoute>
+            }
+          />
+          <Route 
+            path="/fundraisers"
+            element={
+              <ProtectedRoute>
+                <Fundraisers />
               </ProtectedRoute>
             }
           />

@@ -3,6 +3,7 @@ import api from "../api";
 import { useNavigate, Link } from "react-router-dom";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
 import '../styles/form.css';
+import PV from "../styles/PV.png"
 
 const Form = ({route, method}) => {
     const [username, setUsername] = useState("")
@@ -37,7 +38,17 @@ const Form = ({route, method}) => {
                 localStorage.setItem(ACCESS_TOKEN, res.data.access)
                 localStorage.setItem(REFRESH_TOKEN, res.data.refresh)
                 localStorage.setItem("username", username)
+
+                try {
+                    const profileRes = await api.get("core/user/profile/");
+                    const role = profileRes.data.role;
+                    localStorage.setItem("ROLE", role);  
+                } catch (err) {
+                    console.error("Failed to fetch user profile after login:", err);
+                }
+
                 navigate("/")
+                console.log("Going home")
             } else {
                 navigate("/login")
             }
@@ -59,20 +70,19 @@ const Form = ({route, method}) => {
         <form onSubmit={handleSubmit} className="center-container" autoComplete="off">
             <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
                 <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-                <img
-                    alt="Your Company"
-                    src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
-                    className="mx-auto h-10 w-auto"
-                />
-                <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
-                    {
+                    <img
+                        alt="Your Company"
+                        src={PV}
+                        className="mx-auto w-68 h-50"
+                    />
+                    <h2 className="mt-0.5 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
+                        {
                         method === "register" 
                             ? "Register your account"
                             : "Sign in to your account"
-                    }
-                </h2>
+                        }
+                    </h2>
                 </div>
-
                 <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
                 <div className="space-y-6">
                     {method === "register" && (
@@ -103,7 +113,7 @@ const Form = ({route, method}) => {
 
                     <div>
                         <div className="flex items-center justify-between">
-                            <label htmlFor="password" className="block text-sm/6 font-medium text-gray-900">
+                            <label htmlFor="username" className="block text-sm/6 font-medium text-gray-900">
                             Username
                             </label>
                         </div>

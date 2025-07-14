@@ -14,6 +14,7 @@ from pathlib import Path
 from datetime import timedelta
 from dotenv import load_dotenv
 import os
+import sys
 
 load_dotenv()
 
@@ -154,6 +155,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWS_CREDENTIALS = True
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 CHANNEL_LAYERS = { # TODO: swap to Redis
     "default": {
         "BACKEND": "channels.layers.InMemoryChannelLayer"

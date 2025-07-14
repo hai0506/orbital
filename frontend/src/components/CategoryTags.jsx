@@ -43,7 +43,7 @@ const CategoryTags = ({ categories }) => {
 
   return (
     <div className="flex flex-wrap gap-3">
-      {categories.map((category) => (
+      {(categories ?? []).map((category) => (
         <Badge key={category} color={categoryColors[category] || "gray"}>
           {category}
         </Badge>
