@@ -5,9 +5,9 @@ import { useState } from 'react'
 import api from '../api'
 import { useNavigate } from 'react-router-dom'
 import { Button as ShadcnButton } from "./ui/button"
-import { Upload } from "lucide-react";
+import { Warehouse } from "lucide-react";
 import { read, utils } from 'xlsx';
-import InventoryModal from './InventoryModal'
+import UploadInventory from './UploadInventory'
 
 const options = [
   {
@@ -24,10 +24,10 @@ const ConfirmOffer = ({ id, deleteOffer }) => {
     const navigate = useNavigate();
     const [going, setGoing] = useState(null);
     const [agreement, setAgreement] = useState(false);
-    const [inventory, setInventory] = useState(null);
+    const [inventory, setInventory] = useState([]);
+    const [excelSheet, setExcelSheet] = useState(null);
     const [openInventory, setOpenInventory] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [rows, setRows] = useState([])
     const [errors, setErrors] = useState({});
 
     const handleSubmit = async (e) => {
@@ -37,8 +37,9 @@ const ConfirmOffer = ({ id, deleteOffer }) => {
             const formData = new FormData();
             formData.append('status', going ? "confirmed" : "cancelled");
             formData.append('agreement', agreement);
-            if (inventory) {
-                formData.append('inventory_file', inventory);  
+            formData.append('products', inventory);
+            if (excelSheet) {
+                formData.append('inventory_file', excelSheet);  
             }
 
             console.log("Sending formData:", formData);
@@ -105,34 +106,15 @@ const ConfirmOffer = ({ id, deleteOffer }) => {
                 </Field>
                 <Field style={{ marginTop: "10px"}}>
                     <Label className="mb-2 text-base/7 font-medium text-black">Inventory</Label>
-                    <Description className="text-sm/6 text-black/50">Upload your Excel sheet here</Description>
-                    <ShadcnButton variant="outline" size="sm">
-                        <Upload /> 
-                        <input
-                            type="file"
-                            accept=".xlsx,.xls"
-                            onChange={async e => {
-                                const file = e.target.files?.[0]
-                                if (!file) return
-
-                                setInventory(file)
-
-                                const ab = await file.arrayBuffer();
-                                const wb  = read(ab);
-                                const ws  = wb.Sheets[wb.SheetNames[0]];
-                                const data = utils.sheet_to_json(ws);
-
-                                setRows(data)         
-                                setOpenInventory(true)
-                            }}
-                            className="block w-full …"
-                        />
+                    <Description className="text-sm/6 text-black/50"></Description>
+                    <ShadcnButton type="button" onClick={() => setOpenInventory(true)} variant="outline" size="sm">
+                        <Warehouse />{inventory.length === 0 ? "Upload your inventory here" : "View your uploaded inventory"}
                     </ShadcnButton>
                     {errors.inventory_list && (
                         <p className="mt-1 text-sm text-red-600">{errors.inventory_list}</p>
                     )}
                 </Field>
-                {(agreement === true) && (
+                {(agreement === true && inventory.length !== 0) && (
                     <Button type="submit" style={{ marginTop: "10px" }} className="inline-flex items-center gap-2 rounded-md bg-green-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-green-600 data-open:bg-green-700">
                         Confirm Offer
                     </Button>
@@ -144,11 +126,15 @@ const ConfirmOffer = ({ id, deleteOffer }) => {
                 Cancel Offer
             </Button>
         )}
-        <InventoryModal
+        <UploadInventory
             open={openInventory}
             onClose={() => setOpenInventory(false)}
-            rows={rows}
-            setRows={setRows}
+            inventoryProps={{
+                inventory,
+                setInventory,
+                excelSheet,
+                setExcelSheet
+            }}
         />
     </form>
   )
