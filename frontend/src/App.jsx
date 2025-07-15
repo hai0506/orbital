@@ -8,6 +8,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import CreateListing from "./pages/CreateListing";
 import Offers from "./pages/Offers";
 import Fundraisers from "./pages/Fundraisers";
+import Fundraiser from "./pages/Fundraiser";
 
 function Logout() {
   localStorage.clear()
@@ -32,6 +33,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route 
             path="/create"
             element={
@@ -40,6 +42,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route 
             path="/offers"
             element={
@@ -48,6 +51,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          
           <Route 
             path="/fundraisers"
             element={
@@ -56,6 +60,16 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          <Route 
+            path="/fundraiser/:id"
+            element={
+              <ProtectedRoute>
+                <Fundraiser />
+              </ProtectedRoute>
+            }
+          />
+
           <Route path="/login" element={<Login />}/>
           <Route path="/logout" element={<Logout />}/>
           <Route path="/register" element={<RegisterAndLogout />}/>
