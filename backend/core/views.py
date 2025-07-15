@@ -141,7 +141,7 @@ class UpdateOfferStatusView(generics.RetrieveUpdateAPIView):
                 return Response({'agreement': 'Please agree to the Terms and Conditions.'}, status=status.HTTP_400_BAD_REQUEST)
             
             instance = self.get_object()
-            products = request.data.pop('inventory', None)                 
+            products = request.data.get('inventory', None)                 
             if products:
                 for product in products:
                     Product.objects.create(name=product['name'],quantity=product['quantity'],price=product['price'],remarks=product['remarks'],vendor=instance)
