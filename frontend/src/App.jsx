@@ -8,6 +8,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import CreateListing from "./pages/CreateListing";
 import Offers from "./pages/Offers";
 import Fundraisers from "./pages/Fundraisers";
+import Chat from "./pages/Chat"
 
 function Logout() {
   localStorage.clear()
@@ -53,6 +54,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Fundraisers />
+              </ProtectedRoute>
+            }
+          />
+          <Route 
+            path="/chat"
+            element={
+              <ProtectedRoute>
+                <Chat />
               </ProtectedRoute>
             }
           />

@@ -22,7 +22,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return
         
         user_ids = sorted([int(sender.id), int(receiver_id)])
-        self.room_name = f"chat_{user_ids[0]}-{user_ids[1]}"
+        self.room_name = f'chat_{user_ids[0]}-{user_ids[1]}'
         await self.channel_layer.group_add(self.room_name, self.channel_name)
         await self.accept()
 
@@ -40,20 +40,28 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_send(
             self.room_name,
             {
-                "type": "chat_message",
-                "message": message.content,
-                "sender": self.sender.id,
-                "receiver": self.receiver.id,
-                "time_created": message.time_created.isoformat(),
-                "read": message.read
+                'type': 'chat_message',
+                'message': message.content,
+                'senderId': self.sender.id,
+                'receiverId': self.receiver.id,
+                'senderUser': self.sender.username,
+                'receiverUser': self.receiver.username,
+                'time_created': message.time_created.isoformat(),
+                'read': message.read
             }
         )
 
     async def chat_message(self, event):
        await self.send(text_data=json.dumps({
-            "message": event["message"],
-            "sender": event["sender"],
-            "receiver": event["receiver"],
-            "time_created": event["time_created"],
-            "read": event["read"],
+            'content': event['message'],
+            'sender': {
+                'id': event['senderId'],
+                'username':event['senderUser']
+            },
+            'receiver': {
+                'id': event['receiverId'],
+                'username':event['receiverUser']
+            },
+            'time_created': event['time_created'],
+            'read': event['read'],
         }))

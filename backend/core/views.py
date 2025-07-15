@@ -178,25 +178,12 @@ class FundraiserListView(APIView):
         else: 
             raise PermissionError('User cannot view fundraisers.')
         
-        
-# class CreateMessageView(generics.CreateAPIView):
-#     serializer_class = MessageSerializer
-#     permission_classes = [AllowAny]
-
-#     def perform_create(self, serializer):
-#         # serializer.validated_data['sender'] = self.request.user
-#         serializer.validated_data['sender'] = User.objects.get(id=1)
-#         receiver = self.request.data.get('receiver', '')
-
-#         try:
-#             receiver_user = User.objects.get(id=receiver)
-#             serializer.validated_data['receiver'] = receiver_user
-#             if serializer.is_valid():
-#                 serializer.save()
-#                 return Response(data=serializer.data, status=status.HTTP_201_CREATED)
-#             else:
-#                 return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-#         except User.DoesNotExist:
-#             return Response({'error': 'Receiver does not exist'}, status=status.HTTP_400_BAD_REQUEST)
-
-
+class MessageListView(generics.ListAPIView):
+    serializer_class = MessageSerializer
+    permission_classes = [IsAuthenticated]
+    def get_queryset(self): 
+        receiver = self.kwargs['id']
+        return Message.objects.filter(
+            sender__in=[self.request.user, receiver],
+            receiver__in=[self.request.user, receiver]
+        ).order_by('time_created')

@@ -10,5 +10,5 @@ urlpatterns = [
     path('edit-offer-status/<int:offer_id>/', UpdateOfferStatusView.as_view(), name='edit-offer-status'),
     path('delete-offer/<int:offer_id>/', DeleteOfferView.as_view(), name='delete-offer'),
     path("fundraisers/", FundraiserListView.as_view(), name="fundraiser-list"),
-    # path("create-message/", CreateMessageView.as_view(), name="create-message"),
+    path("messages/<int:id>", MessageListView.as_view(), name="messages"),
 ]

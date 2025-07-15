@@ -234,3 +234,10 @@ class FundraiserSerializer(serializers.ModelSerializer):
         rep['listing'] = JobPostSerializer(instance.listing).data
         rep['vendors'] = JobOfferSerializer(instance.vendors.all(), many=True).data
         return rep
+    
+class MessageSerializer(serializers.ModelSerializer):
+    sender=UserSerializer(read_only=True)
+    receiver=UserSerializer(read_only=True)
+    class Meta:
+        model = Message
+        fields = ['message_id','sender','receiver','content','time_created','read']
