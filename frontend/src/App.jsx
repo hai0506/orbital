@@ -8,7 +8,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import CreateListing from "./pages/CreateListing";
 import Offers from "./pages/Offers";
 import Fundraisers from "./pages/Fundraisers";
-import Fundraiser from "./pages/Fundraiser";
+import VendorFundraiser from "./pages/VendorFundraiser";
 
 function Logout() {
   localStorage.clear()
@@ -51,7 +51,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-          
+
           <Route 
             path="/fundraisers"
             element={
@@ -65,7 +65,7 @@ function App() {
             path="/fundraiser/:id"
             element={
               <ProtectedRoute>
-                <Fundraiser />
+                <VendorFundraiser />
               </ProtectedRoute>
             }
           />
