@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
+import api from '../api'
 import { useParams } from 'react-router-dom';
 import { Button } from '@headlessui/react'
 import Layout from "@/components/Layout";
@@ -9,11 +10,12 @@ import { MoveLeft, MoveRight, X } from "lucide-react";
 const VendorFundraiser = () => {
     const { id } = useParams();
     // uncomment this
-    // const [fundraiser, setFundraiser] = useState(null);
+    const [fundraiser, setFundraiser] = useState(null);
     const [loading, setLoading] = useState(false);
     const [hidden, setHidden] = useState(false);
     const [cart, setCart] = useState([]);
     const [totalCost, setTotalCost] = useState(0);
+    const role = localStorage.getItem("ROLE");
 
     const localInventory = [
         { Item: "Socks", Price: 1.5, Quantity: 100, Remarks: "Best seller" },
@@ -25,15 +27,19 @@ const VendorFundraiser = () => {
         { Item: "Scarves", Price: 4.5, Quantity: 60, Remarks: "" },
     ];
 
-
     // uncomment this section to test fundraiser
-    /*
+    
     useEffect(() => {
+        const total = cart.reduce((sum, item) => sum + Number(item.Price) * Number(item.Quantity), 0);
+        setTotalCost(total);
+
         async function fetchFundraiser() {
+            setLoading(true);
             try {
-                const fundraiserRes = await api.get(`core/fundraiser/${id}`);
-                setFundraiser(fundraiser.data);
-                console.log(fundraiser);
+                const route = role === 'organisation' ? `core/fundraiser/${id}` : `core/delete-offer/${id}`;
+                const fundraiserRes = await api.get(route);
+                setFundraiser(fundraiserRes.data);
+                console.log(fundraiserRes);
             } catch (error) {
                 console.error('Failed to load fundraiser:', error);
             } finally {
@@ -42,16 +48,11 @@ const VendorFundraiser = () => {
         }
 
         fetchFundraiser();
-    }, []);
-    */
-
-    useEffect(() => {
-        const total = cart.reduce((sum, item) => sum + Number(item.Price) * Number(item.Quantity), 0);
-        setTotalCost(total);
     }, [cart]);
+    
 
     // comment this out
-    const fundraiser = offers[0];
+    // const fundraiser = offers[0];
 
     const addToCart = item => {
         setCart(prevCart => {
@@ -73,7 +74,7 @@ const VendorFundraiser = () => {
             <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 flex gap-4">
                 {!hidden && (
                     <div className="relative w-[25%] p-4 border-r border-gray-300">
-                        <ListingDetails fields={{...fundraiser.listing, commission: fundraiser.commission}} days={fundraiser.selectedDays} />
+                        <ListingDetails fields={{...fundraiser?.listing, commission: fundraiser?.listing.commission}} days={fundraiser?.selectedDays} />
                         <button
                             onClick={() => setHidden(true)}
                             className="absolute top-2 right-2 text-gray-500 hover:text-black"
@@ -92,7 +93,7 @@ const VendorFundraiser = () => {
                                 <MoveRight/>
                             </button>
                         )}
-                        <h5 className="text-3xl font-semibold mb-2">Inventory</h5>
+                        <h5 className="text-2xl font-semibold mb-2">Inventory</h5>
                         <table className="w-full text-sm">
                             <thead className="sticky top-0 bg-gray-100">
                                 <tr>
@@ -105,18 +106,11 @@ const VendorFundraiser = () => {
                             <tbody>
                                 {localInventory?.map((row, idx) => (
                                 <tr key={idx} className="border-b">
-                                    <td key={row.Item} className="p-2">
-                                        {row.Item}
+                                    {Object.entries(row).map(([k, v]) => (
+                                    <td key={k} className="p-2">
+                                        {v}
                                     </td>
-                                    <td key={row.Price} className="p-2">
-                                        ${row.Price.toFixed(2)}
-                                    </td>
-                                    <td key={row.Quantity} className="p-2">
-                                        {row.Quantity}
-                                    </td>
-                                    <td key={row.Remarks} className="p-2">
-                                        {row.Remarks}
-                                    </td>
+                                    ))}
                                     <td className="p-2">
                                         <button onClick={() => addToCart(row)} className="text-blue-500 hover:text-blue-700">Add to cart</button>
                                     </td>
@@ -126,7 +120,7 @@ const VendorFundraiser = () => {
                         </table>
                         {cart.length > 0 && (
                             <>
-                                <h5 className="text-3xl font-semibold mt-6 mb-2">Checkout</h5>
+                                <h5 className="text-2xl font-semibold mt-6 mb-2">Checkout</h5>
                                 <table className="w-full text-sm">
                                     <thead className="sticky top-0 bg-gray-100">
                                         <tr>
@@ -134,14 +128,13 @@ const VendorFundraiser = () => {
                                             <th className="p-2 text-left">Price</th>
                                             <th className="p-2 text-left">Quantity</th>
                                             <th className="p-2 text-left">Total Cost</th>
-                                            <th />
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {cart.map((row, idx) => (
                                             <tr key={idx} className="border-b">
                                                 <td className="p-2">{row.Item}</td>
-                                                <td className="p-2">${Number(row.Price).toFixed(2)}</td>
+                                                <td className="p-2">{row.Price}</td>
                                                 <td className="p-2">
                                                     <input
                                                         type="number"
@@ -157,7 +150,7 @@ const VendorFundraiser = () => {
                                                     />
                                                 </td>
                                                 <td className="p-2">
-                                                    ${(Number(row.Price) * Number(row.Quantity)).toFixed(2)}
+                                                    {Number(row.Price) * Number(row.Quantity)}
                                                 </td>
                                                 <td className="p-2">
                                                     <button onClick={() => removeItem(idx)} className="text-red-500 hover:text-red-700" >
@@ -168,7 +161,6 @@ const VendorFundraiser = () => {
                                         ))}
                                     </tbody>
                                 </table>
-                                <h5 className="text-2xl font-semibold mt-6 mb-2">Total Cost: ${totalCost.toFixed(2)}</h5>
                                 <div className="flex gap-4 mt-4">
                                     <Button  style={{ marginTop: "10px" }} className="self-start inline-flex items-center gap-2 rounded-md bg-green-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-green-600 data-open:bg-green-700">
                                         Checkout Items
@@ -184,6 +176,6 @@ const VendorFundraiser = () => {
             </div>
         </Layout>
     );
-}
+};
 
 export default VendorFundraiser;
