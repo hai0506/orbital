@@ -230,7 +230,7 @@ class ProductEditView(generics.RetrieveUpdateDestroyAPIView):
 
 class UpdateInventoryView(generics.GenericAPIView):
     serializer_class = ProductUpdateSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
         return Product.objects.filter(vendor=self.kwargs['offer_id'])
