@@ -185,7 +185,6 @@ class RetrieveFundraiserView(generics.RetrieveAPIView):
     serializer_class = FundraiserSerializer
     permission_classes = [IsAuthenticated]
     def get_queryset(self):
-        print('YESSSSSS')
         org = get_or_none(Organization, user=self.request.user)
         if org:
             return Fundraiser.objects.filter(listing__author=org)

@@ -14,6 +14,7 @@ const Fundraiser = () => {
     const [loading, setLoading] = useState(false);
     const [hidden, setHidden] = useState(false);
     const [cart, setCart] = useState([]);
+    const role = localStorage.getItem("ROLE");
 
     const localInventory = [
         { Item: "Socks", Price: 1.5, Quantity: 100, Remarks: "Best seller" },
@@ -31,7 +32,8 @@ const Fundraiser = () => {
         async function fetchFundraiser() {
             setLoading(true);
             try {
-                const fundraiserRes = await api.get(`core/fundraiser/${id}`);
+                const route = role === 'organisation' ? `core/fundraiser/${id}` : `core/delete-offer/${id}`;
+                const fundraiserRes = await api.get(route);
                 setFundraiser(fundraiserRes.data);
                 console.log(fundraiserRes);
             } catch (error) {

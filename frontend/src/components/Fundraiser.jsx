@@ -15,7 +15,8 @@ const Fundraiser = ({ fundraiser, role }) => {
 
     const handleClick = () => {
         setHovered(false);
-        navigate(`/fundraiser/${fundraiser.fundraiser_id}`);
+        const route = role === 'organisation' ? `/fundraiser/${fundraiser.fundraiser_id}` : `/fundraiser/${fundraiser.offer_id}`;
+        navigate(route);
     }
 
     return (
