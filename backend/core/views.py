@@ -180,6 +180,18 @@ class FundraiserListView(APIView):
             return Response(JobOfferSerializer(JobOffer.objects.filter(vendor=vendor, fundraisers__in=fundraisers).distinct(),many=True).data)
         else: 
             raise PermissionError('User cannot view fundraisers.')
+        
+class FundraiserRetrieveView(generics.RetrieveAPIView):
+    serializer_class = FundraiserSerializer
+    permission_classes = [IsAuthenticated]
+    def get_queryset(self):
+        print('YESSSSSS')
+        org = get_or_none(Organization, user=self.request.user)
+        if org:
+            return Fundraiser.objects.filter(listing__author=org)
+        else: 
+            raise PermissionError('User cannot view fundraisers.')    
+    lookup_field = 'fundraiser_id'
 
 class CreateProductView(generics.ListCreateAPIView):
     serializer_class = ProductSerializer

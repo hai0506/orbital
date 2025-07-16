@@ -10,6 +10,7 @@ urlpatterns = [
     path('edit-offer-status/<int:offer_id>/', UpdateOfferStatusView.as_view(), name='edit-offer-status'),
     path('delete-offer/<int:offer_id>/', DeleteOfferView.as_view(), name='delete-offer'),
     path("fundraisers/", FundraiserListView.as_view(), name="fundraiser-list"),
+    path("fundraiser/<int:fundraiser_id>/", FundraiserRetrieveView.as_view(), name="fundraiser-retrieve"),
     path("create-product/", CreateProductView.as_view(), name="create-product"),
     path('edit-product/<int:product_id>/', ProductEditView.as_view(), name='edit-product'),
 ]

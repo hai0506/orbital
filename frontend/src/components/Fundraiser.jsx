@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 import { Field, Fieldset, Label, Button, Description, Checkbox } from '@headlessui/react';
 import { CheckIcon } from '@heroicons/react/20/solid'
 import { X, CircleCheckBig, CircleX, Warehouse } from "lucide-react";
@@ -15,7 +15,7 @@ const Fundraiser = ({ fundraiser, role }) => {
 
     const handleClick = () => {
         setHovered(false);
-        navigate(`/fundraiser/${fundraiser.id}`);
+        navigate(`/fundraiser/${fundraiser.fundraiser_id}`);
     }
 
     return (
