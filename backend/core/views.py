@@ -181,7 +181,7 @@ class FundraiserListView(APIView):
         else: 
             raise PermissionError('User cannot view fundraisers.')
         
-class FundraiserRetrieveView(generics.RetrieveAPIView):
+class RetrieveFundraiserView(generics.RetrieveAPIView):
     serializer_class = FundraiserSerializer
     permission_classes = [IsAuthenticated]
     def get_queryset(self):
@@ -227,3 +227,28 @@ class ProductEditView(generics.RetrieveUpdateDestroyAPIView):
         # return Product.objects.all()
 
     lookup_field = 'product_id' # to edit: go http://127.0.0.1:8000/core/edit-product/<whatever product id>/
+
+class UpdateInventoryView(generics.GenericAPIView):
+    serializer_class = ProductUpdateSerializer
+    permission_classes = [AllowAny]
+    
+    def get_queryset(self):
+        return Product.objects.filter(vendor=self.kwargs['offer_id'])
+    
+    def patch(self, request, offer_id):
+        products = Product.objects.filter(vendor=offer_id)
+        product_names = {p.name: p for p in products}
+
+        for item in request.data:
+            name = item.get('item')
+            if name in product_names:
+                product = product_names[name]
+
+                bought = int(item['quantity'])
+                if bought > product.quantity:
+                    raise serializers.ValidationError(f"Not enough stock for {name}")
+                
+                product.quantity -= bought
+                product.save()
+
+        return Response(self.get_serializer(products, many=True).data)

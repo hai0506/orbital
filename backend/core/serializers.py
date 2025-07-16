@@ -228,3 +228,10 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = ['product_id','name', 'quantity', 'price', 'image', 'vendor','remarks']
     
+class ProductUpdateSerializer(serializers.ModelSerializer):
+    item = serializers.CharField(source="name")
+    maxQuantity = serializers.IntegerField(source="quantity", read_only=True)
+
+    class Meta:
+        model = Product
+        fields = ['product_id', 'item', 'quantity', 'price', 'remarks', 'maxQuantity']
