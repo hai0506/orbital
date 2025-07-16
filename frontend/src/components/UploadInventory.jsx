@@ -17,7 +17,7 @@ export default function UpdateInventory({ open, onClose, inventoryProps }) {
     setLocalInventory(r => r.map((row, i) => (i === idx ? { ...row, [key]: value } : row)))
   }
 
-  const addProduct = () => setLocalInventory([...localInventory, { Item: '', Price: '', Qty: '', Remarks: '' }])
+  const addProduct = () => setLocalInventory([...localInventory, { Item: '', Price: '', Quantity: '', Remarks: '' }])
   const deleteProduct = idx => setLocalInventory(localInventory.filter((_, i) => i !== idx))
   const clearInventory = () => {
     setLocalInventory([]);
@@ -59,7 +59,7 @@ export default function UpdateInventory({ open, onClose, inventoryProps }) {
                             return formattedRow;
                           });
 
-                          const cols = ["Item", "Price", "Qty", "Remarks"];
+                          const cols = ["Item", "Price", "Quantity", "Remarks"];
                           setLocalInventory(data.map(row => {
                             const temp = {};
                             cols.forEach(col => temp[col] = row[col] ?? '');
@@ -74,7 +74,7 @@ export default function UpdateInventory({ open, onClose, inventoryProps }) {
                 <table className="w-full text-sm">
                 <thead className="sticky top-0 bg-gray-100">
                   <tr>
-                    {Object.keys(localInventory?.[0] ?? { Item: '', Price: '', Qty: '', Remarks: '' }).map(h => (
+                    {Object.keys(localInventory?.[0] ?? { Item: '', Price: '', Quantity: '', Remarks: '' }).map(h => (
                       <th key={h} className="p-2 text-left">{h}</th>
                     ))}
                     <th />
