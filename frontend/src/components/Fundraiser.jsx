@@ -1,13 +1,22 @@
 import { useState } from "react";
 import { Field, Fieldset, Label, Button, Description, Checkbox } from '@headlessui/react';
 import { CheckIcon } from '@heroicons/react/20/solid'
-import { X, CircleCheckBig, CircleX } from "lucide-react";
+import { X, CircleCheckBig, CircleX, Warehouse } from "lucide-react";
+import { Button as ShadcnButton } from "./ui/button";
+
 import ListingDetails from "./ListingDetails";
+import { useNavigate } from "react-router-dom";
 
 const Fundraiser = ({ fundraiser, role }) => {
     const [hovered, setHovered] = useState(false);
     const [open, setOpen] = useState(false);
     const [expandedIndex, setExpandedIndex] = useState(null);
+    const navigate = useNavigate();
+
+    const handleClick = () => {
+        setHovered(false);
+        navigate(`/fundraiser/${fundraiser.id}`);
+    }
 
     return (
         <>
@@ -24,7 +33,11 @@ const Fundraiser = ({ fundraiser, role }) => {
                 </button>
 
                 {hovered && (
-                    <Button onClick={() => {setOpen(true);setHovered(false);}} style={{ marginTop: "10px" }} className="inline-flex items-center gap-2 rounded-md bg-gray-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-gray-600 data-open:bg-gray-700">
+                    <Button onClick={
+                        /*
+                        () => {setOpen(true);setHovered(false);}
+                        */
+                       handleClick} style={{ marginTop: "10px" }} className="inline-flex items-center gap-2 rounded-md bg-gray-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-gray-600 data-open:bg-gray-700">
                         Check it out!
                     </Button>
                 )}
@@ -150,7 +163,12 @@ const Fundraiser = ({ fundraiser, role }) => {
                                                                 <span className="text-sm text-gray-700">I agree to the terms and conditions of the fundraiser.</span>
                                                             </label>
                                                         </Field>
-                                                       
+                                                        <Field style={{ marginTop: "10px"}}>
+                                                            <Label className="mb-2 text-base/7 font-medium text-black">Inventory</Label>
+                                                            <ShadcnButton type="button" onClick={() => setOpenInventory(true)} variant="outline" size="sm">
+                                                                <Warehouse />View Inventory
+                                                            </ShadcnButton>
+                                                        </Field>
                                                     </div>
                                                 )}
                                             </div>
@@ -158,86 +176,90 @@ const Fundraiser = ({ fundraiser, role }) => {
                                 })}
                                 {role === "vendor" && (
                                     <>
-                                        <div className="pt-4 text-sm text-gray-700">
-                                                        <Field>
-                                                            <Label className="text-base/7 font-medium text-black">Dates</Label>
-                                                            {fundraiser.allDays === "Yes" ? (
-                                                                <div className="flex items-center gap-2 text-sm text-green-600">
-                                                                    <CircleCheckBig className="size-4" />
-                                                                    <span>Able to make it on all days</span>
-                                                                </div>
-                                                                ) : (
-                                                                <div className="text-sm text-red-600">
-                                                                    <div className="flex items-center gap-2 mb-1">
-                                                                        <CircleX className="size-4" />
-                                                                        <span>Unable to make it on these days:</span>
-                                                                    </div>
-                                                                        <ul className="pl-6 list-none space-y-1">
-                                                                            {fundraiser.selectedDays?.map((day, index) => (
-                                                                                <li key={index} className="flex items-center gap-2">
-                                                                                <span>{new Intl.DateTimeFormat('en-GB').format(new Date(day))}</span>
-                                                                                </li>
-                                                                            ))}
-                                                                        </ul>
-                                                                </div>
-                                                            )}
-                                                        </Field>
-                                                        <Field>
-                                                            <Label className="text-base/7 font-medium text-black">Products</Label>
-                                                            <div className="flex flex-wrap gap-3">
-                                                                {(fundraiser.selectedCategories ?? []).map((category) => (
-                                                                    <span
-                                                                        className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${fundraiser.listing.categories.includes(category) ? "bg-green-100 text-green-800" : "bg-orange-100 text-orange-800"}`}
-                                                                    >
-                                                                        {category}
-                                                                    </span>
-                                                                ))}
-                                                            </div>
-                                                        </Field>
-                                                        <Field>
-                                                            <Label className="text-base/7 font-medium text-black">Commission</Label>
-                                                            {fundraiser.commission >= fundraiser.listing.commission 
-                                                                ?   ( 
-                                                                        <div className="flex items-center gap-2 text-sm text-green-600">
-                                                                            <CircleCheckBig className="size-4" />
-                                                                            <span>{fundraiser.commission}% of revenue</span>
-                                                                        </div>
-                                                                    )
-                                                                :   ( 
-                                                                        <div className="flex items-center gap-2 text-sm text-red-600">
-                                                                            <CircleX className="size-4" />
-                                                                            <span>{fundraiser.commission}% of revenue ({fundraiser.listing.commission - fundraiser.commission}% less)</span>
-                                                                        </div>
-                                                                    )
-                                                            }
-                                                        </Field>
-                                                        <Field>
-                                                            {fundraiser.remarks && (
-                                                                <>
-                                                                    <Label className="text-base/7 font-medium text-black">Remarks</Label>
-                                                                    <div className="flex items-center gap-2 text-sm">
-                                                                        {fundraiser.remarks}
-                                                                    </div>
-                                                                </>
-                                                            )}
-                                                        </Field>
-                                                        <Field>
-                                                            <Label className="mb-2 text-base/7 font-medium text-black">Terms and Conditions</Label>
-                                                            <Description className="text-sm/6 text-black/50">Do you agree to the Terms and Conditions on the left?</Description>
-                                                            <label key="Agreement" className="flex items-center space-x-2 cursor-pointer mt-2">
-                                                                <Checkbox
-                                                                    disabled
-                                                                    checked={true}
-                                                                    onChange={() => {setAgreement(!agreement);console.log(agreement)}}
-                                                                    className="group size-6 rounded-md bg-black/10 p-1 ring-1 ring-gray-300 ring-inset focus:outline-none data-checked:bg-white-600"
-                                                                >
-                                                                <CheckIcon className="hidden size-4 fill-black group-data-checked:block" />
-                                                                </Checkbox>
-                                                                <span className="text-sm text-gray-700">I agree to the terms and conditions of the fundraiser.</span>
-                                                            </label>
-                                                        </Field>
-       
+                                            <Field>
+                                                <Label className="text-base/7 font-medium text-black">Dates</Label>
+                                                {fundraiser.allDays === "Yes" ? (
+                                                    <div className="flex items-center gap-2 text-sm text-green-600">
+                                                        <CircleCheckBig className="size-4" />
+                                                        <span>Able to make it on all days</span>
                                                     </div>
+                                                    ) : (
+                                                    <div className="text-sm text-red-600">
+                                                        <div className="flex items-center gap-2 mb-1">
+                                                            <CircleX className="size-4" />
+                                                            <span>Unable to make it on these days:</span>
+                                                        </div>
+                                                            <ul className="pl-6 list-none space-y-1">
+                                                                {fundraiser.selectedDays?.map((day, index) => (
+                                                                    <li key={index} className="flex items-center gap-2">
+                                                                    <span>{new Intl.DateTimeFormat('en-GB').format(new Date(day))}</span>
+                                                                    </li>
+                                                                ))}
+                                                            </ul>
+                                                    </div>
+                                                )}
+                                            </Field>
+                                            <Field>
+                                                <Label className="text-base/7 font-medium text-black">Products</Label>
+                                                <div className="flex flex-wrap gap-3">
+                                                    {(fundraiser.selectedCategories ?? []).map((category) => (
+                                                        <span
+                                                            className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${fundraiser.listing.categories.includes(category) ? "bg-green-100 text-green-800" : "bg-orange-100 text-orange-800"}`}
+                                                        >
+                                                            {category}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            </Field>
+                                            <Field>
+                                                <Label className="text-base/7 font-medium text-black">Commission</Label>
+                                                {fundraiser.commission >= fundraiser.listing.commission 
+                                                    ?   ( 
+                                                            <div className="flex items-center gap-2 text-sm text-green-600">
+                                                                <CircleCheckBig className="size-4" />
+                                                                <span>{fundraiser.commission}% of revenue</span>
+                                                            </div>
+                                                        )
+                                                    :   ( 
+                                                            <div className="flex items-center gap-2 text-sm text-red-600">
+                                                                <CircleX className="size-4" />
+                                                                <span>{fundraiser.commission}% of revenue ({fundraiser.listing.commission - fundraiser.commission}% less)</span>
+                                                            </div>
+                                                        )
+                                                }
+                                            </Field>
+                                            <Field>
+                                                {fundraiser.remarks && (
+                                                    <>
+                                                        <Label className="text-base/7 font-medium text-black">Remarks</Label>
+                                                        <div className="flex items-center gap-2 text-sm">
+                                                            {fundraiser.remarks}
+                                                        </div>
+                                                    </>
+                                                )}
+                                            </Field>
+                                            <Field>
+                                                <Label className="mb-2 text-base/7 font-medium text-black">Terms and Conditions</Label>
+                                                <Description className="text-sm/6 text-black/50">Do you agree to the Terms and Conditions on the left?</Description>
+                                                <label key="Agreement" className="flex items-center space-x-2 cursor-pointer mt-2">
+                                                    <Checkbox
+                                                        disabled
+                                                        checked={true}
+                                                        onChange={() => {setAgreement(!agreement);console.log(agreement)}}
+                                                        className="group size-6 rounded-md bg-black/10 p-1 ring-1 ring-gray-300 ring-inset focus:outline-none data-checked:bg-white-600"
+                                                    >
+                                                    <CheckIcon className="hidden size-4 fill-black group-data-checked:block" />
+                                                    </Checkbox>
+                                                    <span className="text-sm text-gray-700">I agree to the terms and conditions of the fundraiser.</span>
+                                                </label>
+                                            </Field>
+                                            
+                                            <Field style={{ marginTop: "10px"}}>
+                                                <Label className="mb-2 text-base/7 font-medium text-black">Inventory</Label>
+                                                <ShadcnButton type="button" onClick={() => setOpenInventory(true)} variant="outline" size="sm">
+                                                    <Warehouse />View Inventory
+                                                </ShadcnButton>
+                                            </Field>
                                     </>
                                 )} 
                             </div>
