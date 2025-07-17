@@ -15,17 +15,16 @@ const VendorFundraiser = () => {
     const [hidden, setHidden] = useState(false);
     const [cart, setCart] = useState([]);
     const [totalCost, setTotalCost] = useState(0);
-    const role = localStorage.getItem("ROLE");
 
-    const localInventory = [
-        { Item: "Socks", Price: 1.5, Quantity: 100, Remarks: "Best seller" },
-        { Item: "T-Shirts", Price: 8.0, Quantity: 50, Remarks: "New arrival" },
-        { Item: "Hats", Price: 5.5, Quantity: 25, Remarks: "Limited stock" },
-        { Item: "Jeans", Price: 20.0, Quantity: 30, Remarks: "Popular" },
-        { Item: "Jackets", Price: 40.0, Quantity: 10, Remarks: "" },
-        { Item: "Gloves", Price: 3.0, Quantity: 80, Remarks: "Winter collection" },
-        { Item: "Scarves", Price: 4.5, Quantity: 60, Remarks: "" },
-    ];
+    // const localInventory = [
+    //     { Item: "Socks", Price: 1.5, Quantity: 100, Remarks: "Best seller" },
+    //     { Item: "T-Shirts", Price: 8.0, Quantity: 50, Remarks: "New arrival" },
+    //     { Item: "Hats", Price: 5.5, Quantity: 25, Remarks: "Limited stock" },
+    //     { Item: "Jeans", Price: 20.0, Quantity: 30, Remarks: "Popular" },
+    //     { Item: "Jackets", Price: 40.0, Quantity: 10, Remarks: "" },
+    //     { Item: "Gloves", Price: 3.0, Quantity: 80, Remarks: "Winter collection" },
+    //     { Item: "Scarves", Price: 4.5, Quantity: 60, Remarks: "" },
+    // ];
 
     // uncomment this section to test fundraiser
     
@@ -36,8 +35,7 @@ const VendorFundraiser = () => {
         async function fetchFundraiser() {
             setLoading(true);
             try {
-                const route = role === 'organisation' ? `core/fundraiser/${id}` : `core/delete-offer/${id}`;
-                const fundraiserRes = await api.get(route);
+                const fundraiserRes = await api.get(`core/delete-offer/${id}`);
                 setFundraiser(fundraiserRes.data);
                 console.log(fundraiserRes);
             } catch (error) {
@@ -68,7 +66,7 @@ const VendorFundraiser = () => {
     }
 
     const removeItem = idx => setCart(cart.filter((_, i) => i !== idx));
-
+    if (loading || !fundraiser || !fundraiser.inventory) return <p>Loading...</p>;
     return (
         <Layout heading="View Fundraiser">
             <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 flex gap-4">
@@ -96,21 +94,28 @@ const VendorFundraiser = () => {
                         <h5 className="text-2xl font-semibold mb-2">Inventory</h5>
                         <table className="w-full text-sm">
                             <thead className="sticky top-0 bg-gray-100">
-                                <tr>
-                                    {Object.keys(localInventory?.[0] ?? { Item: '', Price: '', Quantity: '', Remarks: '' }).map(h => (
-                                    <th key={h} className="p-2 text-left">{h}</th>
-                                    ))}
-                                    <th />
-                                </tr>
+                            <tr>
+                                <th key='name' className="p-2 text-left">Item</th>
+                                <th key='price' className="p-2 text-left">Price</th>
+                                <th key='quantity' className="p-2 text-left">Quantity</th>
+                                <th key='remarks' className="p-2 text-left">Remarks</th>
+                            </tr>
                             </thead>
                             <tbody>
-                                {localInventory?.map((row, idx) => (
+                                {fundraiser.inventory?.map((row, idx) => (
                                 <tr key={idx} className="border-b">
-                                    {Object.entries(row).map(([k, v]) => (
-                                    <td key={k} className="p-2">
-                                        {v}
+                                    <td key={row.name} className="p-2">
+                                        {row.name}
                                     </td>
-                                    ))}
+                                    <td key={row.price} className="p-2">
+                                        ${row.price}
+                                    </td>
+                                    <td key={row.quantity} className="p-2">
+                                        {row.quantity}
+                                    </td>
+                                    <td key={row.remarks} className="p-2">
+                                        {row.remarks}
+                                    </td>
                                     <td className="p-2">
                                         <button onClick={() => addToCart(row)} className="text-blue-500 hover:text-blue-700">Add to cart</button>
                                     </td>
