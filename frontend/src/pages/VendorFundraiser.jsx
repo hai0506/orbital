@@ -96,7 +96,7 @@ const VendorFundraiser = () => {
                         <table className="w-full text-sm">
                             <thead className="sticky top-0 bg-gray-100">
                                 <tr>
-                                    {Object.keys(localInventory?.[0] ?? { Item: '', Price: '', Qty: '', Remarks: '' }).map(h => (
+                                    {Object.keys(localInventory?.[0] ?? { Item: '', Price: '', Quantity: '', Remarks: '' }).map(h => (
                                     <th key={h} className="p-2 text-left">{h}</th>
                                     ))}
                                     <th />
