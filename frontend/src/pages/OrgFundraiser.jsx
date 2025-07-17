@@ -76,25 +76,26 @@ const OrgFundraiser = () => {
                                         <table className="w-full text-sm">
                                             <thead className="sticky top-0 bg-gray-100">
                                                 <tr>
-                                                    {Object.keys(vendor.inventory?.[0] ?? { Item: '', Price: '', Quantity: '', Remarks: '' }).map(h => (
-                                                    <th key={h} className="p-2 text-left">{h}</th>
-                                                    ))}
+                                                    <th key='name' className="p-2 text-left">Item</th>
+                                                    <th key='price' className="p-2 text-left">Price</th>
+                                                    <th key='quantity' className="p-2 text-left">Quantity</th>
+                                                    <th key='remarks' className="p-2 text-left">Remarks</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 {vendor.inventory?.map((row, idx) => (
                                                 <tr key={idx} className="border-b">
-                                                    <td key={row.Item} className="p-2">
-                                                        {row.Item}
+                                                    <td key={row.name} className="p-2">
+                                                        {row.name}
                                                     </td>
-                                                    <td key={row.Price} className="p-2">
-                                                        ${row.Price.toFixed(2)}
+                                                    <td key={row.price} className="p-2">
+                                                        ${row.price}
                                                     </td>
-                                                    <td key={row.Quantity} className="p-2">
-                                                        {row.Quantity}
+                                                    <td key={row.quantity} className="p-2">
+                                                        {row.quantity}
                                                     </td>
-                                                    <td key={row.Remarks} className="p-2">
-                                                        {row.Remarks}
+                                                    <td key={row.remarks} className="p-2">
+                                                        {row.remarks}
                                                     </td>
                                                 </tr>
                                                 ))}

@@ -150,13 +150,14 @@ class JobOfferSerializer(serializers.ModelSerializer):
     vendor = serializers.PrimaryKeyRelatedField(read_only=True)
     listing = serializers.PrimaryKeyRelatedField(queryset=JobPost.objects.all())
     allDays = CharBooleanSerializer()
+    inventory = serializers.SerializerMethodField()
 
     class Meta:
         model = JobOffer
         fields = [
             'offer_id', 'vendor', 'listing', 'allDays', 'selectedDays',
             'selectedCategories', 'category_list', 'remarks', 'commission',
-            'status', 'time_created'
+            'status', 'time_created','inventory'
         ]
 
     def __init__(self, *args, **kwargs):
@@ -190,6 +191,10 @@ class JobOfferSerializer(serializers.ModelSerializer):
             
         return data
     
+    def get_inventory(self, obj):
+        products = Product.objects.filter(vendor=obj)
+        return ProductSerializer(products, many=True).data
+    
     def to_representation(self, instance):
         rep = super().to_representation(instance)
         rep['listing'] = JobPostSerializer(instance.listing).data
@@ -208,19 +213,6 @@ class OfferStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobOffer
         fields = ['status','agreement','inventory']
-
-class FundraiserSerializer(serializers.ModelSerializer):
-    listing = serializers.PrimaryKeyRelatedField(read_only=True)
-    vendors = serializers.PrimaryKeyRelatedField(many=True, queryset=JobOffer.objects.all())
-    class Meta:
-        model = Fundraiser
-        fields = ['fundraiser_id','vendors','listing']
-
-    def to_representation(self, instance):
-        rep = super().to_representation(instance)
-        rep['listing'] = JobPostSerializer(instance.listing).data
-        rep['vendors'] = JobOfferSerializer(instance.vendors.all(), many=True).data
-        return rep
     
 class ProductSerializer(serializers.ModelSerializer):
     vendor=serializers.PrimaryKeyRelatedField(read_only=True)
@@ -235,3 +227,16 @@ class ProductUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['product_id', 'item', 'quantity', 'price', 'remarks', 'maxQuantity']
+
+class FundraiserSerializer(serializers.ModelSerializer):
+    listing = serializers.PrimaryKeyRelatedField(read_only=True)
+    vendors = serializers.PrimaryKeyRelatedField(many=True, queryset=JobOffer.objects.all())
+    class Meta:
+        model = Fundraiser
+        fields = ['fundraiser_id','vendors','listing']
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        rep['listing'] = JobPostSerializer(instance.listing).data
+        rep['vendors'] = JobOfferSerializer(instance.vendors.all(), many=True).data
+        return rep
