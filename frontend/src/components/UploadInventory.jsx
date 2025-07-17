@@ -38,16 +38,20 @@ export default function UpdateInventory({ open, onClose, inventoryProps }) {
 
   const parseQty = (val) => {
     const num = parseInt(val);
-    return isNaN(num) || !Number.isInteger(int) ? null : int;
+    return isNaN(num) || !Number.isInteger(num) ? null : num;
   };
 
   const handleFileUpload = async (e) => {
+    setErrors({});
     const file = e.target.files?.[0]
-    if (!file) return
+    if (!file) {
+      setErrors({'file_upload':'File not found'})
+      return;
+    }
 
     const extension = file.name.split('.').pop();
     if (!['xlsx', 'xls'].includes(extension)) {
-      setErrors("Unsupported file type. Please ensure that your file is .xlsx or .xls.");
+      setErrors({'file_upload':'Unsupported file type. Please ensure that your file is .xlsx or .xls.'});
       return;
     }
 
@@ -65,20 +69,45 @@ export default function UpdateInventory({ open, onClose, inventoryProps }) {
       });
       return formattedRow;
     });
+    for (const col of ['Item','Price','Quantity']) {
+      if (!(col in data[0])) {
+        setErrors({'file_upload':`Missing required column: "${col}".`});
+        return;
+      }
+    }
 
-    const cols = ["Item", "Price", "Quantity", "Remarks"];
-    try {
-      setLocalInventory(data.map(row => {
-        // if()
-        const temp = {};
-        cols.forEach(col => temp[col] = row[col] ?? '');
-        return temp;
-      }));
+    const validatedData = []
+    for (let i = 0; i < data.length; i++) {
+      const row = data[i];
+      const item = row.Item;
+      const priceRaw = row.Price;
+      const quantityRaw = row.Quantity;
+      const remarks = row.Remarks ?? "";
+
+      if (!item || !priceRaw || !quantityRaw) {
+        setErrors({'file_upload':`Row ${i + 2} missing required fields (Item, Price or Quantity).`});
+        return;
+      }
+
+      const price = parsePrice(priceRaw);
+      const quantity = parseQty(quantityRaw);
+      if (price === null) {
+        setErrors({'file_upload':`Row ${i + 2}: Invalid price format. Please use a number.`});
+        return;
+      }
+      if (quantity === null) {
+        setErrors({'file_upload':`Row ${i + 2}: Invalid quantity format. Please use a whole number.`});
+        return;
+      }
+      validatedData.push({
+        Item: item,
+        Price: price,
+        Quantity: quantity,
+        Remarks: remarks
+      });
     }
-    catch(error) {
-      console.error(err);
-      setError("Failed to read Excel file.");
-    }
+    console.log(validatedData);
+    setLocalInventory(validatedData);
   }
 
   return (
@@ -96,6 +125,9 @@ export default function UpdateInventory({ open, onClose, inventoryProps }) {
                       className="block w-full"
                   />
             </ShadcnButton>
+            {errors['file_upload'] && (
+                        <p className="mb-3 text-sm text-red-600">{errors['file_upload']}</p>
+                    )}
             <div className="overflow-auto max-h-[60vh]">
                 <table className="w-full text-sm">
                 <thead className="sticky top-0 bg-gray-100">
