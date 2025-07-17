@@ -8,6 +8,7 @@ from .serializers import *
 from itertools import chain
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
+import json
 
 
 @api_view(['GET'])
@@ -141,10 +142,10 @@ class UpdateOfferStatusView(generics.RetrieveUpdateAPIView):
                 return Response({'agreement': 'Please agree to the Terms and Conditions.'}, status=status.HTTP_400_BAD_REQUEST)
             
             instance = self.get_object()
-            products = request.data.get('inventory', None)                 
+            products = json.loads(request.data.get('inventory', None))        
             if products:
                 for product in products:
-                    Product.objects.create(name=product['name'],quantity=product['quantity'],price=product['price'],remarks=product['remarks'],vendor=instance)
+                    Product.objects.create(name=product['Item'],quantity=product['Quantity'],price=product['Price'],remarks=product['Remarks'],vendor=instance)
             
             fundraiser,_ = Fundraiser.objects.get_or_create(listing=instance.listing)
             fundraiser.vendors.add(instance)

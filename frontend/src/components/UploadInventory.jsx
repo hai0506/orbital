@@ -26,9 +26,32 @@ export default function UpdateInventory({ open, onClose, inventoryProps }) {
   }
 
   const handleSave = () => {
-    setInventory(localInventory);
+    const errors = [];
+    const validated = [];
+  
+    for (let i = 0; i < localInventory.length; i++) {
+      const row = localInventory[i];
+      const item = row.Item?.toString().trim();
+      const remarks = row.Remarks ?? "";
+      const price = parsePrice(row.Price);
+      const quantity = parseQty(row.Quantity);
+  
+      if (!item || item === '') errors.push(`Row ${i + 1}: "Item" is required.`);
+      if (price === null) errors.push(`Row ${i + 1}: Invalid price format. Please use a number.`);
+      if (quantity === null) errors.push(`Row ${i + 1}: Invalid quantity format. Please use a whole number.`);
+  
+      validated.push({ Item: item, Price: price, Quantity: quantity, Remarks: remarks });
+    }
+  
+    if (errors.length > 0) {
+      setErrors({ inventory: errors });
+      return;
+    }
+  
+    setInventory(validated);
+    setErrors({});
     onClose();
-  }
+  };
 
   const parsePrice = (val) => {
     if (typeof val === 'string') val = val.replace(/[$,]/g, '').trim();
@@ -37,8 +60,9 @@ export default function UpdateInventory({ open, onClose, inventoryProps }) {
   };
 
   const parseQty = (val) => {
-    const num = parseInt(val);
-    return isNaN(num) || !Number.isInteger(num) ? null : num;
+    if (typeof val === 'string') val = val.trim();
+    const num = Number(val);
+    return  !Number.isInteger(num) ? null : num;
   };
 
   const handleFileUpload = async (e) => {
@@ -75,39 +99,7 @@ export default function UpdateInventory({ open, onClose, inventoryProps }) {
         return;
       }
     }
-
-    const validatedData = []
-    for (let i = 0; i < data.length; i++) {
-      const row = data[i];
-      const item = row.Item;
-      const priceRaw = row.Price;
-      const quantityRaw = row.Quantity;
-      const remarks = row.Remarks ?? "";
-
-      if (!item || !priceRaw || !quantityRaw) {
-        setErrors({'file_upload':`Row ${i + 2} missing required fields (Item, Price or Quantity).`});
-        return;
-      }
-
-      const price = parsePrice(priceRaw);
-      const quantity = parseQty(quantityRaw);
-      if (price === null) {
-        setErrors({'file_upload':`Row ${i + 2}: Invalid price format. Please use a number.`});
-        return;
-      }
-      if (quantity === null) {
-        setErrors({'file_upload':`Row ${i + 2}: Invalid quantity format. Please use a whole number.`});
-        return;
-      }
-      validatedData.push({
-        Item: item,
-        Price: price,
-        Quantity: quantity,
-        Remarks: remarks
-      });
-    }
-    console.log(validatedData);
-    setLocalInventory(validatedData);
+    setLocalInventory(data);
   }
 
   return (
@@ -157,8 +149,11 @@ export default function UpdateInventory({ open, onClose, inventoryProps }) {
                     ))}
                 </tbody>
                 </table>
+                {errors['inventory'] && (
+                        <p className="mb-1 mt-2 text-sm text-red-600">{errors['inventory'][0]}</p>
+                    )}
             </div>
-
+            
             <div className="flex justify-between mt-4">
                 <button onClick={addProduct} className="px-3 py-1 rounded bg-gray-200">Add Product</button>
                 <button onClick={clearInventory} className="px-3 py-1 rounded bg-gray-200">Clear Inventory</button>

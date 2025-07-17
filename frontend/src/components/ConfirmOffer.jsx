@@ -37,10 +37,10 @@ const ConfirmOffer = ({ id, deleteOffer }) => {
             const formData = new FormData();
             formData.append('status', going ? "confirmed" : "cancelled");
             formData.append('agreement', agreement);
-            formData.append('products', inventory);
-            if (excelSheet) {
-                formData.append('inventory_file', excelSheet);  
-            }
+            formData.append('inventory', JSON.stringify(inventory));
+            // if (excelSheet) {
+            //     formData.append('inventory_file', excelSheet);  
+            // }
 
             console.log("Sending formData:", formData);
 
