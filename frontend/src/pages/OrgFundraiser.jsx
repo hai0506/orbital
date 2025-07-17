@@ -23,7 +23,7 @@ const OrgFundraiser = () => {
     // uncomment this section to test fundraiser
     useEffect(() => {
         async function fetchFundraiser() {
-            setLoading(true);
+            // setLoading(true);
             try {
                 const fundraiserRes = await api.get(`core/fundraiser/${id}`);
                 setFundraiser(fundraiserRes.data);
@@ -38,13 +38,13 @@ const OrgFundraiser = () => {
         fetchFundraiser();
     }, []);
 
-    if (loading || !fundraiser.listing || !fundraiser.vendors) return <p>Loading...</p>;
+    // if (loading || !fundraiser.listing || !fundraiser.vendors) return <p>Loading...</p>;
     return (
         <Layout heading="View Fundraiser">
             <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 flex gap-4">
                 {!hidden && (
                     <div className="relative w-[25%] p-4 border-r border-gray-300">
-                        <ListingDetails fields={{...fundraiser.listing, commission: fundraiser.listing.commission}} days={fundraiser.selectedDays} />
+                        <ListingDetails fields={{...fundraiser?.listing, commission: fundraiser?.listing?.commission}} days={fundraiser?.selectedDays} />
                         <button
                             onClick={() => setHidden(true)}
                             className="absolute top-2 right-2 text-gray-500 hover:text-black"
@@ -63,13 +63,13 @@ const OrgFundraiser = () => {
                                 <MoveRight/>
                             </button>
                         )}
-                        <Tabs defaultValue={fundraiser.vendors[0].vendor.username} className="w-full">
+                        <Tabs defaultValue={fundraiser?.vendors?.[0].vendor.username} className="w-full">
                             <TabsList className="flex justify-start space-x-2 border-b">
-                                {fundraiser.vendors.map(vendor => (
+                                {fundraiser?.vendors?.map(vendor => (
                                     <TabsTrigger value={vendor.vendor.username}>{vendor.vendor.username}</TabsTrigger>
                                 ))}
                             </TabsList>
-                            {fundraiser.vendors.map(vendor => (
+                            {fundraiser?.vendors?.map(vendor => (
                                 <TabsContent value={vendor.vendor.username}>
                                     <>
                                         <h5 className="text-3xl font-semibold mb-2">{vendor.vendor.username}</h5>

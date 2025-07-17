@@ -66,7 +66,7 @@ const VendorFundraiser = () => {
     }
 
     const removeItem = idx => setCart(cart.filter((_, i) => i !== idx));
-    if (loading || !fundraiser || !fundraiser.inventory) return <p>Loading...</p>;
+    // if (loading || !fundraiser || !fundraiser.inventory) return <p>Loading...</p>;
     return (
         <Layout heading="View Fundraiser">
             <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 flex gap-4">
@@ -102,7 +102,7 @@ const VendorFundraiser = () => {
                             </tr>
                             </thead>
                             <tbody>
-                                {fundraiser.inventory?.map((row, idx) => (
+                                {fundraiser?.inventory?.map((row, idx) => (
                                 <tr key={idx} className="border-b">
                                     <td key={row.name} className="p-2">
                                         {row.name}
