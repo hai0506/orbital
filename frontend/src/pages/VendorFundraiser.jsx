@@ -33,7 +33,7 @@ const VendorFundraiser = () => {
         setTotalCost(total);
 
         async function fetchFundraiser() {
-            setLoading(true);
+            // setLoading(true);
             try {
                 const fundraiserRes = await api.get(`core/delete-offer/${id}`);
                 setFundraiser(fundraiserRes.data);
