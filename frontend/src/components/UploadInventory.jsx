@@ -8,6 +8,7 @@ import { Description } from '@headlessui/react'
 export default function UpdateInventory({ open, onClose, inventoryProps }) {
   const { inventory, setInventory, excelSheet, setExcelSheet } = inventoryProps;
   const [localInventory, setLocalInventory] = useState(inventory);
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     setLocalInventory(inventory)
@@ -29,6 +30,57 @@ export default function UpdateInventory({ open, onClose, inventoryProps }) {
     onClose();
   }
 
+  const parsePrice = (val) => {
+    if (typeof val === 'string') val = val.replace(/[$,]/g, '').trim();
+    const num = parseFloat(val);
+    return isNaN(num) ? null : parseFloat(num.toFixed(2));
+  };
+
+  const parseQty = (val) => {
+    const num = parseInt(val);
+    return isNaN(num) || !Number.isInteger(int) ? null : int;
+  };
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const extension = file.name.split('.').pop();
+    if (!['xlsx', 'xls'].includes(extension)) {
+      setErrors("Unsupported file type. Please ensure that your file is .xlsx or .xls.");
+      return;
+    }
+
+    setExcelSheet(file)
+
+    const ab = await file.arrayBuffer();
+    const wb  = read(ab);
+    const ws  = wb.Sheets[wb.SheetNames[0]];
+    const rawData = utils.sheet_to_json(ws, { raw: true, defval: '' }); 
+
+    const data = rawData.map(row => {
+      const formattedRow = {};
+      Object.entries(row).forEach(([key, value]) => {
+        formattedRow[key.trim()] = typeof value === 'string' ? value.trim() : value;
+      });
+      return formattedRow;
+    });
+
+    const cols = ["Item", "Price", "Quantity", "Remarks"];
+    try {
+      setLocalInventory(data.map(row => {
+        // if()
+        const temp = {};
+        cols.forEach(col => temp[col] = row[col] ?? '');
+        return temp;
+      }));
+    }
+    catch(error) {
+      console.error(err);
+      setError("Failed to read Excel file.");
+    }
+  }
+
   return (
     <Dialog as={Fragment} open={open} onClose={onClose}>
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
@@ -40,33 +92,7 @@ export default function UpdateInventory({ open, onClose, inventoryProps }) {
                   <input
                       type="file"
                       accept=".xlsx,.xls"
-                      onChange={async e => {
-                          const file = e.target.files?.[0]
-                          if (!file) return
-
-                          setExcelSheet(file)
-
-                          const ab = await file.arrayBuffer();
-                          const wb  = read(ab);
-                          const ws  = wb.Sheets[wb.SheetNames[0]];
-                          const rawData = utils.sheet_to_json(ws, { raw: true, defval: '' }); 
-
-                          const data = rawData.map(row => {
-                            const formattedRow = {};
-                            Object.entries(row).forEach(([key, value]) => {
-                              formattedRow[key.trim()] = typeof value === 'string' ? value.trim() : value;
-                            });
-                            return formattedRow;
-                          });
-
-                          const cols = ["Item", "Price", "Quantity", "Remarks"];
-                          setLocalInventory(data.map(row => {
-                            const temp = {};
-                            cols.forEach(col => temp[col] = row[col] ?? '');
-                            return temp;
-                          }));
-         
-                      }}
+                      onChange={handleFileUpload}
                       className="block w-full"
                   />
             </ShadcnButton>

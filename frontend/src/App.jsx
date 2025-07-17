@@ -1,5 +1,5 @@
 import React from "react";
-import {BrowserRouter, Routes, Route, Navigate} from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
@@ -9,6 +9,7 @@ import CreateListing from "./pages/CreateListing";
 import Offers from "./pages/Offers";
 import Fundraisers from "./pages/Fundraisers";
 import VendorFundraiser from "./pages/VendorFundraiser";
+import OrgFundraiser from "./pages/OrgFundraiser";
 
 function Logout() {
   localStorage.clear()
@@ -62,10 +63,19 @@ function App() {
           />
 
           <Route 
-            path="/fundraiser/:id"
+            path="/vfundraiser/:id"
             element={
               <ProtectedRoute>
                 <VendorFundraiser />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route 
+            path="/ofundraiser/:id"
+            element={
+              <ProtectedRoute>
+                <OrgFundraiser />
               </ProtectedRoute>
             }
           />

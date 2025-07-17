@@ -1,3 +1,5 @@
+import listings from "./Listings";
+
 const organization = {
     id: 200,
     username: "Test Organization",
@@ -17,19 +19,64 @@ const vendors = [
         otherCategories: "",
         commission: 25,
         remarks: "",
+        inventory: [
+            { Item: "Socks", Price: 1.5, Quantity: 100, Remarks: "Best seller" },
+            { Item: "T-Shirts", Price: 8.0, Quantity: 50, Remarks: "New arrival" },
+            { Item: "Hats", Price: 5.5, Quantity: 25, Remarks: "Limited stock" },
+            { Item: "Jeans", Price: 20.0, Quantity: 30, Remarks: "Popular" },
+            { Item: "Jackets", Price: 40.0, Quantity: 10, Remarks: "" },
+            { Item: "Gloves", Price: 3.0, Quantity: 80, Remarks: "Winter collection" },
+            { Item: "Scarves", Price: 4.5, Quantity: 60, Remarks: "" },
+        ]
+    },
+    {
+        vendor: {
+            id: 101,
+            username: "Alice Tan",
+            email: "alice@vendor.com"
+        },
+        allDays: "Yes",
+        selectedDays: [],
+        selectedCategories: ["Jewelry", "Handmade Goods"],
+        otherCategories: "Eco-friendly Items",
+        commission: 20,
+        remarks: "Returning vendor",
+        inventory: [
+            { Item: "Necklace", Price: 15.0, Quantity: 40, Remarks: "Handmade" },
+            { Item: "Bracelet", Price: 10.0, Quantity: 70, Remarks: "" },
+            { Item: "Earrings", Price: 12.5, Quantity: 60, Remarks: "Best seller" },
+            { Item: "Rings", Price: 8.0, Quantity: 100, Remarks: "" },
+            { Item: "Keychains", Price: 5.0, Quantity: 150, Remarks: "Popular item" }
+        ]
+    },
+    {
+        vendor: {
+            id: 102,
+            username: "David Chen",
+            email: "david@bazaar.com"
+        },
+        allDays: "No",
+        selectedDays: [new Date("2025-06-21")],
+        selectedCategories: ["Home Decor"],
+        otherCategories: "",
+        commission: 30,
+        remarks: "First-time participant",
+        inventory: [
+            { Item: "Candles", Price: 6.0, Quantity: 40, Remarks: "Scented" },
+            { Item: "Lamps", Price: 25.0, Quantity: 20, Remarks: "" },
+            { Item: "Wall Art", Price: 30.0, Quantity: 15, Remarks: "Local artist" },
+            { Item: "Cushions", Price: 12.0, Quantity: 50, Remarks: "" },
+            { Item: "Vases", Price: 18.0, Quantity: 35, Remarks: "Glassware" }
+        ]
     }
-]
+];
+
 
 const Fundraisers = [
     {
-        organization: organization,
+        fundraiser_id: 100,
         vendors: vendors,
-        title: "Test Fundraiser",
-        location: "National University of Singapore",
-        start_date: new Date("2025-06-17"),
-        end_date: new Date("2025-06-29"),
-        start_time: "08:45:00",
-        end_time: "13:45:00",
+        listing: listings[0]
     }
 ]
 
