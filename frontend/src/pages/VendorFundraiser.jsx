@@ -4,18 +4,27 @@ import { useParams } from 'react-router-dom';
 import { Button } from '@headlessui/react'
 import Layout from "@/components/Layout";
 import ListingDetails from "@/components/ListingDetails";
-import offers from "@/data/Offers";
+import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { MoveLeft, MoveRight, X } from "lucide-react";
  
 const VendorFundraiser = () => {
     const { id } = useParams();
-    // uncomment this
     const [fundraiser, setFundraiser] = useState(null);
     const [inventory, setInventory] = useState(null);
     const [loading, setLoading] = useState(false);
     const [hidden, setHidden] = useState(false);
     const [cart, setCart] = useState([]);
     const [totalCost, setTotalCost] = useState(0);
+    const [buyerDetails, setBuyerDetails] = useState({});
     const [errors, setErrors] = useState(null);
 
     // const localInventory = [
@@ -77,7 +86,9 @@ const VendorFundraiser = () => {
         try {
             console.log(cart);
             const checkoutRes = await api.patch(`core/update-inventory/${id}/`, cart);
+            console.log(buyerDetails);
             setCart([]); 
+            setBuyerDetails({});
         } catch (error) {
             console.error('Failed to update inventory:', error);
         } finally {
@@ -135,23 +146,23 @@ const VendorFundraiser = () => {
                             </thead>
                             <tbody>
                                 {inventory?.map((row, idx) => (
-                                <tr className="border-b">
-                                    <td className="p-2">
-                                        {row.name}
-                                    </td>
-                                    <td className="p-2">
-                                        ${row.price.toFixed(2)}
-                                    </td>
-                                    <td className="p-2">
-                                        {row.quantity}
-                                    </td>
-                                    <td className="p-2">
-                                        {row.remarks}
-                                    </td>
-                                    <td className="p-2">
-                                        <button onClick={() => addToCart(row)} className="text-blue-500 hover:text-blue-700">Add to cart</button>
-                                    </td>
-                                </tr>
+                                    <tr className="border-b">
+                                        <td className="p-2">
+                                            {row.name}
+                                        </td>
+                                        <td className="p-2">
+                                            ${row.price.toFixed(2)}
+                                        </td>
+                                        <td className="p-2">
+                                            {row.quantity}
+                                        </td>
+                                        <td className="p-2">
+                                            {row.remarks}
+                                        </td>
+                                        <td className="p-2">
+                                            <button onClick={() => addToCart(row)} className="text-blue-500 hover:text-blue-700">Add to cart</button>
+                                        </td>
+                                    </tr>
                                 ))}
                             </tbody>
                         </table>
@@ -192,9 +203,9 @@ const VendorFundraiser = () => {
 
                                                                 const updatedCart = [...cart];
                                                                 const oldQuantity = updatedCart[idx].quantity;
-                                                                const delta = newQuantity - oldQuantity;
+                                                                const change = newQuantity - oldQuantity;
 
-                                                                if (delta === 0) return;
+                                                                if (change === 0) return;
 
                                                                 updatedCart[idx].quantity = newQuantity;
                                                                 setCart(updatedCart);
@@ -204,7 +215,7 @@ const VendorFundraiser = () => {
                                                                         if (product.name === row.item) {
                                                                             return {
                                                                                 ...product,
-                                                                                quantity: product.quantity - delta,
+                                                                                quantity: product.quantity - change,
                                                                             };
                                                                         }
                                                                         return product;
@@ -229,7 +240,64 @@ const VendorFundraiser = () => {
                                         ))}
                                     </tbody>
                                 </table>
-                                {cart && (<p className="text-2xl font-semibold mt-6 mb-2">Total Price: ${totalCost.toFixed(2)}</p>)}
+                                {cart && (
+                                    <>
+                                        <p className="text-2xl font-semibold mt-6 mb-2">Total Price: ${totalCost.toFixed(2)}</p>
+                                        <div className='grid grid-cols-4 gap-4'>
+                                            <Input
+                                                onChange={e =>
+                                                    setBuyerDetails(prev => ({
+                                                        ...prev,
+                                                        name: e.target.value
+                                                    }))
+                                                }
+                                                type="text"
+                                                placeholder="Name of Buyer"
+                                            />
+                                            <Input
+                                                onChange={e =>
+                                                    setBuyerDetails(prev => ({
+                                                        ...prev,
+                                                        phone: e.target.value
+                                                    }))
+                                                }
+                                                type="text"
+                                                placeholder="Phone Number (optional)"
+                                            />
+                                            <Input
+                                                onChange={e =>
+                                                    setBuyerDetails(prev => ({
+                                                        ...prev,
+                                                        email: e.target.value
+                                                    }))
+                                                }
+                                                type="email" 
+                                                placeholder="Email Address (optional)"
+                                            />
+                                            <Select
+                                                onValueChange={value =>
+                                                    setBuyerDetails(prev => ({
+                                                        ...prev,
+                                                        payment: value
+                                                    }))
+                                                }
+                                            >
+                                                <SelectTrigger className="w-full">
+                                                    <SelectValue placeholder="Payment Method" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectGroup>
+                                                        <SelectItem value="PayLah/PayNow">PayLah/PayNow</SelectItem>
+                                                        <SelectItem value="Cash">Cash</SelectItem>
+                                                        <SelectItem value="Card">Card</SelectItem>
+                                                        <SelectItem value="NETS">NETS</SelectItem>
+                                                        <SelectItem value="Others">Others</SelectItem>
+                                                    </SelectGroup>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                    </>
+                                )}
                                 {errors && (
                                     <p className="mt-1 text-sm text-red-600">
                                         {errors[0]}
