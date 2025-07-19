@@ -183,11 +183,18 @@ const VendorFundraiser = () => {
                                                             min={1}
                                                             max={row.maxQuantity}
                                                             onChange={(e) => {
-                                                                const newQuantity = parseInt(e.target.value) || 0;
-                                                                const updatedCart = [...cart];
+                                                                const max = row.maxQuantity; 
+                                                                let newQuantity = parseInt(e.target.value);
 
+                                                                if (isNaN(newQuantity)) return;
+
+                                                                newQuantity = Math.max(1, Math.min(max, newQuantity));
+
+                                                                const updatedCart = [...cart];
                                                                 const oldQuantity = updatedCart[idx].quantity;
                                                                 const delta = newQuantity - oldQuantity;
+
+                                                                if (delta === 0) return;
 
                                                                 updatedCart[idx].quantity = newQuantity;
                                                                 setCart(updatedCart);
@@ -197,7 +204,7 @@ const VendorFundraiser = () => {
                                                                         if (product.name === row.item) {
                                                                             return {
                                                                                 ...product,
-                                                                                quantity: product.quantity - delta
+                                                                                quantity: product.quantity - delta,
                                                                             };
                                                                         }
                                                                         return product;
