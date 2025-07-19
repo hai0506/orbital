@@ -11,10 +11,12 @@ const VendorFundraiser = () => {
     const { id } = useParams();
     // uncomment this
     const [fundraiser, setFundraiser] = useState(null);
+    const [inventory, setInventory] = useState(null);
     const [loading, setLoading] = useState(false);
     const [hidden, setHidden] = useState(false);
     const [cart, setCart] = useState([]);
     const [totalCost, setTotalCost] = useState(0);
+    const [errors, setErrors] = useState(null);
 
     // const localInventory = [
     //     { Item: "Socks", Price: 1.5, Quantity: 100, Remarks: "Best seller" },
@@ -29,14 +31,12 @@ const VendorFundraiser = () => {
     // uncomment this section to test fundraiser
     
     useEffect(() => {
-        const total = cart.reduce((sum, item) => sum + Number(item.Price) * Number(item.Quantity), 0);
-        setTotalCost(total);
-
         async function fetchFundraiser() {
             // setLoading(true);
             try {
                 const fundraiserRes = await api.get(`core/delete-offer/${id}`);
                 setFundraiser(fundraiserRes.data);
+                setInventory(fundraiserRes.data.inventory);
                 console.log(fundraiserRes);
             } catch (error) {
                 console.error('Failed to load fundraiser:', error);
@@ -46,26 +46,57 @@ const VendorFundraiser = () => {
         }
 
         fetchFundraiser();
-    }, [cart]);
+    }, []);
+
+    useEffect(() => {
+        const total = cart.reduce((sum, item) => sum + Number(item.price) * Number(item.quantity), 0);
+        setTotalCost(total);
+    }, [cart])
     
 
     // comment this out
     // const fundraiser = offers[0];
 
     const addToCart = item => {
+        console.log(item);
         setCart(prevCart => {
-            const exists = prevCart.find(i => i.Item === item.Item);
+            const exists = prevCart.find(i => i.item === item.name);
             if (exists) {
-                return prevCart.map(i =>
-                    i.Item === item.Item ? { ...i, Quantity: i.Quantity + 1 } : i
-                );
+                return prevCart;
             } else {
-                return [...prevCart, { Item: item.Item, Price: item.Price, Quantity: 1, maxQuantity: item.Quantity }];
+                return [...prevCart, { item: item.name, price: item.price, quantity: 1, maxQuantity: item.quantity }];
             }
         })
+        setInventory(prev =>
+            prev.filter(product => product.name !== item.name)
+        );
     }
 
-    const removeItem = idx => setCart(cart.filter((_, i) => i !== idx));
+    const handleCheckout = async () => {
+        setLoading(true);
+        try {
+            console.log(cart);
+            const checkoutRes = await api.patch(`core/update-inventory/${id}/`, cart);
+            setCart([]); 
+        } catch (error) {
+            console.error('Failed to update inventory:', error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const removeItem = item => {
+        setCart(cart.filter(i => i !== item));
+        setInventory(prevInventory => [
+            ...prevInventory,
+            {
+                name: item.item,
+                price: item.price,
+                quantity: item.maxQuantity,
+            },
+        ]);
+    }
+
     // if (loading || !fundraiser || !fundraiser.inventory) return <p>Loading...</p>;
     return (
         <Layout heading="View Fundraiser">
@@ -99,21 +130,22 @@ const VendorFundraiser = () => {
                                 <th key='price' className="p-2 text-left">Price</th>
                                 <th key='quantity' className="p-2 text-left">Quantity</th>
                                 <th key='remarks' className="p-2 text-left">Remarks</th>
+                                <th />
                             </tr>
                             </thead>
                             <tbody>
-                                {fundraiser?.inventory?.map((row, idx) => (
-                                <tr key={idx} className="border-b">
-                                    <td key={row.name} className="p-2">
+                                {inventory?.map((row, idx) => (
+                                <tr className="border-b">
+                                    <td className="p-2">
                                         {row.name}
                                     </td>
-                                    <td key={row.price} className="p-2">
-                                        ${row.price}
+                                    <td className="p-2">
+                                        ${row.price.toFixed(2)}
                                     </td>
-                                    <td key={row.quantity} className="p-2">
+                                    <td className="p-2">
                                         {row.quantity}
                                     </td>
-                                    <td key={row.remarks} className="p-2">
+                                    <td className="p-2">
                                         {row.remarks}
                                     </td>
                                     <td className="p-2">
@@ -132,42 +164,72 @@ const VendorFundraiser = () => {
                                             <th className="p-2 text-left">Item</th>
                                             <th className="p-2 text-left">Price</th>
                                             <th className="p-2 text-left">Quantity</th>
+                                            <th className="p-2 text-left">Qty Left</th>
                                             <th className="p-2 text-left">Total Cost</th>
+                                            <th />
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {cart.map((row, idx) => (
-                                            <tr key={idx} className="border-b">
-                                                <td className="p-2">{row.Item}</td>
-                                                <td className="p-2">{row.Price}</td>
-                                                <td className="p-2">
-                                                    <input
-                                                        type="number"
-                                                        className="w-16 border rounded px-2 py-1"
-                                                        value={row.Quantity}
-                                                        min={1}
-                                                        max={row.maxQuantity}
-                                                        onChange={(e) => {
-                                                            const updatedCart = [...cart];
-                                                            updatedCart[idx].Quantity = parseInt(e.target.value) || 0;
-                                                            setCart(updatedCart);
-                                                        }}
-                                                    />
-                                                </td>
-                                                <td className="p-2">
-                                                    {Number(row.Price) * Number(row.Quantity)}
-                                                </td>
-                                                <td className="p-2">
-                                                    <button onClick={() => removeItem(idx)} className="text-red-500 hover:text-red-700" >
-                                                        <X />
-                                                    </button>
-                                                </td>
-                                            </tr>
+                                            <>
+                                                <tr className="border-b">
+                                                    <td className="p-2">{row.item}</td>
+                                                    <td className="p-2">${row.price.toFixed(2)}</td>
+                                                    <td className="p-2">
+                                                        <input
+                                                            type="number"
+                                                            className="w-16 border rounded px-2 py-1"
+                                                            value={row.quantity}
+                                                            min={1}
+                                                            max={row.maxQuantity}
+                                                            onChange={(e) => {
+                                                                const newQuantity = parseInt(e.target.value) || 0;
+                                                                const updatedCart = [...cart];
+
+                                                                const oldQuantity = updatedCart[idx].quantity;
+                                                                const delta = newQuantity - oldQuantity;
+
+                                                                updatedCart[idx].quantity = newQuantity;
+                                                                setCart(updatedCart);
+
+                                                                setInventory(prevInventory =>
+                                                                    prevInventory.map(product => {
+                                                                        if (product.name === row.item) {
+                                                                            return {
+                                                                                ...product,
+                                                                                quantity: product.quantity - delta
+                                                                            };
+                                                                        }
+                                                                        return product;
+                                                                    })
+                                                                );
+                                                            }}
+                                                        />
+                                                    </td>
+                                                    <td className="p-2">
+                                                        {row.maxQuantity - row.quantity}
+                                                    </td>
+                                                    <td className="p-2">
+                                                        ${(Number(row.price) * Number(row.quantity)).toFixed(2)}
+                                                    </td>
+                                                    <td className="p-2">
+                                                        <button onClick={() => removeItem(row)} className="text-red-500 hover:text-red-700" >
+                                                            <X />
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </>
                                         ))}
                                     </tbody>
                                 </table>
+                                {cart && (<p className="text-2xl font-semibold mt-6 mb-2">Total Price: ${totalCost.toFixed(2)}</p>)}
+                                {errors && (
+                                    <p className="mt-1 text-sm text-red-600">
+                                        {errors[0]}
+                                    </p>
+                                )}
                                 <div className="flex gap-4 mt-4">
-                                    <Button  style={{ marginTop: "10px" }} className="self-start inline-flex items-center gap-2 rounded-md bg-green-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-green-600 data-open:bg-green-700">
+                                    <Button onClick={handleCheckout} style={{ marginTop: "10px" }} className="self-start inline-flex items-center gap-2 rounded-md bg-green-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-green-600 data-open:bg-green-700">
                                         Checkout Items
                                     </Button>
                                     <Button onClick={() => setCart([])} style={{ marginTop: "10px" }} className="self-start inline-flex items-center gap-2 rounded-md bg-red-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-red-600 data-open:bg-red-700">
