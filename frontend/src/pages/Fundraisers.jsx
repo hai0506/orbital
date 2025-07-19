@@ -33,19 +33,31 @@ const Fundraisers = () => {
   return (
     <>
         <Layout heading="Fundraisers">
-            <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 grid grid-cols-3 gap-4">
-                {fundraisers.map((fundraiser, index) => {
-                    return <Fundraiser key={fundraiser.fundraiser_id ?? `fallback-${index}`} fundraiser={fundraiser} role={role} />;
-                })}
-                {fundraisers.length === 0 && (
-                    <div>You have no active fundraisers at this time.</div>
+          <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+            {fundraisers.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {fundraisers.map((fundraiser, index) => (
+                  <Fundraiser
+                    key={fundraiser.fundraiser_id ?? `fallback-${index}`}
+                    fundraiser={fundraiser}
+                    role={role}
+                  />
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-700">
+                You have no active fundraisers at this time.{" "}
+                {role === "organization" && (
+                  <Link
+                    to="/create"
+                    className="font-semibold text-indigo-600 hover:text-indigo-500"
+                  >
+                    Why don't you start one?
+                  </Link>
                 )}
-                {(fundraisers.length === 0 && role === "organization") && (
-                    <Link to="/create" className="font-semibold text-indigo-600 hover:text-indigo-500">
-                        Why don't you start one?
-                    </Link>
-                )}
-            </div>
+              </p>
+            )}
+          </div>
         </Layout>
     </>
   );
