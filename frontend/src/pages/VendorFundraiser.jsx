@@ -35,7 +35,7 @@ const VendorFundraiser = () => {
     const [totalCost, setTotalCost] = useState(0);
     const [buyerDetails, setBuyerDetails] = useState({});
     const [transactions, setTransactions] = useState([]);
-    const [errors, setErrors] = useState(null);
+    const [errors, setErrors] = useState({});
     
     useEffect(() => {
         async function fetchFundraiser() {
@@ -110,6 +110,7 @@ const VendorFundraiser = () => {
             setBuyerDetails({});
         } catch (error) {
             console.error('Failed to update inventory:', error);
+            setErrors(error.response.data)
         } finally {
             setLoading(false);
         }
@@ -270,16 +271,21 @@ const VendorFundraiser = () => {
                                                 <>
                                                     <p className="text-2xl font-semibold mt-6 mb-2">Total Price: ${totalCost.toFixed(2)}</p>
                                                     <div className='grid grid-cols-4 gap-4'>
-                                                        <Input
-                                                            onChange={e =>
-                                                                setBuyerDetails(prev => ({
-                                                                    ...prev,
-                                                                    name: e.target.value
-                                                                }))
-                                                            }
-                                                            type="text"
-                                                            placeholder="Name of Buyer"
-                                                        />
+                                                        <div className="flex flex-col">
+                                                            <Input
+                                                                onChange={e =>
+                                                                    setBuyerDetails(prev => ({
+                                                                        ...prev,
+                                                                        name: e.target.value
+                                                                    }))
+                                                                }
+                                                                type="text"
+                                                                placeholder="Name of Buyer"
+                                                            />
+                                                            {errors.name && (
+                                                                <p className="mt-1 text-sm text-red-600">{errors.name}</p>
+                                                            )}
+                                                        </div>
                                                         <Input
                                                             onChange={e =>
                                                                 setBuyerDetails(prev => ({
@@ -290,6 +296,7 @@ const VendorFundraiser = () => {
                                                             type="text"
                                                             placeholder="Phone Number (optional)"
                                                         />
+                                                        
                                                         <Input
                                                             onChange={e =>
                                                                 setBuyerDetails(prev => ({
@@ -300,6 +307,7 @@ const VendorFundraiser = () => {
                                                             type="email" 
                                                             placeholder="Email Address (optional)"
                                                         />
+                                                        <div className="flex flex-col">
                                                         <Select
                                                             onValueChange={value =>
                                                                 setBuyerDetails(prev => ({
@@ -322,6 +330,10 @@ const VendorFundraiser = () => {
                                                                 </SelectGroup>
                                                             </SelectContent>
                                                         </Select>
+                                                        {errors.payment && (
+                                                            <p className="mt-1 text-sm text-red-600">{errors.payment}</p>
+                                                        )}
+                                                        </div>
                                                     </div>
                                                 </>
                                             )}
