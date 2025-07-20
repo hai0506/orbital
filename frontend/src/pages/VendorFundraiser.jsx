@@ -23,7 +23,7 @@ import {
 import { MoveLeft, MoveRight, X } from "lucide-react";
 
 // comment this out to test api
-import transactions from '@/data/Transactions';
+// import transactions from '@/data/Transactions';
  
 const VendorFundraiser = () => {
     const { id } = useParams();
@@ -34,6 +34,7 @@ const VendorFundraiser = () => {
     const [cart, setCart] = useState([]);
     const [totalCost, setTotalCost] = useState(0);
     const [buyerDetails, setBuyerDetails] = useState({});
+    const [transactions, setTransactions] = useState([]);
     const [errors, setErrors] = useState(null);
     
     useEffect(() => {
@@ -50,8 +51,21 @@ const VendorFundraiser = () => {
                 setLoading(false);
             }
         }
+        async function fetchTransactions() {
+            // setLoading(true);
+            try {
+                const transactionsRes = await api.get(`core/transactions/${id}`);
+                setTransactions(transactionsRes.data);
+                console.log(transactionsRes);
+            } catch (error) {
+                console.error('Failed to load transactions:', error);
+            } finally {
+                setLoading(false);
+            }
+        }
 
         fetchFundraiser();
+        fetchTransactions();
     }, []);
 
     useEffect(() => {
@@ -70,7 +84,7 @@ const VendorFundraiser = () => {
             if (exists) {
                 return prevCart;
             } else {
-                return [...prevCart, { item: item.name, price: item.price, quantity: 1, maxQuantity: item.quantity }];
+                return [...prevCart, { product: item.product_id, item: item.name, price: item.price, quantity: 1, maxQuantity: item.quantity }];
             }
         })
         setInventory(prev =>
@@ -81,15 +95,16 @@ const VendorFundraiser = () => {
     const handleCheckout = async () => {
         setLoading(true);
         try {
-            console.log("cart: ", cart);
-            console.log("buyer details: ", buyerDetails);
+        //     console.log("cart: ", cart);
+        //     console.log("buyer details: ", buyerDetails);
             const checkout = { 
                 items: cart,
                 name: buyerDetails.name,
                 phone: buyerDetails.phone,
                 email: buyerDetails.email,
-                payment: buyerDetails.name
+                payment: buyerDetails.payment
              };
+             console.log(checkout);
             const checkoutRes = await api.post(`core/create-transaction/${id}/`, checkout);
             setCart([]); 
             setBuyerDetails({});
