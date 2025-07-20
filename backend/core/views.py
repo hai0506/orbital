@@ -178,7 +178,6 @@ class FundraiserListView(APIView):
         if org:
             return Response(FundraiserSerializer(Fundraiser.objects.filter(listing__author=org), many=True).data)
         elif vendor:
-            print(VendorFundraiserSerializer(VendorFundraiser.objects.filter(offer__vendor=vendor),many=True).data)
             return Response(VendorFundraiserSerializer(VendorFundraiser.objects.filter(offer__vendor=vendor),many=True).data)
         else: 
             raise PermissionError('User cannot view fundraisers.')
@@ -232,27 +231,15 @@ class ProductEditView(generics.RetrieveUpdateDestroyAPIView):
 
     lookup_field = 'product_id' # to edit: go http://127.0.0.1:8000/core/edit-product/<whatever product id>/
 
-class UpdateInventoryView(generics.GenericAPIView):
-    serializer_class = ProductUpdateSerializer
-    permission_classes = [IsAuthenticated]
-    
-    def get_queryset(self):
-        return Product.objects.filter(vendor=self.kwargs['offer_id'])
-    
-    def patch(self, request, offer_id):
-        products = Product.objects.filter(vendor=offer_id)
-        product_names = {p.name: p for p in products}
+class CreateTransactionView(generics.CreateAPIView):
+    queryset = Transaction.objects.all()
+    serializer_class = TransactionSerializer
+    permission_classes = [AllowAny]
 
-        for item in request.data:
-            name = item.get('item')
-            if name in product_names:
-                product = product_names[name]
-
-                bought = int(item['quantity'])
-                if bought > product.quantity:
-                    raise serializers.ValidationError(f"Not enough stock for {name}")
-                
-                product.quantity -= bought
-                product.save()
-
-        return Response(self.get_serializer(products, many=True).data)
+    def perform_create(self, serializer):
+        buyer = get_or_none(Organization, user=self.request.user)
+        buyer = Organization.objects.get(user_id=1)
+        if buyer:
+           serializer.save(buyer=buyer)
+        else:
+           raise PermissionError('User cannot make transactions.')

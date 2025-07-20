@@ -13,5 +13,5 @@ urlpatterns = [
     path("fundraiser/<int:fundraiser_id>/", RetrieveFundraiserView.as_view(), name="retrieve-fundraiser"),
     path("create-product/", CreateProductView.as_view(), name="create-product"),
     path('edit-product/<int:product_id>/', ProductEditView.as_view(), name='edit-product'),
-    path('update-inventory/<int:offer_id>/', UpdateInventoryView.as_view(), name='update-inventory'),
+    path('create-transaction/', CreateTransactionView.as_view(), name='create-transaction'),
 ]

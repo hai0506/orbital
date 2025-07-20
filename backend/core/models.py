@@ -65,7 +65,6 @@ class Fundraiser(models.Model):
 class VendorFundraiser(models.Model):
     fundraiser_id = models.AutoField(primary_key=True)
     offer = models.OneToOneField(JobOffer, on_delete=models.CASCADE, related_name='vendor_fundraiser')
-    status = models.CharField()
     revenue = models.FloatField()
     org_fundraiser = models.ForeignKey(Fundraiser, on_delete=models.CASCADE, related_name='vendors')
 
@@ -78,4 +77,20 @@ class Product(models.Model):
     vendor = models.ForeignKey(VendorFundraiser, on_delete=models.CASCADE, related_name="products")
     remarks = models.TextField(max_length=1000, blank=True)
 
+class Transaction(models.Model):
+    transaction_id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100)
+    phone = models.CharField(max_length=20, blank=True, null=True)
+    email = models.CharField(max_length=50, blank=True, null=True)
+    payment = models.CharField()
+    buyer = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="transactions")
+    time_created = models.DateTimeField(auto_now_add=True)
 
+
+class TransactionItem(models.Model):
+    transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE, related_name="items")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+
+    def total_price(self):
+        return self.quantity * self.product.price

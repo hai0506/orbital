@@ -115,11 +115,8 @@ class JobPostSerializer(serializers.ModelSerializer):
         return data 
 
     def create(self, validated_data):
-        keyword_values = validated_data.pop('category_list', []) 
-        
+        keyword_values = validated_data.pop('category_list', [])
         k = []
-        
-    
         for value in keyword_values:
             if value in categories_options:
                 keyword_obj, _ = Category.objects.get_or_create(value=value)
@@ -244,6 +241,7 @@ class VendorFundraiserSerializer(serializers.ModelSerializer):
     offer = serializers.PrimaryKeyRelatedField(read_only=True)
     inventory = serializers.SerializerMethodField()
     org_fundraiser = serializers.PrimaryKeyRelatedField(read_only=True)
+    status = serializers.SerializerMethodField()
     class Meta:
         model = VendorFundraiser
         fields = ['fundraiser_id','offer','status','revenue','inventory','org_fundraiser']
@@ -252,8 +250,70 @@ class VendorFundraiserSerializer(serializers.ModelSerializer):
         products = Product.objects.filter(vendor=obj)
         return ProductSerializer(products, many=True).data
     
+    def get_status(self, obj):
+        listing = obj.offer.listing
+        now = datetime.now()
+
+        start_dt = datetime.combine(listing.start_date, listing.start_time)
+        end_dt = datetime.combine(listing.end_date, listing.end_time)
+
+        if now < start_dt:
+            return "yet to start"
+        elif start_dt <= now and now <= end_dt:
+            return "ongoing"
+        else:
+            return "concluded"
+    
     def to_representation(self, instance):
         rep = super().to_representation(instance)
         rep['offer'] = JobOfferSerializer(instance.offer).data
         # rep['vendors'] = VendorFundraiserSerializer(instance.vendors.all(), many=True).data
         return rep
+    
+class TransactionItemSerializer(serializers.ModelSerializer):
+    transaction = serializers.PrimaryKeyRelatedField(read_only=True)
+    product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
+    total_price = serializers.SerializerMethodField()
+    class Meta:
+        model = TransactionItem
+        fields = ['transaction','product','quantity','total_price']
+
+    def get_total_price(self, obj):
+        return obj.quantity * obj.product.price
+    
+class TransactionSerializer(serializers.ModelSerializer):
+    buyer = serializers.PrimaryKeyRelatedField(read_only=True)
+    items = TransactionItemSerializer(many=True)
+    total_price = serializers.SerializerMethodField()
+    class Meta:
+        model = Transaction
+        fields = ['transaction_id','name','phone','email','payment','buyer','items','time_created','total_price']
+
+    def create(self, validated_data):
+        items = validated_data.pop('items')
+        transaction = Transaction.objects.create(**validated_data)
+        for item in items:
+            product = item['product']
+            quantity = item['quantity']
+            product.quantity -= quantity
+            product.save()
+            TransactionItem.objects.create(transaction=transaction,product=product,quantity=quantity)
+
+        return transaction
+
+    def get_total_price(self, obj):
+        return sum(item.total_price() for item in obj.items.all())
+
+    def validate(self, data):
+        payment = data.get('payment')
+        if payment not in ['balls']:
+            raise serializers.ValidationError({'payment': 'Invalid payment type.'})
+        items = data.get('items')
+        for item in items:
+            product = item['product']
+            quantity = item['quantity']
+            if quantity <= 0:
+                raise serializers.ValidationError({'quantity': 'Quantity cannot be 0.'})
+            elif product.quantity < quantity:
+                raise serializers.ValidationError({'quantity': f'Not enough stock for {product.name}.'})
+        return data
