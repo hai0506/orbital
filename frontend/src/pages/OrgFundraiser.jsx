@@ -63,16 +63,16 @@ const OrgFundraiser = () => {
                                 <MoveRight/>
                             </button>
                         )}
-                        <Tabs defaultValue={fundraiser?.vendors?.[0].vendor.username} className="w-full">
+                        <Tabs defaultValue={fundraiser?.vendors?.[0].offer.vendor.username} className="w-full">
                             <TabsList className="flex justify-start space-x-2 border-b">
                                 {fundraiser?.vendors?.map(vendor => (
-                                    <TabsTrigger value={vendor.vendor.username}>{vendor.vendor.username}</TabsTrigger>
+                                    <TabsTrigger value={vendor.offer.vendor.username}>{vendor.offer.vendor.username}</TabsTrigger>
                                 ))}
                             </TabsList>
                             {fundraiser?.vendors?.map(vendor => (
-                                <TabsContent value={vendor.vendor.username}>
+                                <TabsContent value={vendor.offer.vendor.username}>
                                     <>
-                                        <h5 className="text-3xl font-semibold mb-2">{vendor.vendor.username}</h5>
+                                        <h5 className="text-3xl font-semibold mb-2">{vendor.offer.vendor.username}</h5>
                                         <table className="w-full text-sm">
                                             <thead className="sticky top-0 bg-gray-100">
                                                 <tr>

@@ -150,14 +150,13 @@ class JobOfferSerializer(serializers.ModelSerializer):
     vendor = serializers.PrimaryKeyRelatedField(read_only=True)
     listing = serializers.PrimaryKeyRelatedField(queryset=JobPost.objects.all())
     allDays = CharBooleanSerializer()
-    inventory = serializers.SerializerMethodField()
 
     class Meta:
         model = JobOffer
         fields = [
             'offer_id', 'vendor', 'listing', 'allDays', 'selectedDays',
             'selectedCategories', 'category_list', 'remarks', 'commission',
-            'status', 'time_created','inventory'
+            'status', 'time_created'
         ]
 
     def __init__(self, *args, **kwargs):
@@ -190,10 +189,6 @@ class JobOfferSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'selectedDays': 'Are you available for every day of the event?'})
             
         return data
-    
-    def get_inventory(self, obj):
-        products = Product.objects.filter(vendor=obj)
-        return ProductSerializer(products, many=True).data
     
     def to_representation(self, instance):
         rep = super().to_representation(instance)
@@ -230,13 +225,35 @@ class ProductUpdateSerializer(serializers.ModelSerializer):
 
 class FundraiserSerializer(serializers.ModelSerializer):
     listing = serializers.PrimaryKeyRelatedField(read_only=True)
-    vendors = serializers.PrimaryKeyRelatedField(many=True, queryset=JobOffer.objects.all())
+    vendors = serializers.SerializerMethodField()
     class Meta:
         model = Fundraiser
         fields = ['fundraiser_id','vendors','listing']
 
+    def get_vendors(self, obj):
+        vendors = VendorFundraiser.objects.filter(org_fundraiser=obj)
+        return VendorFundraiserSerializer(vendors, many=True).data
+
     def to_representation(self, instance):
         rep = super().to_representation(instance)
         rep['listing'] = JobPostSerializer(instance.listing).data
-        rep['vendors'] = JobOfferSerializer(instance.vendors.all(), many=True).data
+        rep['vendors'] = VendorFundraiserSerializer(instance.vendors.all(), many=True).data
+        return rep
+    
+class VendorFundraiserSerializer(serializers.ModelSerializer):
+    offer = serializers.PrimaryKeyRelatedField(read_only=True)
+    inventory = serializers.SerializerMethodField()
+    org_fundraiser = serializers.PrimaryKeyRelatedField(read_only=True)
+    class Meta:
+        model = VendorFundraiser
+        fields = ['fundraiser_id','offer','status','revenue','inventory','org_fundraiser']
+
+    def get_inventory(self, obj):
+        products = Product.objects.filter(vendor=obj)
+        return ProductSerializer(products, many=True).data
+    
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        rep['offer'] = JobOfferSerializer(instance.offer).data
+        # rep['vendors'] = VendorFundraiserSerializer(instance.vendors.all(), many=True).data
         return rep
