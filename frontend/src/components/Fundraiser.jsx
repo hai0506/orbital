@@ -16,7 +16,7 @@ const Fundraiser = ({ fundraiser, role }) => {
     const handleClick = () => {
         setHovered(false);
         if (role === 'vendor') {
-            navigate(`/vfundraiser/${fundraiser.offer_id}`);
+            navigate(`/vfundraiser/${fundraiser.fundraiser_id}`);
         } else if (role === 'organization') {
             navigate(`/ofundraiser/${fundraiser.fundraiser_id}`);
         }
@@ -28,7 +28,12 @@ const Fundraiser = ({ fundraiser, role }) => {
                 onMouseLeave={() => setHovered(false)} 
                 className="border border-gray-300 rounded-lg p-4 shadow-sm bg-white max-w-md"
             >
-                <ListingDetails fields={fundraiser.listing} />
+                {role === "vendor" && (
+                    <ListingDetails fields={fundraiser.offer.listing} />
+                )}
+                {role === "organization" && (
+                    <ListingDetails fields={fundraiser.listing} />
+                )}
 
                 <button
                     className="absolute top-2 right-2 text-gray-500 hover:text-black"
@@ -59,7 +64,7 @@ const Fundraiser = ({ fundraiser, role }) => {
                         <div className="flex h-full w-full">
                             <div className="w-[50%] p-4">
                                 {role === "vendor" && (
-                                    <ListingDetails fields={{...fundraiser.listing, commission: fundraiser.commission}} days={fundraiser.selectedDays} />
+                                    <ListingDetails fields={{...fundraiser.offer.listing, commission: fundraiser.offer.commission}} days={fundraiser.offer.selectedDays} />
                                 )}
                                 {role === "organization" && (
                                     <ListingDetails fields={fundraiser.listing} />

@@ -9,7 +9,7 @@ from itertools import chain
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 import json
-
+from django.shortcuts import get_object_or_404
 
 @api_view(['GET'])
 def get_user_profile(request):
@@ -142,13 +142,14 @@ class UpdateOfferStatusView(generics.RetrieveUpdateAPIView):
                 return Response({'agreement': 'Please agree to the Terms and Conditions.'}, status=status.HTTP_400_BAD_REQUEST)
             
             instance = self.get_object()
+            fundraiser,_ = Fundraiser.objects.get_or_create(listing=instance.listing)
+            vendor_fundraiser = VendorFundraiser.objects.create(offer=instance,revenue=0,status='Yet to start',org_fundraiser=fundraiser)
+            
             products = json.loads(request.data.get('inventory', None))        
             if products:
                 for product in products:
-                    Product.objects.create(name=product['Item'],quantity=product['Quantity'],price=product['Price'],remarks=product['Remarks'],vendor=instance)
+                    Product.objects.create(name=product['Item'],quantity=product['Quantity'],price=product['Price'],remarks=product['Remarks'],vendor=vendor_fundraiser)
             
-            fundraiser,_ = Fundraiser.objects.get_or_create(listing=instance.listing)
-            fundraiser.vendors.add(instance)
         return super().update(request, *args, **kwargs)
 
 
@@ -177,22 +178,25 @@ class FundraiserListView(APIView):
         if org:
             return Response(FundraiserSerializer(Fundraiser.objects.filter(listing__author=org), many=True).data)
         elif vendor:
-            fundraisers = Fundraiser.objects.filter(vendors__vendor=vendor)
-            return Response(JobOfferSerializer(JobOffer.objects.filter(vendor=vendor, fundraisers__in=fundraisers).distinct(),many=True).data)
+            print(VendorFundraiserSerializer(VendorFundraiser.objects.filter(offer__vendor=vendor),many=True).data)
+            return Response(VendorFundraiserSerializer(VendorFundraiser.objects.filter(offer__vendor=vendor),many=True).data)
         else: 
             raise PermissionError('User cannot view fundraisers.')
         
-class RetrieveFundraiserView(generics.RetrieveAPIView):
-    serializer_class = FundraiserSerializer
+class RetrieveFundraiserView(APIView):
     permission_classes = [IsAuthenticated]
-    def get_queryset(self):
+    def get(self, request, fundraiser_id, *args, **kwargs):
         org = get_or_none(Organization, user=self.request.user)
+        vendor = get_or_none(Vendor, user=self.request.user)
         if org:
-            return Fundraiser.objects.filter(listing__author=org)
+            fundraiser = get_object_or_404(Fundraiser, fundraiser_id=fundraiser_id, listing__author=org)
+            return Response(FundraiserSerializer(fundraiser).data)
+        elif vendor:
+            fundraiser = get_object_or_404(VendorFundraiser, fundraiser_id=fundraiser_id, offer__vendor=vendor)
+            return Response(VendorFundraiserSerializer(fundraiser).data)
         else: 
-            raise PermissionError('User cannot view fundraisers.')    
-    lookup_field = 'fundraiser_id'
-
+            raise PermissionError('User cannot view fundraisers.')
+        
 class CreateProductView(generics.ListCreateAPIView):
     serializer_class = ProductSerializer
     permission_classes = [IsAuthenticated]

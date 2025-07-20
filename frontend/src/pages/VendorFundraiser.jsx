@@ -40,7 +40,7 @@ const VendorFundraiser = () => {
         async function fetchFundraiser() {
             // setLoading(true);
             try {
-                const fundraiserRes = await api.get(`core/delete-offer/${id}`);
+                const fundraiserRes = await api.get(`core/fundraiser/${id}`);
                 setFundraiser(fundraiserRes.data);
                 setInventory(fundraiserRes.data.inventory);
                 console.log(fundraiserRes);
@@ -112,7 +112,7 @@ const VendorFundraiser = () => {
             <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 flex gap-4">
                 {!hidden && (
                     <div className="relative w-[25%] p-4 border-r border-gray-300">
-                        <ListingDetails fields={{...fundraiser?.listing, commission: fundraiser?.listing.commission}} days={fundraiser?.selectedDays} />
+                        {/* <ListingDetails fields={{...fundraiser?.offer.listing, commission: fundraiser?.offer.listing.commission}} days={fundraiser?.offer.selectedDays} /> */}
                         <button
                             onClick={() => setHidden(true)}
                             className="absolute top-2 right-2 text-gray-500 hover:text-black"

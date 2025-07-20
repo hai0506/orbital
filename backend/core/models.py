@@ -60,8 +60,14 @@ class JobOffer(models.Model):
 
 class Fundraiser(models.Model):
     fundraiser_id = models.AutoField(primary_key=True)
-    vendors = models.ManyToManyField(JobOffer, related_name='fundraisers')
     listing = models.ForeignKey(JobPost, on_delete=models.CASCADE, related_name='fundraisers')
+
+class VendorFundraiser(models.Model):
+    fundraiser_id = models.AutoField(primary_key=True)
+    offer = models.OneToOneField(JobOffer, on_delete=models.CASCADE, related_name='vendor_fundraiser')
+    status = models.CharField()
+    revenue = models.FloatField()
+    org_fundraiser = models.ForeignKey(Fundraiser, on_delete=models.CASCADE, related_name='vendors')
 
 class Product(models.Model):
     product_id = models.AutoField(primary_key=True)
@@ -69,5 +75,7 @@ class Product(models.Model):
     quantity = models.IntegerField(validators=[MinValueValidator(0)])
     price = models.FloatField(validators=[MinValueValidator(0)])
     image = models.ImageField(upload_to='product_images/', blank=True, null=True, validators=[filesize_valid])
-    vendor = models.ForeignKey(JobOffer, on_delete=models.CASCADE, related_name="products")
+    vendor = models.ForeignKey(VendorFundraiser, on_delete=models.CASCADE, related_name="products")
     remarks = models.TextField(max_length=1000, blank=True)
+
+
