@@ -83,8 +83,14 @@ const VendorFundraiser = () => {
         try {
             console.log("cart: ", cart);
             console.log("buyer details: ", buyerDetails);
-            const checkout = { cart, buyerDetails };
-            const checkoutRes = await api.patch(`core/checkout/${id}/`, checkout);
+            const checkout = { 
+                items: cart,
+                name: buyerDetails.name,
+                phone: buyerDetails.phone,
+                email: buyerDetails.email,
+                payment: buyerDetails.name
+             };
+            const checkoutRes = await api.post(`core/create-transaction/${id}/`, checkout);
             setCart([]); 
             setBuyerDetails({});
         } catch (error) {

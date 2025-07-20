@@ -282,7 +282,7 @@ class TransactionItemSerializer(serializers.ModelSerializer):
     
 class TransactionSerializer(serializers.ModelSerializer):
     vendor = serializers.PrimaryKeyRelatedField(read_only=True)
-    items = TransactionItemSerializer(many=True)
+    items = TransactionItemSerializer(many=True,write_only=True)
     total_price = serializers.SerializerMethodField()
     class Meta:
         model = Transaction
@@ -293,6 +293,7 @@ class TransactionSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         payment = data.get('payment')
+        print(payment)
         if payment not in ['PayLah','PayNow','Cash','NETS','Card','Others']:
             raise serializers.ValidationError({'payment': 'Invalid payment type.'})
         items = data.get('items')
