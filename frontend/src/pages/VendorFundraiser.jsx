@@ -349,7 +349,7 @@ const VendorFundraiser = () => {
                                                     {row.payment}
                                                 </td>
                                                 <td className="p-2">
-                                                    <button onClick={() => addToCart(row)} className="text-blue-500 hover:text-blue-700">View Receipt</button>
+                                                    <button className="text-blue-500 hover:text-blue-700">View Receipt</button>
                                                 </td>
                                             </tr>
                                         ))}
