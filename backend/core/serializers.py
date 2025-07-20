@@ -267,7 +267,6 @@ class VendorFundraiserSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         rep = super().to_representation(instance)
         rep['offer'] = JobOfferSerializer(instance.offer).data
-        # rep['vendors'] = VendorFundraiserSerializer(instance.vendors.all(), many=True).data
         return rep
     
 class TransactionItemSerializer(serializers.ModelSerializer):
@@ -282,13 +281,30 @@ class TransactionItemSerializer(serializers.ModelSerializer):
         return obj.quantity * obj.product.price
     
 class TransactionSerializer(serializers.ModelSerializer):
-    buyer = serializers.PrimaryKeyRelatedField(read_only=True)
+    vendor = serializers.PrimaryKeyRelatedField(read_only=True)
     items = TransactionItemSerializer(many=True)
     total_price = serializers.SerializerMethodField()
     class Meta:
         model = Transaction
-        fields = ['transaction_id','name','phone','email','payment','buyer','items','time_created','total_price']
+        fields = ['transaction_id','name','phone','email','payment','vendor','items','time_created','total_price']
 
+    def get_total_price(self, obj):
+        return sum(item.total_price() for item in obj.items.all())
+
+    def validate(self, data):
+        payment = data.get('payment')
+        if payment not in ['PayLah','PayNow','Cash','NETS','Card','Others']:
+            raise serializers.ValidationError({'payment': 'Invalid payment type.'})
+        items = data.get('items')
+        for item in items:
+            product = item['product']
+            quantity = item['quantity']
+            if quantity <= 0:
+                raise serializers.ValidationError({'quantity': 'Quantity cannot be 0.'})
+            elif product.quantity < quantity:
+                raise serializers.ValidationError({'quantity': f'Not enough stock for {product.name}.'})
+        return data
+    
     def create(self, validated_data):
         items = validated_data.pop('items')
         transaction = Transaction.objects.create(**validated_data)
@@ -300,20 +316,8 @@ class TransactionSerializer(serializers.ModelSerializer):
             TransactionItem.objects.create(transaction=transaction,product=product,quantity=quantity)
 
         return transaction
-
-    def get_total_price(self, obj):
-        return sum(item.total_price() for item in obj.items.all())
-
-    def validate(self, data):
-        payment = data.get('payment')
-        if payment not in ['balls']:
-            raise serializers.ValidationError({'payment': 'Invalid payment type.'})
-        items = data.get('items')
-        for item in items:
-            product = item['product']
-            quantity = item['quantity']
-            if quantity <= 0:
-                raise serializers.ValidationError({'quantity': 'Quantity cannot be 0.'})
-            elif product.quantity < quantity:
-                raise serializers.ValidationError({'quantity': f'Not enough stock for {product.name}.'})
-        return data
+    
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        rep['vendor'] = VendorFundraiserSerializer(instance.vendor).data
+        return rep

@@ -83,7 +83,7 @@ class Transaction(models.Model):
     phone = models.CharField(max_length=20, blank=True, null=True)
     email = models.CharField(max_length=50, blank=True, null=True)
     payment = models.CharField()
-    buyer = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="transactions")
+    vendor = models.ForeignKey(VendorFundraiser, on_delete=models.CASCADE, related_name="transactions")
     time_created = models.DateTimeField(auto_now_add=True)
 
 

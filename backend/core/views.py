@@ -234,12 +234,25 @@ class ProductEditView(generics.RetrieveUpdateDestroyAPIView):
 class CreateTransactionView(generics.CreateAPIView):
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        buyer = get_or_none(Organization, user=self.request.user)
-        buyer = Organization.objects.get(user_id=1)
-        if buyer:
-           serializer.save(buyer=buyer)
+        vendor = get_or_none(Vendor, user=self.request.user)
+        if vendor:
+            vendor_fundraiser_id = self.kwargs.get('vendor_fundraiser_id')
+            vendor_fundraiser = get_object_or_404(VendorFundraiser, fundraiser_id=vendor_fundraiser_id)
+            serializer.save(vendor=vendor_fundraiser)
         else:
-           raise PermissionError('User cannot make transactions.')
+            raise PermissionError('User cannot make transactions.')
+
+class TransactionListView(generics.ListAPIView):
+    serializer_class = TransactionSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self): 
+        vendor = get_or_none(Vendor, user=self.request.user)
+        if vendor:
+            vendor_fundraiser_id = self.kwargs.get('vendor_fundraiser_id')
+            vendor_fundraiser = get_object_or_404(VendorFundraiser, fundraiser_id=vendor_fundraiser_id)
+            return Transaction.objects.filter(vendor=vendor_fundraiser)
+        else: return Transaction.objects.none()
