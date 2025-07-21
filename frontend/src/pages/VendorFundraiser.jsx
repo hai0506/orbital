@@ -398,7 +398,7 @@ const VendorFundraiser = () => {
                                                         {row.payment}
                                                     </td>
                                                     <td className="p-2">
-                                                        <button onClick={() => setReceipt(row.items)} className="text-blue-500 hover:text-blue-700">View Receipt</button>
+                                                        <button onClick={() => setReceipt(row)} className="text-blue-500 hover:text-blue-700">View Receipt</button>
                                                     </td>
                                                 </tr>
                                             ))}
@@ -408,7 +408,7 @@ const VendorFundraiser = () => {
                                 {transactions.length <= 0 && (
                                     <p>No transactions yet.</p>
                                 )}
-                                {receipt && (
+                                {receipt?.items && (
                                     <div 
                                         className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm"
                                         onClick={() => setReceipt(null)}
@@ -429,7 +429,7 @@ const VendorFundraiser = () => {
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        {receipt?.map(item => (
+                                                        {receipt?.items?.map(item => (
                                                             <tr className="border-b">
                                                                 <td className="p-2">
                                                                     {item.product.name}
