@@ -242,13 +242,18 @@ class VendorFundraiserSerializer(serializers.ModelSerializer):
     inventory = serializers.SerializerMethodField()
     org_fundraiser = serializers.PrimaryKeyRelatedField(read_only=True)
     status = serializers.SerializerMethodField()
+    transactions = serializers.SerializerMethodField()
     class Meta:
         model = VendorFundraiser
-        fields = ['fundraiser_id','offer','status','revenue','inventory','org_fundraiser']
+        fields = ['fundraiser_id','offer','status','revenue','inventory','org_fundraiser','transactions']
 
     def get_inventory(self, obj):
         products = Product.objects.filter(vendor=obj)
         return ProductSerializer(products, many=True).data
+    
+    def get_transactions(self, obj):
+        trs = Transaction.objects.filter(vendor=obj)
+        return TransactionSerializer(trs, many=True).data
     
     def get_status(self, obj):
         listing = obj.offer.listing
@@ -325,6 +330,6 @@ class TransactionSerializer(serializers.ModelSerializer):
     
     def to_representation(self, instance):
         rep = super().to_representation(instance)
-        rep['vendor'] = VendorFundraiserSerializer(instance.vendor).data
+        # rep['vendor'] = VendorFundraiserSerializer(instance.vendor).data
         rep['items']=TransactionItemSerializer(instance.items, many=True).data
         return rep
