@@ -240,77 +240,80 @@ const VendorFundraiser = () => {
                                     {cart.length > 0 && (
                                         <>
                                             <h5 className="text-2xl font-semibold mt-6 mb-2">Checkout</h5>
-                                            <table className="w-full text-sm">
-                                                <thead className="sticky top-0 bg-gray-100">
-                                                    <tr>
-                                                        <th className="p-2 text-left">Item</th>
-                                                        <th className="p-2 text-left">Price</th>
-                                                        <th className="p-2 text-left">Quantity</th>
-                                                        <th className="p-2 text-left">Qty Left</th>
-                                                        <th className="p-2 text-left">Total Cost</th>
-                                                        <th />
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {cart.map((row, idx) => (
-                                                        <>
-                                                            <tr className="border-b">
-                                                                <td className="p-2">{row.item}</td>
-                                                                <td className="p-2">${row.price.toFixed(2)}</td>
-                                                                <td className="p-2">
-                                                                    <input
-                                                                        type="number"
-                                                                        className="w-16 border rounded px-2 py-1"
-                                                                        value={row.quantity}
-                                                                        min={1}
-                                                                        max={row.maxQuantity}
-                                                                        onChange={(e) => {
-                                                                            const max = row.maxQuantity; 
-                                                                            let newQuantity = parseInt(e.target.value);
+                                            <div className="max-h-[60vh] overflow-auto">
+                                                <table className="w-full text-sm">
+                                                    <thead className="sticky top-0 bg-gray-100">
+                                                        <tr>
+                                                            <th className="p-2 text-left">Item</th>
+                                                            <th className="p-2 text-left">Price</th>
+                                                            <th className="p-2 text-left">Quantity</th>
+                                                            <th className="p-2 text-left">Qty Left</th>
+                                                            <th className="p-2 text-left">Total Cost</th>
+                                                            <th />
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {cart.map((row, idx) => (
+                                                            <>
+                                                                <tr className="border-b">
+                                                                    <td className="p-2">{row.item}</td>
+                                                                    <td className="p-2">${row.price.toFixed(2)}</td>
+                                                                    <td className="p-2">
+                                                                        <input
+                                                                            type="number"
+                                                                            className="w-16 border rounded px-2 py-1"
+                                                                            value={row.quantity}
+                                                                            min={1}
+                                                                            max={row.maxQuantity}
+                                                                            onChange={(e) => {
+                                                                                const max = row.maxQuantity; 
+                                                                                let newQuantity = parseInt(e.target.value);
 
-                                                                            if (isNaN(newQuantity)) return;
+                                                                                if (isNaN(newQuantity)) return;
 
-                                                                            newQuantity = Math.max(1, Math.min(max, newQuantity));
+                                                                                newQuantity = Math.max(1, Math.min(max, newQuantity));
 
-                                                                            const updatedCart = [...cart];
-                                                                            const oldQuantity = updatedCart[idx].quantity;
-                                                                            const change = newQuantity - oldQuantity;
+                                                                                const updatedCart = [...cart];
+                                                                                const oldQuantity = updatedCart[idx].quantity;
+                                                                                const change = newQuantity - oldQuantity;
 
-                                                                            if (change === 0) return;
+                                                                                if (change === 0) return;
 
-                                                                            updatedCart[idx].quantity = newQuantity;
-                                                                            setCart(updatedCart);
+                                                                                updatedCart[idx].quantity = newQuantity;
+                                                                                setCart(updatedCart);
 
-                                                                            setInventory(prevInventory =>
-                                                                                prevInventory.map(product => {
-                                                                                    if (product.name === row.item) {
-                                                                                        return {
-                                                                                            ...product,
-                                                                                            quantity: product.quantity - change,
-                                                                                        };
-                                                                                    }
-                                                                                    return product;
-                                                                                })
-                                                                            );
-                                                                        }}
-                                                                    />
-                                                                </td>
-                                                                <td className="p-2">
-                                                                    {row.maxQuantity - row.quantity}
-                                                                </td>
-                                                                <td className="p-2">
-                                                                    ${(Number(row.price) * Number(row.quantity)).toFixed(2)}
-                                                                </td>
-                                                                <td className="p-2">
-                                                                    <button onClick={() => removeItem(row)} className="text-red-500 hover:text-red-700" >
-                                                                        <X />
-                                                                    </button>
-                                                                </td>
-                                                            </tr>
-                                                        </>
-                                                    ))}
-                                                </tbody>
-                                            </table>
+                                                                                setInventory(prevInventory =>
+                                                                                    prevInventory.map(product => {
+                                                                                        if (product.name === row.item) {
+                                                                                            return {
+                                                                                                ...product,
+                                                                                                quantity: product.quantity - change,
+                                                                                            };
+                                                                                        }
+                                                                                        return product;
+                                                                                    })
+                                                                                );
+                                                                            }}
+                                                                        />
+                                                                    </td>
+                                                                    <td className="p-2">
+                                                                        {row.maxQuantity - row.quantity}
+                                                                    </td>
+                                                                    <td className="p-2">
+                                                                        ${(Number(row.price) * Number(row.quantity)).toFixed(2)}
+                                                                    </td>
+                                                                    <td className="p-2">
+                                                                        <button onClick={() => removeItem(row)} className="text-red-500 hover:text-red-700" >
+                                                                            <X />
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                            </>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            
                                             {cart && (
                                                 <>
                                                     <p className="text-2xl font-semibold mt-6 mb-2">Total Price: ${totalCost.toFixed(2)}</p>
@@ -407,45 +410,47 @@ const VendorFundraiser = () => {
                                     className="w-full md:w-1/3 mb-2"
                                 />
                                 {transactions.length > 0 && (
-                                    <table className="w-full text-sm">
-                                        <thead className="sticky top-0 bg-gray-100">
-                                            <tr>
-                                                <th key='name' className="p-2 text-left">Buyer Name</th>
-                                                <th key='phone' className="p-2 text-left">Phone Number</th>
-                                                <th key='email' className="p-2 text-left">Email Address</th>
-                                                <th key='payment' className="p-2 text-left">Payment Method</th>
-                                                <th key='receipt' className="p-2 text-left">Receipt</th>
-                                                <th key='datetime' className="p-2 text-left">Time of Transaction</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {transactions?.map(row => (
-                                                <tr className="border-b">
-                                                    <td className="p-2">
-                                                        {row.name}
-                                                    </td>
-                                                    <td className="p-2">
-                                                        {row.phone}
-                                                    </td>
-                                                    <td className="p-2">
-                                                        {row.email}
-                                                    </td>
-                                                    <td className="p-2">
-                                                        {row.payment}
-                                                    </td>
-                                                    <td className="p-2">
-                                                        <button onClick={() => setReceipt(row)} className="text-blue-500 hover:text-blue-700">View Receipt</button>
-                                                    </td>
-                                                    <td className="p-2">
-                                                        {new Date(row.time_created).toLocaleString('en-SG', {
-                                                            dateStyle: 'medium',
-                                                            timeStyle: 'short',
-                                                        })}
-                                                    </td>
+                                    <div className="max-h-[60vh] overflow-auto">
+                                        <table className="w-full text-sm">
+                                            <thead className="sticky top-0 bg-gray-100">
+                                                <tr>
+                                                    <th key='name' className="p-2 text-left">Buyer Name</th>
+                                                    <th key='phone' className="p-2 text-left">Phone Number</th>
+                                                    <th key='email' className="p-2 text-left">Email Address</th>
+                                                    <th key='payment' className="p-2 text-left">Payment Method</th>
+                                                    <th key='receipt' className="p-2 text-left">Receipt</th>
+                                                    <th key='datetime' className="p-2 text-left">Time of Transaction</th>
                                                 </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
+                                            </thead>
+                                            <tbody>
+                                                {transactions?.map(row => (
+                                                    <tr className="border-b">
+                                                        <td className="p-2">
+                                                            {row.name}
+                                                        </td>
+                                                        <td className="p-2">
+                                                            {row.phone}
+                                                        </td>
+                                                        <td className="p-2">
+                                                            {row.email}
+                                                        </td>
+                                                        <td className="p-2">
+                                                            {row.payment}
+                                                        </td>
+                                                        <td className="p-2">
+                                                            <button onClick={() => setReceipt(row)} className="text-blue-500 hover:text-blue-700">View Receipt</button>
+                                                        </td>
+                                                        <td className="p-2">
+                                                            {new Date(row.time_created).toLocaleString('en-SG', {
+                                                                dateStyle: 'medium',
+                                                                timeStyle: 'short',
+                                                            })}
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 )}
                                 {transactions.length <= 0 && (
                                     <p>No transactions yet.</p>
@@ -461,34 +466,36 @@ const VendorFundraiser = () => {
                                         >
                                             <div className="flex flex-col h-full w-full">
                                                 <h5 className="text-2xl font-semibold mb-2">Receipt</h5>
-                                                <table className="w-full text-sm">
-                                                    <thead className="sticky top-0 bg-gray-100">
-                                                        <tr>
-                                                            <th key='receipt-item' className="p-2 text-left">Item</th>
-                                                            <th key='receipt-price' className="p-2 text-left">Unit Price</th>
-                                                            <th key='receipt-quantity' className="p-2 text-left">Quantity</th>
-                                                            <th key='receipt-cost' className="p-2 text-left">Total Cost</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {receipt?.items?.map(item => (
-                                                            <tr className="border-b">
-                                                                <td className="p-2">
-                                                                    {item.product.name}
-                                                                </td>
-                                                                <td className="p-2">
-                                                                    ${item.product.price.toFixed(2)}
-                                                                </td>
-                                                                <td className="p-2">
-                                                                    {item.quantity}
-                                                                </td>
-                                                                <td className="p-2">
-                                                                    ${item.total_price.toFixed(2)}
-                                                                </td>
+                                                <div className="max-h-[60vh] overflow-auto">
+                                                    <table className="w-full text-sm">
+                                                        <thead className="sticky top-0 bg-gray-100">
+                                                            <tr>
+                                                                <th key='receipt-item' className="p-2 text-left">Item</th>
+                                                                <th key='receipt-price' className="p-2 text-left">Unit Price</th>
+                                                                <th key='receipt-quantity' className="p-2 text-left">Quantity</th>
+                                                                <th key='receipt-cost' className="p-2 text-left">Total Cost</th>
                                                             </tr>
-                                                        ))}
-                                                    </tbody>
-                                                </table>
+                                                        </thead>
+                                                        <tbody>
+                                                            {receipt?.items?.map(item => (
+                                                                <tr className="border-b">
+                                                                    <td className="p-2">
+                                                                        {item.product.name}
+                                                                    </td>
+                                                                    <td className="p-2">
+                                                                        ${item.product.price.toFixed(2)}
+                                                                    </td>
+                                                                    <td className="p-2">
+                                                                        {item.quantity}
+                                                                    </td>
+                                                                    <td className="p-2">
+                                                                        ${item.total_price.toFixed(2)}
+                                                                    </td>
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                                 <p className="text-2xl font-semibold mt-6 mb-2">Total Price: ${receipt.total_price.toFixed(2)}</p>
                                             </div>
 
