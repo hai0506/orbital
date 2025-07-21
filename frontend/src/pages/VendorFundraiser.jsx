@@ -35,38 +35,38 @@ const VendorFundraiser = () => {
     const [totalCost, setTotalCost] = useState(0);
     const [buyerDetails, setBuyerDetails] = useState({});
     const [transactions, setTransactions] = useState([]);
+    const [receipt, setReceipt] = useState(null);
     const [errors, setErrors] = useState({});
     
     useEffect(() => {
         async function fetchFundraiser() {
-            // setLoading(true);
             try {
                 const fundraiserRes = await api.get(`core/fundraiser/${id}`);
                 setFundraiser(fundraiserRes.data);
                 setInventory(fundraiserRes.data.inventory);
-                console.log(fundraiserRes);
+                console.log(fundraiserRes.data);
             } catch (error) {
                 console.error('Failed to load fundraiser:', error);
-            } finally {
-                setLoading(false);
-            }
-        }
-        async function fetchTransactions() {
-            // setLoading(true);
-            try {
-                const transactionsRes = await api.get(`core/transactions/${id}`);
-                setTransactions(transactionsRes.data);
-                console.log(transactionsRes);
-            } catch (error) {
-                console.error('Failed to load transactions:', error);
-            } finally {
-                setLoading(false);
             }
         }
 
         fetchFundraiser();
+    }, []);
+
+    const fetchTransactions = async () => {
+        try {
+            const transactionsRes = await api.get(`core/transactions/${id}`);
+            setTransactions(transactionsRes.data);
+            console.log(transactionsRes.data);
+        } catch (error) {
+            console.error('Failed to load transactions:', error);
+        }
+    }
+
+    useEffect(() => {
         fetchTransactions();
     }, []);
+
 
     useEffect(() => {
         const total = cart.reduce((sum, item) => sum + Number(item.price) * Number(item.quantity), 0);
@@ -92,30 +92,6 @@ const VendorFundraiser = () => {
         );
     }
 
-    const handleCheckout = async () => {
-        setLoading(true);
-        try {
-        //     console.log("cart: ", cart);
-        //     console.log("buyer details: ", buyerDetails);
-            const checkout = { 
-                items: cart,
-                name: buyerDetails.name,
-                phone: buyerDetails.phone,
-                email: buyerDetails.email,
-                payment: buyerDetails.payment
-             };
-             console.log(checkout);
-            const checkoutRes = await api.post(`core/create-transaction/${id}/`, checkout);
-            setCart([]); 
-            setBuyerDetails({});
-        } catch (error) {
-            console.error('Failed to update inventory:', error);
-            setErrors(error.response.data)
-        } finally {
-            setLoading(false);
-        }
-    }
-
     const removeItem = item => {
         setCart(cart.filter(i => i !== item));
         setInventory(prevInventory => [
@@ -128,13 +104,52 @@ const VendorFundraiser = () => {
         ]);
     }
 
+    const handleCheckout = async () => {
+        setLoading(true);
+        try {
+            const checkout = { 
+                items: cart,
+                name: buyerDetails.name,
+                phone: buyerDetails.phone,
+                email: buyerDetails.email,
+                payment: buyerDetails.payment
+            };
+            console.log(checkout);
+            const checkoutRes = await api.post(`core/create-transaction/${id}/`, checkout);
+            cart.forEach(item => {
+                setCart(cart.filter(i => i !== item));
+                setInventory(prevInventory => [
+                    ...prevInventory,
+                    {
+                        name: item.item,
+                        price: item.price,
+                        quantity: item.maxQuantity - item.quantity,
+                    },
+                ]);
+            })
+            setBuyerDetails({});
+            await fetchTransactions();
+        } catch (error) {
+            console.error('Failed to update inventory:', error);
+            setErrors(error.response.data)
+        } finally {
+            setLoading(false);
+        }
+    }
+
     // if (loading || !fundraiser || !fundraiser.inventory) return <p>Loading...</p>;
     return (
         <Layout heading="View Fundraiser">
             <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 flex gap-4">
                 {!hidden && (
                     <div className="relative w-[25%] p-4 border-r border-gray-300">
-                        {/* <ListingDetails fields={{...fundraiser?.offer.listing, commission: fundraiser?.offer.listing.commission}} days={fundraiser?.offer.selectedDays} /> */}
+                        <ListingDetails 
+                            fields={{...fundraiser?.offer.listing, 
+                                        commission: fundraiser?.offer.listing.commission, 
+                                        categories: fundraiser?.offer.selectedCategories
+                                    }} 
+                            days={fundraiser?.offer.selectedDays} 
+                        />
                         <button
                             onClick={() => setHidden(true)}
                             className="absolute top-2 right-2 text-gray-500 hover:text-black"
@@ -172,7 +187,7 @@ const VendorFundraiser = () => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {inventory?.map((row, idx) => (
+                                            {inventory?.map(row => (
                                                 <tr className="border-b">
                                                     <td className="p-2">
                                                         {row.name}
@@ -356,38 +371,93 @@ const VendorFundraiser = () => {
                             </TabsContent>
                             <TabsContent value="transactions">
                                 <h5 className="text-2xl font-semibold mb-2">Transactions</h5>
-                                <table className="w-full text-sm">
-                                    <thead className="sticky top-0 bg-gray-100">
-                                        <tr>
-                                            <th key='name' className="p-2 text-left">Buyer Name</th>
-                                            <th key='phone' className="p-2 text-left">Phone Number</th>
-                                            <th key='email' className="p-2 text-left">Email Address</th>
-                                            <th key='payment' className="p-2 text-left">Payment Method</th>
-                                            <th key='receipt' className="p-2 text-left">Receipt</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {transactions?.map(row => (
-                                            <tr className="border-b">
-                                                <td className="p-2">
-                                                    {row.name}
-                                                </td>
-                                                <td className="p-2">
-                                                    {row.phone}
-                                                </td>
-                                                <td className="p-2">
-                                                    {row.email}
-                                                </td>
-                                                <td className="p-2">
-                                                    {row.payment}
-                                                </td>
-                                                <td className="p-2">
-                                                    <button className="text-blue-500 hover:text-blue-700">View Receipt</button>
-                                                </td>
+                                {transactions.length > 0 && (
+                                    <table className="w-full text-sm">
+                                        <thead className="sticky top-0 bg-gray-100">
+                                            <tr>
+                                                <th key='name' className="p-2 text-left">Buyer Name</th>
+                                                <th key='phone' className="p-2 text-left">Phone Number</th>
+                                                <th key='email' className="p-2 text-left">Email Address</th>
+                                                <th key='payment' className="p-2 text-left">Payment Method</th>
+                                                <th key='receipt' className="p-2 text-left">Receipt</th>
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody>
+                                            {transactions?.map(row => (
+                                                <tr className="border-b">
+                                                    <td className="p-2">
+                                                        {row.name}
+                                                    </td>
+                                                    <td className="p-2">
+                                                        {row.phone}
+                                                    </td>
+                                                    <td className="p-2">
+                                                        {row.email}
+                                                    </td>
+                                                    <td className="p-2">
+                                                        {row.payment}
+                                                    </td>
+                                                    <td className="p-2">
+                                                        <button onClick={() => setReceipt(row.items)} className="text-blue-500 hover:text-blue-700">View Receipt</button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                )}
+                                {transactions.length <= 0 && (
+                                    <p>No transactions yet.</p>
+                                )}
+                                {receipt && (
+                                    <div 
+                                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm"
+                                        onClick={() => setReceipt(null)}
+                                    >
+                                        <div 
+                                            className="max-w-2xl w-full rounded-lg bg-white p-6 shadow-lg relative"
+                                            onClick={e => e.stopPropagation()}
+                                        >
+                                            <div className="flex flex-col h-full w-full">
+                                                <h5 className="text-2xl font-semibold mb-2">Receipt</h5>
+                                                <table className="w-full text-sm">
+                                                    <thead className="sticky top-0 bg-gray-100">
+                                                        <tr>
+                                                            <th key='receipt-item' className="p-2 text-left">Item</th>
+                                                            <th key='receipt-price' className="p-2 text-left">Unit Price</th>
+                                                            <th key='receipt-quantity' className="p-2 text-left">Quantity</th>
+                                                            <th key='receipt-cost' className="p-2 text-left">Total Cost</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {receipt?.map(item => (
+                                                            <tr className="border-b">
+                                                                <td className="p-2">
+                                                                    {item.product.name}
+                                                                </td>
+                                                                <td className="p-2">
+                                                                    ${item.product.price.toFixed(2)}
+                                                                </td>
+                                                                <td className="p-2">
+                                                                    {item.quantity}
+                                                                </td>
+                                                                <td className="p-2">
+                                                                    ${item.total_price.toFixed(2)}
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+
+                                            <button
+                                                onClick={() => setReceipt(null)}
+                                                className="absolute top-2 right-2 text-gray-500 hover:text-black"
+                                            >
+                                                <X/>
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
                             </TabsContent>
                         </Tabs>
                     </div>
