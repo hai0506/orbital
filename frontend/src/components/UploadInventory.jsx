@@ -120,8 +120,8 @@ export default function UpdateInventory({ open, onClose, inventoryProps }) {
                   />
             </ShadcnButton>
             {errors['file_upload'] && (
-                        <p className="mb-3 text-sm text-red-600">{errors['file_upload']}</p>
-                    )}
+                <p className="mb-3 text-sm text-red-600">{errors['file_upload']}</p>
+            )}
             <div className="overflow-auto max-h-[60vh]">
                 <table className="w-full text-sm">
                 <thead className="sticky top-0 bg-gray-100">
@@ -152,17 +152,19 @@ export default function UpdateInventory({ open, onClose, inventoryProps }) {
                 </tbody>
                 </table>
                 {errors['inventory'] && (
-                        <p className="mb-1 mt-2 text-sm text-red-600">{errors['inventory'][0]}</p>
-                    )}
+                    <p className="mb-1 mt-2 text-sm text-red-600">{errors['inventory'][0]}</p>
+                )}
             </div>
             
-            <div className="flex justify-between mt-4">
-                <button onClick={addProduct} className="px-3 py-1 rounded bg-gray-200">Add Product</button>
-                <button onClick={clearInventory} className="px-3 py-1 rounded bg-gray-200">Clear Inventory</button>
-                <div>
-                  <button onClick={onClose} className="mr-2 px-4 py-1 bg-gray-300 rounded">Cancel</button>
-                  <button onClick={handleSave} className="px-4 py-1 bg-indigo-600 text-white rounded">Save</button>
-                </div>
+            <div className="flex justify-between mt-4 flex-wrap gap-2">
+              <div className="flex gap-2">
+                <ShadcnButton variant="secondary" onClick={addProduct}>Add Product</ShadcnButton>
+                <ShadcnButton variant="secondary" onClick={clearInventory}>Clear Inventory</ShadcnButton>
+              </div>
+              <div className="flex gap-2">
+                <ShadcnButton variant="outline" onClick={onClose}>Cancel</ShadcnButton>
+                <ShadcnButton onClick={handleSave}>Save</ShadcnButton>
+              </div>
             </div>
         </div>
       </div>
