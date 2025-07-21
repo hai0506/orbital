@@ -447,7 +447,7 @@ const VendorFundraiser = () => {
                                                         ))}
                                                     </tbody>
                                                 </table>
-                                                <p className="text-2xl font-semibold mt-6 mb-2">Total Price: ${receipt.total_price}</p>
+                                                <p className="text-2xl font-semibold mt-6 mb-2">Total Price: ${receipt.total_price.toFixed(2)}</p>
                                             </div>
 
                                             <button
