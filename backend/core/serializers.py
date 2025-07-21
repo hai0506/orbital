@@ -321,4 +321,5 @@ class TransactionSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         rep = super().to_representation(instance)
         rep['vendor'] = VendorFundraiserSerializer(instance.vendor).data
+        rep['items']=TransactionItemSerializer(instance.items, many=True).data
         return rep
