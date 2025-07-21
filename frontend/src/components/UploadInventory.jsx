@@ -38,7 +38,9 @@ export default function UpdateInventory({ open, onClose, inventoryProps }) {
   
       if (!item || item === '') errors.push(`Row ${i + 1}: "Item" is required.`);
       if (price === null) errors.push(`Row ${i + 1}: Invalid price format. Please use a number.`);
+      else if (price < 0) errors.push(`Row ${i + 1}: Price cannot be negative.`);
       if (quantity === null) errors.push(`Row ${i + 1}: Invalid quantity format. Please use a whole number.`);
+      else if (quantity < 1) errors.push(`Row ${i + 1}: Quantity must be greater than 0.`);
   
       validated.push({ Item: item, Price: price, Quantity: quantity, Remarks: remarks });
     }
