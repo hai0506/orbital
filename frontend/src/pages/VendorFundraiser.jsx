@@ -117,7 +117,6 @@ const VendorFundraiser = () => {
             console.log(checkout);
             const checkoutRes = await api.post(`core/create-transaction/${id}/`, checkout);
             cart.forEach(item => {
-                setCart(cart.filter(i => i !== item));
                 setInventory(prevInventory => [
                     ...prevInventory,
                     {
@@ -127,6 +126,7 @@ const VendorFundraiser = () => {
                     },
                 ]);
             })
+            setCart([]);
             setBuyerDetails({});
             await fetchTransactions();
         } catch (error) {
@@ -447,6 +447,7 @@ const VendorFundraiser = () => {
                                                         ))}
                                                     </tbody>
                                                 </table>
+                                                <p className="text-2xl font-semibold mt-6 mb-2">Total Price: ${receipt.total_price}</p>
                                             </div>
 
                                             <button
