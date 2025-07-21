@@ -28,14 +28,18 @@ import { MoveLeft, MoveRight, X } from "lucide-react";
 const VendorFundraiser = () => {
     const { id } = useParams();
     const [fundraiser, setFundraiser] = useState(null);
-    const [inventory, setInventory] = useState(null);
+    const [fullInventory, setFullInventory] = useState([]);
+    const [inventory, setInventory] = useState([]);
     const [loading, setLoading] = useState(false);
     const [hidden, setHidden] = useState(false);
     const [cart, setCart] = useState([]);
     const [totalCost, setTotalCost] = useState(0);
     const [buyerDetails, setBuyerDetails] = useState({});
+    const [fullTransactions, setFullTransactions] = useState([]);
     const [transactions, setTransactions] = useState([]);
     const [receipt, setReceipt] = useState(null);
+    const [searchItem, setSearchItem] = useState("");
+    const [searchBuyer, setSearchBuyer] = useState("");
     const [errors, setErrors] = useState({});
     
     useEffect(() => {
@@ -43,6 +47,7 @@ const VendorFundraiser = () => {
             try {
                 const fundraiserRes = await api.get(`core/fundraiser/${id}`);
                 setFundraiser(fundraiserRes.data);
+                setFullInventory(fundraiserRes.data.inventory);
                 setInventory(fundraiserRes.data.inventory);
                 console.log(fundraiserRes.data);
             } catch (error) {
@@ -53,9 +58,17 @@ const VendorFundraiser = () => {
         fetchFundraiser();
     }, []);
 
+    useEffect(() => {
+        const filtered = fullInventory.filter(item =>
+            item.name.toLowerCase().includes(searchItem.toLowerCase())
+        );
+        setInventory(filtered);
+    }, [searchItem, fullInventory]);
+
     const fetchTransactions = async () => {
         try {
             const transactionsRes = await api.get(`core/transactions/${id}`);
+            setFullTransactions(transactionsRes.data);
             setTransactions(transactionsRes.data);
             console.log(transactionsRes.data);
         } catch (error) {
@@ -67,6 +80,13 @@ const VendorFundraiser = () => {
         fetchTransactions();
     }, []);
 
+    useEffect(() => {
+        const filtered = fullTransactions.filter(txn =>
+            txn.name?.toLowerCase().includes(searchBuyer.toLowerCase())
+        );
+        console.log("Filtered Transactions:", filtered);
+        setTransactions(filtered);
+    }, [searchBuyer, fullTransactions]);
 
     useEffect(() => {
         const total = cart.reduce((sum, item) => sum + Number(item.price) * Number(item.quantity), 0);
@@ -176,38 +196,47 @@ const VendorFundraiser = () => {
                             <TabsContent value="inventory">
                                 <>
                                     <h5 className="text-2xl font-semibold mb-2">Inventory</h5>
-                                    <table className="w-full text-sm">
-                                        <thead className="sticky top-0 bg-gray-100">
-                                            <tr>
-                                                <th key='name' className="p-2 text-left">Item</th>
-                                                <th key='price' className="p-2 text-left">Price</th>
-                                                <th key='quantity' className="p-2 text-left">Quantity</th>
-                                                <th key='remarks' className="p-2 text-left">Remarks</th>
-                                                <th />
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {inventory?.map(row => (
-                                                <tr className="border-b">
-                                                    <td className="p-2">
-                                                        {row.name}
-                                                    </td>
-                                                    <td className="p-2">
-                                                        ${row.price.toFixed(2)}
-                                                    </td>
-                                                    <td className="p-2">
-                                                        {row.quantity}
-                                                    </td>
-                                                    <td className="p-2">
-                                                        {row.remarks}
-                                                    </td>
-                                                    <td className="p-2">
-                                                        <button onClick={() => addToCart(row)} className="text-blue-500 hover:text-blue-700">Add to cart</button>
-                                                    </td>
+                                    <Input
+                                        type="search"
+                                        placeholder="Search by Item Name"
+                                        onChange={e => setSearchItem(e.target.value)}
+                                        className="w-full md:w-1/3 mb-2"
+                                    />
+                                    <div className="max-h-[60vh] overflow-auto">
+                                        <table className="w-full text-sm overflow-auto max-h-[60vh]">
+                                            <thead className="sticky top-0 bg-gray-100">
+                                                <tr>
+                                                    <th key='name' className="p-2 text-left">Item</th>
+                                                    <th key='price' className="p-2 text-left">Price</th>
+                                                    <th key='quantity' className="p-2 text-left">Quantity</th>
+                                                    <th key='remarks' className="p-2 text-left">Remarks</th>
+                                                    <th />
                                                 </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
+                                            </thead>
+                                            <tbody>
+                                                {inventory?.map(row => (
+                                                    <tr className="border-b">
+                                                        <td className="p-2">
+                                                            {row.name}
+                                                        </td>
+                                                        <td className="p-2">
+                                                            ${row.price.toFixed(2)}
+                                                        </td>
+                                                        <td className="p-2">
+                                                            {row.quantity}
+                                                        </td>
+                                                        <td className="p-2">
+                                                            {row.remarks}
+                                                        </td>
+                                                        <td className="p-2">
+                                                            <button onClick={() => addToCart(row)} className="text-blue-500 hover:text-blue-700">Add to cart</button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    
                                     {cart.length > 0 && (
                                         <>
                                             <h5 className="text-2xl font-semibold mt-6 mb-2">Checkout</h5>
@@ -371,6 +400,12 @@ const VendorFundraiser = () => {
                             </TabsContent>
                             <TabsContent value="transactions">
                                 <h5 className="text-2xl font-semibold mb-2">Transactions</h5>
+                                <Input
+                                    type="search"
+                                    placeholder="Search by Buyer Name"
+                                    onChange={e => setSearchBuyer(e.target.value)}
+                                    className="w-full md:w-1/3 mb-2"
+                                />
                                 {transactions.length > 0 && (
                                     <table className="w-full text-sm">
                                         <thead className="sticky top-0 bg-gray-100">
