@@ -380,6 +380,7 @@ const VendorFundraiser = () => {
                                                 <th key='email' className="p-2 text-left">Email Address</th>
                                                 <th key='payment' className="p-2 text-left">Payment Method</th>
                                                 <th key='receipt' className="p-2 text-left">Receipt</th>
+                                                <th key='datetime' className="p-2 text-left">Time of Transaction</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -399,6 +400,12 @@ const VendorFundraiser = () => {
                                                     </td>
                                                     <td className="p-2">
                                                         <button onClick={() => setReceipt(row)} className="text-blue-500 hover:text-blue-700">View Receipt</button>
+                                                    </td>
+                                                    <td className="p-2">
+                                                        {new Date(row.time_created).toLocaleString('en-SG', {
+                                                            dateStyle: 'medium',
+                                                            timeStyle: 'short',
+                                                        })}
                                                     </td>
                                                 </tr>
                                             ))}
