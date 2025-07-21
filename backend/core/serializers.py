@@ -280,6 +280,11 @@ class TransactionItemSerializer(serializers.ModelSerializer):
     def get_total_price(self, obj):
         return obj.quantity * obj.product.price
     
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        rep['product'] = ProductSerializer(instance.product).data
+        return rep
+    
 class TransactionSerializer(serializers.ModelSerializer):
     vendor = serializers.PrimaryKeyRelatedField(read_only=True)
     items = TransactionItemSerializer(many=True,write_only=True)
