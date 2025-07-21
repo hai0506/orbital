@@ -106,7 +106,7 @@ export default function UpdateInventory({ open, onClose, inventoryProps }) {
     <Dialog as={Fragment} open={open} onClose={onClose}>
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
         <div className="max-w-3xl w-full rounded-lg bg-white p-6 shadow-lg">
-            <h2 className="text-xl font-semibold mb-4">Your Inventory</h2>
+            <h2 className="text-xl font-semibold mb-2">Your Inventory</h2>
             <Description className="text-sm/6 text-black/50">Upload an Excel sheet if you have one</Description>
             <ShadcnButton variant="outline" size="sm" style={{ marginBottom: "10px" }}>
                   <Upload /> 
