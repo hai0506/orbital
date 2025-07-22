@@ -79,7 +79,7 @@ const VendorOffer = ({ offer, deleteOffer }) => {
 
                             {status === "approved" && (
                                 <div className="w-[50%] p-4">
-                                    <ListingDetails fields={{...offer.listing, commission: offer.commission}} days={offer.selectedDays} />
+                                    <ListingDetails fields={{...offer.listing, commission: offer.commission, categories: offer.selectedCategories}} days={offer.selectedDays} />
                                 </div>
                             )}
 

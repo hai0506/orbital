@@ -4,10 +4,16 @@ from .views import *
 urlpatterns = [
     path("create-post/", CreatePostView.as_view(), name="create-post"),
     path("posts/", PostListView.as_view(), name="post-list"),
+    path('delete-post/<int:post>/', DeletePostView.as_view(), name='delete-post'),
     path('user/profile/', get_user_profile, name='user-profile'),
     path("create-offer/", CreateOfferView.as_view(), name="create-offer"),
     path("offers/", OfferListView.as_view(), name="offer-list"),
     path('edit-offer-status/<int:offer_id>/', UpdateOfferStatusView.as_view(), name='edit-offer-status'),
     path('delete-offer/<int:offer_id>/', DeleteOfferView.as_view(), name='delete-offer'),
     path("fundraisers/", FundraiserListView.as_view(), name="fundraiser-list"),
+    path("fundraiser/<int:fundraiser_id>/", RetrieveFundraiserView.as_view(), name="retrieve-fundraiser"),
+    path("create-product/", CreateProductView.as_view(), name="create-product"),
+    path('edit-product/<int:product_id>/', ProductEditView.as_view(), name='edit-product'),
+    path('create-transaction/<int:vendor_fundraiser_id>/', CreateTransactionView.as_view(), name='create-transaction'),
+    path('transactions/<int:vendor_fundraiser_id>/', TransactionListView.as_view(), name='transaction-list'),
 ]
