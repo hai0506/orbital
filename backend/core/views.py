@@ -190,8 +190,9 @@ class UpdateOfferStatusView(generics.RetrieveUpdateAPIView):
             fundraiser,_ = Fundraiser.objects.get_or_create(listing=instance.listing)
             vendor_fundraiser = VendorFundraiser.objects.create(offer=instance,revenue=0,org_fundraiser=fundraiser)
             
-            products = json.loads(request.data.get('inventory', None))        
-            if products:
+            inv_data = request.data.get('inventory', None)       
+            if inv_data:
+                products = json.loads(inv_data) 
                 for product in products:
                     Product.objects.create(name=product['Item'],quantity=product['Quantity'],price=product['Price'],remarks=product['Remarks'],vendor=vendor_fundraiser)
             
@@ -217,7 +218,7 @@ class DeleteOfferView(generics.RetrieveDestroyAPIView):
 
 class FundraiserListView(APIView):
     permission_classes = [IsAuthenticated]
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
         org = get_or_none(Organization, user=self.request.user)
         vendor = get_or_none(Vendor, user=self.request.user)
         if org:
@@ -230,7 +231,7 @@ class FundraiserListView(APIView):
         
 class RetrieveFundraiserView(APIView):
     permission_classes = [IsAuthenticated]
-    def get(self, request, fundraiser_id, *args, **kwargs):
+    def get(self, request, fundraiser_id):
         org = get_or_none(Organization, user=self.request.user)
         vendor = get_or_none(Vendor, user=self.request.user)
         if org:
@@ -276,6 +277,29 @@ class ProductEditView(generics.RetrieveUpdateDestroyAPIView):
         # return Product.objects.all()
 
     lookup_field = 'product_id' # to edit: go http://127.0.0.1:8000/core/edit-product/<whatever product id>/
+
+class UpdateInventoryView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, fundraiser_id):
+        vendor = get_or_none(Vendor, user=self.request.user)
+        if not vendor:
+            raise PermissionError('User cannot edit inventory.')
+        vendor_fundraiser = get_object_or_404(VendorFundraiser, fundraiser_id=fundraiser_id)
+        if self.request.user != vendor_fundraiser.offer.vendor.user:
+            raise PermissionError('User cannot edit this fundraiser\'s inventory.')
+        
+        inv_data = request.data.get('inventory', None)
+        if inv_data:
+            products = json.loads(inv_data)
+            Product.objects.filter(vendor=vendor_fundraiser).delete()
+            for product in products:
+                print(product)
+                Product.objects.create(name=product['Item'],quantity=product['Quantity'],price=product['Price'],remarks=product['Remarks'],vendor=vendor_fundraiser)
+            return Response({'inventory_update':'Update successful.'}, status=status.HTTP_200_OK)
+        return Response({'inventory_update': 'No inventory provided.'}, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 class CreateTransactionView(generics.CreateAPIView):
     queryset = Transaction.objects.all()

@@ -13,6 +13,7 @@ const Fundraiser = ({ fundraiser, role }) => {
     const [open, setOpen] = useState(false);
     const [expandedIndex, setExpandedIndex] = useState(null);
     const [openInventory, setOpenInventory] = useState(false);
+    const [excelSheet, setExcelSheet] = useState(null);
     const [inventory, setInventory] = useState(
         fundraiser.inventory.map(({ name, price, quantity, remarks }) => ({
             Item: name,
@@ -48,13 +49,14 @@ const Fundraiser = ({ fundraiser, role }) => {
 
             console.log("Sending formData:", formData);
 
-            const route = `core/edit-offer-status/${fundraiser.fundraiser_id}/`;
+            const route = `core/edit-inventory/${fundraiser.fundraiser_id}/`;
 
             const res = await api.patch(route, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data', 
                 },
             });
+            setOpen(false);
             navigate("/fundraisers");
         } catch (error) {
             console.error(error);
@@ -325,6 +327,8 @@ const Fundraiser = ({ fundraiser, role }) => {
                                                 inventoryProps={{
                                                     inventory,
                                                     setInventory,
+                                                    excelSheet,
+                                                    setExcelSheet
                                                 }}
                                             />
                                             {updated && (
