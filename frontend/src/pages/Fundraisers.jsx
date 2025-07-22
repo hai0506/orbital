@@ -3,6 +3,7 @@ import api from '../api';
 import Layout from "../components/Layout";
 import Fundraiser from '../components/Fundraiser';
 import { Link } from 'react-router-dom';
+import FundraiserFilter from '@/components/FundraiserFilter';
 // JSON mock data
 //import fundraisers from '../data/Fundraisers'; // comment this out
 
@@ -11,8 +12,17 @@ const Fundraisers = () => {
   const [loading, setLoading] = useState(true); // this as well
   const role = localStorage.getItem("ROLE");
 
-  // uncomment this section to test job creation
-  // /*
+  const applyFilters = async (filters) => {
+    try {
+        const offersRes = await api.get(`core/fundraisers/?${filters}`);
+        setFundraisers(offersRes.data);
+    } catch (error) {
+        console.error('Filter failed:', error);
+    } finally {
+        setLoading(false);
+    }
+  };
+
   useEffect(() => {
     async function fetchFundraisers() {
       try {
@@ -33,6 +43,11 @@ const Fundraisers = () => {
   return (
     <>
         <Layout heading="Fundraisers">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="mt-4">
+                <FundraiserFilter onApply={applyFilters} />
+            </div>
+          </div>
           <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
             {fundraisers.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

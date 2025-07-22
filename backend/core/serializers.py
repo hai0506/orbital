@@ -223,40 +223,18 @@ class ProductUpdateSerializer(serializers.ModelSerializer):
 class FundraiserSerializer(serializers.ModelSerializer):
     listing = serializers.PrimaryKeyRelatedField(read_only=True)
     vendors = serializers.SerializerMethodField()
+    status = serializers.SerializerMethodField()
+
     class Meta:
         model = Fundraiser
-        fields = ['fundraiser_id','vendors','listing']
+        fields = ['fundraiser_id','vendors','listing','status']
 
     def get_vendors(self, obj):
         vendors = VendorFundraiser.objects.filter(org_fundraiser=obj)
         return VendorFundraiserSerializer(vendors, many=True).data
-
-    def to_representation(self, instance):
-        rep = super().to_representation(instance)
-        rep['listing'] = JobPostSerializer(instance.listing).data
-        rep['vendors'] = VendorFundraiserSerializer(instance.vendors.all(), many=True).data
-        return rep
-    
-class VendorFundraiserSerializer(serializers.ModelSerializer):
-    offer = serializers.PrimaryKeyRelatedField(read_only=True)
-    inventory = serializers.SerializerMethodField()
-    org_fundraiser = serializers.PrimaryKeyRelatedField(read_only=True)
-    status = serializers.SerializerMethodField()
-    transactions = serializers.SerializerMethodField()
-    class Meta:
-        model = VendorFundraiser
-        fields = ['fundraiser_id','offer','status','revenue','inventory','org_fundraiser','transactions']
-
-    def get_inventory(self, obj):
-        products = Product.objects.filter(vendor=obj)
-        return ProductSerializer(products, many=True).data
-    
-    def get_transactions(self, obj):
-        trs = Transaction.objects.filter(vendor=obj)
-        return TransactionSerializer(trs, many=True).data
     
     def get_status(self, obj):
-        listing = obj.offer.listing
+        listing = obj.listing
         now = datetime.now()
 
         start_dt = datetime.combine(listing.start_date, listing.start_time)
@@ -268,6 +246,29 @@ class VendorFundraiserSerializer(serializers.ModelSerializer):
             return "ongoing"
         else:
             return "concluded"
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        rep['listing'] = JobPostSerializer(instance.listing).data
+        rep['vendors'] = VendorFundraiserSerializer(instance.vendors.all(), many=True).data
+        return rep
+    
+class VendorFundraiserSerializer(serializers.ModelSerializer):
+    offer = serializers.PrimaryKeyRelatedField(read_only=True)
+    inventory = serializers.SerializerMethodField()
+    org_fundraiser = serializers.PrimaryKeyRelatedField(read_only=True)
+    transactions = serializers.SerializerMethodField()
+    class Meta:
+        model = VendorFundraiser
+        fields = ['fundraiser_id','offer','revenue','inventory','org_fundraiser','transactions']
+
+    def get_inventory(self, obj):
+        products = Product.objects.filter(vendor=obj)
+        return ProductSerializer(products, many=True).data
+    
+    def get_transactions(self, obj):
+        trs = Transaction.objects.filter(vendor=obj)
+        return TransactionSerializer(trs, many=True).data
     
     def to_representation(self, instance):
         rep = super().to_representation(instance)
