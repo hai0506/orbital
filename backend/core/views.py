@@ -10,6 +10,8 @@ from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 import json
 from django.shortcuts import get_object_or_404
+from django.db.models import F,Q
+
 
 @api_view(['GET'])
 def get_user_profile(request):
@@ -64,27 +66,50 @@ class PostListView(generics.ListAPIView): # view others posts and filters.
     serializer_class = JobPostSerializer
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        # to filter: http://127.0.0.1:8000/core/posts/?categories=whatever1&categories=whatever2&...
-        keyword_values = self.request.query_params.getlist('categories')
-        combined_queryset = None
-        if len(keyword_values) > 0:
-            for v in keyword_values:
-                value = v.strip().lower()
-                keyword = get_or_none(Category, value = value)
-                if keyword:
-                    if combined_queryset is None: combined_queryset = keyword.jobpost_set.all()
-                    else: combined_queryset = combined_queryset.union(keyword.jobpost_set.all())
-        else: 
-            combined_queryset = JobPost.objects.all()
+    def get_queryset(self):# to filter: http://127.0.0.1:8000/core/posts/?categories=whatever1&categories=whatever2&sortby=time_created&...
+        sort_field = self.request.query_params.get('sortby')
+        category_values = self.request.query_params.getlist('categories')
+
+        # filter categories
+        qs = JobPost.objects.all()
+        if len(category_values) > 0:
+            filters = Q()
+            valid = False
+            for value in category_values:
+                category = get_or_none(Category, value = value)
+                if category:
+                    filters |= Q(categories=category)
+                    valid=True
+
+            if valid: qs = qs.filter(filters).distinct()
+            else: qs = qs.none()
 
         # hide posts that the vendor has already made offers for
         vendor = get_or_none(Vendor, user=self.request.user)
+        # vendor = Vendor.objects.get(user_id=2)
         if not vendor:
-            return combined_queryset
-        
+            return qs
         offered_posts = JobPost.objects.filter(post_offers__vendor=vendor)
-        return combined_queryset.exclude(post_id__in=offered_posts.values_list('post_id', flat=True))
+        final_qs = qs.exclude(post_id__in=offered_posts.values_list('post_id', flat=True))
+
+        # sort posts
+        if sort_field == 'start_date':
+            final_qs = final_qs.order_by(sort_field, 'start_time')
+        else:
+            final_qs = final_qs.order_by('-time_created')
+        return final_qs
+    
+class DeletePostView(generics.RetrieveDestroyAPIView):
+    serializer_class = JobPostSerializer
+    permission_classes = [IsAuthenticated]
+    def get_queryset(self): 
+        org = get_or_none(Organization, user=self.request.user)
+        if org:
+            return JobPost.objects.filter(author=org)
+        else: 
+            raise PermissionError('User cannot delete offers.')
+
+    lookup_field = 'post_id' # http://127.0.0.1:8000/core/delete-post/<post id>/
 
 class CreateOfferView(generics.CreateAPIView): # create offers
     serializer_class = JobOfferSerializer
@@ -110,11 +135,31 @@ class OfferListView(generics.ListAPIView):
     def get_queryset(self): 
         org = get_or_none(Organization, user=self.request.user)
         vendor = get_or_none(Vendor, user=self.request.user)
+        sort_field = self.request.query_params.get('sortby')
+        available = self.request.query_params.get('available')
+        commission = self.request.query_params.get('commission')
+        status = self.request.query_params.get('status')
         if org:
-            return JobOffer.objects.filter(listing__author=org, status='pending')
+            qs = JobOffer.objects.filter(listing__author=org, status='pending')
+            # available all only
+            if available == '1':
+                qs = qs.filter(allDays=True)
+            # same or higher commision only
+            if commission == '1':
+                qs = qs.annotate(required_commission=F('listing__commission')).filter(
+                    commission__gte=F('required_commission')
+                )
         elif vendor:
-            return JobOffer.objects.filter(vendor=vendor).exclude(status='confirmed')
-        else: return JobOffer.objects.none()
+            qs = JobOffer.objects.filter(vendor=vendor).exclude(status='confirmed')
+            if status in ['approved','pending','rejected','cancelled']: qs = qs.filter(status=status)
+        else: qs = JobOffer.objects.none()
+
+        # sort
+        if sort_field == 'start_date':
+            qs = qs.order_by('listing__start_date', 'listing__start_time')
+        else:
+            qs = qs.order_by('-time_created')
+        return qs
 
 class UpdateOfferStatusView(generics.RetrieveUpdateAPIView):
     serializer_class = OfferStatusSerializer
@@ -176,7 +221,8 @@ class FundraiserListView(APIView):
         org = get_or_none(Organization, user=self.request.user)
         vendor = get_or_none(Vendor, user=self.request.user)
         if org:
-            return Response(FundraiserSerializer(Fundraiser.objects.filter(listing__author=org), many=True).data)
+            return Response(FundraiserSerializer(Fundraiser.objects.filter(listing__author=org)
+                    .order_by('listing__start_date','listing__start_time'), many=True).data)
         elif vendor:
             return Response(VendorFundraiserSerializer(VendorFundraiser.objects.filter(offer__vendor=vendor),many=True).data)
         else: 
