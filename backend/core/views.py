@@ -2,11 +2,14 @@ from django.shortcuts import render
 from django.contrib.auth.models import User
 from rest_framework.response import Response
 from rest_framework import generics, status
+from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .serializers import *
 from itertools import chain
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
+import json
+from django.shortcuts import get_object_or_404
 from django.db.models import F,Q
 
 
@@ -78,12 +81,15 @@ class PostListView(generics.ListAPIView): # view others posts and filters.
         qs = JobPost.objects.all()
         if len(category_values) > 0:
             filters = Q()
+            valid = False
             for value in category_values:
                 category = get_or_none(Category, value = value)
                 if category:
                     filters |= Q(categories=category)
+                    valid=True
 
-            qs = qs.filter(filters).distinct()
+            if valid: qs = qs.filter(filters).distinct()
+            else: qs = qs.none()
 
         # hide posts that the vendor has already made offers for
         vendor = get_or_none(Vendor, user=self.request.user)
@@ -121,12 +127,8 @@ class CreateOfferView(generics.CreateAPIView): # create offers
         if vendor:
             return JobOffer.filter(vendor=vendor)
         else: return JobOffer.objects.none()
-        # return JobOffer.objects.none()
 
     def perform_create(self, serializer):
-        # vendor = Vendor.objects.get(user_id=2)
-        # serializer.save(vendor=vendor)
-
         vendor = get_or_none(Vendor, user=self.request.user)
         if vendor:
             serializer.save(vendor=vendor)
@@ -170,7 +172,6 @@ class UpdateOfferStatusView(generics.RetrieveUpdateAPIView):
     serializer_class = OfferStatusSerializer
     permission_classes = [IsAuthenticated]
     def get_queryset(self): 
-        # return JobOffer.objects.all()
         org = get_or_none(Organization, user=self.request.user)
         vendor = get_or_none(Vendor, user=self.request.user)
         if org:
@@ -181,15 +182,30 @@ class UpdateOfferStatusView(generics.RetrieveUpdateAPIView):
             raise PermissionError('User cannot edit offer status')
         
     def update(self, request, *args, **kwargs):
-        if request.data.get('status') == 'confirmed':
+        status_value = request.data.get('status')
+        if status_value not in ['pending', 'approved', 'rejected','confirmed','cancelled']:
+            return Response({'status': 'Invalid status.'}, status=status.HTTP_400_BAD_REQUEST)            
+            
+        if status_value == 'confirmed':
+            vendor = get_or_none(Vendor, user=self.request.user)
+            if not vendor: raise PermissionError('User cannot confirm offers.')
+
+            if request.data.get('agreement') == 'false':
+                return Response({'agreement': 'Please agree to the Terms and Conditions.'}, status=status.HTTP_400_BAD_REQUEST)
+            
             instance = self.get_object()
             fundraiser,_ = Fundraiser.objects.get_or_create(listing=instance.listing)
-            fundraiser.vendors.add(instance)
-
+            vendor_fundraiser = VendorFundraiser.objects.create(offer=instance,revenue=0,org_fundraiser=fundraiser)
+            
+            products = json.loads(request.data.get('inventory', None))        
+            if products:
+                for product in products:
+                    Product.objects.create(name=product['Item'],quantity=product['Quantity'],price=product['Price'],remarks=product['Remarks'],vendor=vendor_fundraiser)
+            
         return super().update(request, *args, **kwargs)
 
 
-    lookup_field = 'offer_id' # to edit: go http://127.0.0.1:8000/core/edit-offer-status/<whatever product id>/
+    lookup_field = 'offer_id' # to edit: go http://127.0.0.1:8000/core/edit-offer-status/<whatever offer id>/
     
 class DeleteOfferView(generics.RetrieveDestroyAPIView):
     serializer_class = JobOfferSerializer
@@ -204,7 +220,7 @@ class DeleteOfferView(generics.RetrieveDestroyAPIView):
         else: 
             raise PermissionError('User cannot delete offers.')
 
-    lookup_field = 'offer_id' # http://127.0.0.1:8000/core/delete-offer/<product id>/
+    lookup_field = 'offer_id' # http://127.0.0.1:8000/core/delete-offer/<offer id>/
 
 class FundraiserListView(APIView):
     permission_classes = [IsAuthenticated]
@@ -215,8 +231,81 @@ class FundraiserListView(APIView):
             return Response(FundraiserSerializer(Fundraiser.objects.filter(listing__author=org)
                     .order_by('listing__start_date','listing__start_time'), many=True).data)
         elif vendor:
-            fundraisers = Fundraiser.objects.filter(vendors__vendor=vendor)
-            return Response(JobOfferSerializer(JobOffer.objects.filter(vendor=vendor, fundraisers__in=fundraisers).distinct()
-                .order_by('listing__start_date','listing__start_time'),many=True).data)
+            return Response(VendorFundraiserSerializer(VendorFundraiser.objects.filter(offer__vendor=vendor),many=True).data)
         else: 
             raise PermissionError('User cannot view fundraisers.')
+        
+class RetrieveFundraiserView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request, fundraiser_id, *args, **kwargs):
+        org = get_or_none(Organization, user=self.request.user)
+        vendor = get_or_none(Vendor, user=self.request.user)
+        if org:
+            fundraiser = get_object_or_404(Fundraiser, fundraiser_id=fundraiser_id, listing__author=org)
+            return Response(FundraiserSerializer(fundraiser).data)
+        elif vendor:
+            fundraiser = get_object_or_404(VendorFundraiser, fundraiser_id=fundraiser_id, offer__vendor=vendor)
+            return Response(VendorFundraiserSerializer(fundraiser).data)
+        else: 
+            raise PermissionError('User cannot view fundraisers.')
+        
+class CreateProductView(generics.ListCreateAPIView):
+    serializer_class = ProductSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        vendor = get_or_none(Vendor, user=self.request.user)
+        if vendor:
+            return Product.filter(vendor=vendor)
+        else: return Product.objects.none()
+        # return JobPost.objects.none()
+    
+    def perform_create(self, serializer):
+        # vendor = Vendor.objects.get(user_id=2)
+        # serializer.save(vendor=vendor)
+
+        vendor = get_or_none(Vendor, user=self.request.user)
+        if vendor:
+            serializer.save(vendor=vendor)
+        else:
+            raise PermissionError('User cannot create products')
+        
+class ProductEditView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = ProductSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        vendor = get_or_none(Vendor, user=self.request.user)
+        if vendor:
+            return Product.filter(vendor=vendor)
+        else: 
+            raise PermissionError('User cannot edit products')
+        # return Product.objects.all()
+
+    lookup_field = 'product_id' # to edit: go http://127.0.0.1:8000/core/edit-product/<whatever product id>/
+
+class CreateTransactionView(generics.CreateAPIView):
+    queryset = Transaction.objects.all()
+    serializer_class = TransactionSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        vendor = get_or_none(Vendor, user=self.request.user)
+        if vendor:
+            vendor_fundraiser_id = self.kwargs.get('vendor_fundraiser_id')
+            vendor_fundraiser = get_object_or_404(VendorFundraiser, fundraiser_id=vendor_fundraiser_id)
+            serializer.save(vendor=vendor_fundraiser)
+        else:
+            raise PermissionError('User cannot make transactions.')
+
+class TransactionListView(generics.ListAPIView):
+    serializer_class = TransactionSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self): 
+        vendor = get_or_none(Vendor, user=self.request.user)
+        if vendor:
+            vendor_fundraiser_id = self.kwargs.get('vendor_fundraiser_id')
+            vendor_fundraiser = get_object_or_404(VendorFundraiser, fundraiser_id=vendor_fundraiser_id)
+            return Transaction.objects.filter(vendor=vendor_fundraiser)
+        else: return Transaction.objects.none()
