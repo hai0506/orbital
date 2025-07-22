@@ -9,19 +9,32 @@ import UploadInventory from './UploadInventory';
 import { useNavigate } from "react-router-dom";
 
 const Fundraiser = ({ fundraiser, role }) => {
+    console.log(fundraiser);
     const [hovered, setHovered] = useState(false);
     const [open, setOpen] = useState(false);
     const [expandedIndex, setExpandedIndex] = useState(null);
     const [openInventory, setOpenInventory] = useState(false);
     const [excelSheet, setExcelSheet] = useState(null);
-    const [inventory, setInventory] = useState(
-        fundraiser.inventory.map(({ name, price, quantity, remarks }) => ({
-            Item: name,
-            Price: price,
-            Quantity: quantity,
-            Remarks: remarks
-        }))
-    );
+    // const [inventory, setInventory] = useState(
+    //     fundraiser.inventory.map(({ name, price, quantity, remarks }) => ({
+    //         Item: name,
+    //         Price: price,
+    //         Quantity: quantity,
+    //         Remarks: remarks
+    //     }))
+    // );
+    const [inventory, setInventory] = useState(() => {
+        if (role === 'vendor') {
+            return fundraiser.inventory.map(({ name, price, quantity, remarks }) => ({
+                Item: name,
+                Price: price,
+                Quantity: quantity,
+                Remarks: remarks
+            }));
+        } else if (role === 'organization') {
+            return null;
+        }
+    });
     const [loading, setLoading] = useState(false);
     const [updated, setUpdated] = useState(false);
     const [errors, setErrors] = useState({});
