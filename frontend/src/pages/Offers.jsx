@@ -4,12 +4,24 @@ import Offer from '../components/Offer'
 import VendorOffer from '../components/VendorOffer'
 import api from '../api'
 //import offers from '../data/Offers'
+import OfferFilter from '../components/OfferFilter'
+import VendorOfferFilter from '../components/VendorOfferFilter'
 
 const Offers = () => {
     const role = localStorage.getItem("ROLE");
     const [offers, setOffers] = useState([]);
     const [loading, setLoading] = useState(false);
 
+    const applyFilters = async (filters) => {
+        try {
+            const offersRes = await api.get(`core/offers/?${filters}`);
+            setOffers(offersRes.data);
+        } catch (error) {
+            console.error('Filter failed:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
     // uncomment this section to test job creation
     // /*
     useEffect(() => {
@@ -35,6 +47,8 @@ const Offers = () => {
 
     return (
         <Layout heading="Offers">
+            {role=="organization" && <OfferFilter onApply={applyFilters} />}
+            {role=="vendor" && <VendorOfferFilter onApply={applyFilters} />}
             <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 grid grid-cols-3 gap-4">
                 {offers.map((offer, index) => {
                     if (role === "organization") {

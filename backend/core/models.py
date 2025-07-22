@@ -53,7 +53,6 @@ class JobOffer(models.Model):
     remarks = models.TextField(max_length=2000, blank=True)
     status = models.CharField()
     time_created = models.DateTimeField(auto_now_add=True)
-    inventory_file = models.FileField(null=True, blank=True,upload_to='inventory_files/')
 
     def delete(self, *args, **kwargs):
         self.selectedCategories.clear()
@@ -61,8 +60,41 @@ class JobOffer(models.Model):
 
 class Fundraiser(models.Model):
     fundraiser_id = models.AutoField(primary_key=True)
-    vendors = models.ManyToManyField(JobOffer, related_name='fundraisers')
     listing = models.ForeignKey(JobPost, on_delete=models.CASCADE, related_name='fundraisers')
+
+class VendorFundraiser(models.Model):
+    fundraiser_id = models.AutoField(primary_key=True)
+    offer = models.OneToOneField(JobOffer, on_delete=models.CASCADE, related_name='vendor_fundraiser')
+    revenue = models.FloatField()
+    org_fundraiser = models.ForeignKey(Fundraiser, on_delete=models.CASCADE, related_name='vendors')
+
+class Product(models.Model):
+    product_id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=50)
+    quantity = models.IntegerField(validators=[MinValueValidator(0)])
+    price = models.FloatField(validators=[MinValueValidator(0)])
+    image = models.ImageField(upload_to='product_images/', blank=True, null=True, validators=[filesize_valid])
+    vendor = models.ForeignKey(VendorFundraiser, on_delete=models.CASCADE, related_name="products")
+    remarks = models.TextField(max_length=1000, blank=True)
+
+class Transaction(models.Model):
+    transaction_id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100)
+    phone = models.CharField(max_length=20, blank=True, null=True)
+    email = models.CharField(max_length=50, blank=True, null=True)
+    payment = models.CharField()
+    vendor = models.ForeignKey(VendorFundraiser, on_delete=models.CASCADE, related_name="transactions")
+    time_created = models.DateTimeField(auto_now_add=True)
+
+
+class TransactionItem(models.Model):
+    transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE, related_name="items")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+
+    def total_price(self):
+        return self.quantity * self.product.price
+
     
 class Message(models.Model):  
     message_id = models.AutoField(primary_key=True)
