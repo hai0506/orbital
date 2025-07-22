@@ -294,7 +294,6 @@ class UpdateInventoryView(APIView):
             products = json.loads(inv_data)
             Product.objects.filter(vendor=vendor_fundraiser).delete()
             for product in products:
-                print(product)
                 Product.objects.create(name=product['Item'],quantity=product['Quantity'],price=product['Price'],remarks=product['Remarks'],vendor=vendor_fundraiser)
             return Response({'inventory_update':'Update successful.'}, status=status.HTTP_200_OK)
         return Response({'inventory_update': 'No inventory provided.'}, status=status.HTTP_400_BAD_REQUEST)
