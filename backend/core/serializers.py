@@ -196,6 +196,7 @@ class JobOfferSerializer(serializers.ModelSerializer):
                 "id": vendor.id,
                 "username": vendor.user.username,
                 "email": vendor.user.email,
+                "userid": vendor.user.id
             }
         return rep
 
