@@ -221,11 +221,17 @@ class FundraiserListView(APIView):
     def get(self, request):
         org = get_or_none(Organization, user=self.request.user)
         vendor = get_or_none(Vendor, user=self.request.user)
+        status = self.request.query_params.get('status')
         if org:
-            return Response(FundraiserSerializer(Fundraiser.objects.filter(listing__author=org)
-                    .order_by('listing__start_date','listing__start_time'), many=True).data)
+            qs = Fundraiser.objects.filter(listing__author=org).order_by('listing__start_date','listing__start_time')
+            if status:
+                qs = [f for f in qs if FundraiserSerializer(f).data['status'] == status]
+            return Response(FundraiserSerializer(qs, many=True).data)
         elif vendor:
-            return Response(VendorFundraiserSerializer(VendorFundraiser.objects.filter(offer__vendor=vendor),many=True).data)
+            qs = VendorFundraiser.objects.filter(offer__vendor=vendor)
+            if status:
+                qs = [f for f in qs if FundraiserSerializer(f.org_fundraiser).data['status'] == status]
+            return Response(VendorFundraiserSerializer(qs, many=True).data)
         else: 
             raise PermissionError('User cannot view fundraisers.')
         
@@ -297,8 +303,6 @@ class UpdateInventoryView(APIView):
                 Product.objects.create(name=product['Item'],quantity=product['Quantity'],price=product['Price'],remarks=product['Remarks'],vendor=vendor_fundraiser)
             return Response({'inventory_update':'Update successful.'}, status=status.HTTP_200_OK)
         return Response({'inventory_update': 'No inventory provided.'}, status=status.HTTP_400_BAD_REQUEST)
-
-
 
 class CreateTransactionView(generics.CreateAPIView):
     queryset = Transaction.objects.all()
