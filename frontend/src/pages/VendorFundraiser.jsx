@@ -229,7 +229,9 @@ const VendorFundraiser = () => {
                                                             {row.remarks}
                                                         </td>
                                                         <td className="p-2">
+                                                        {row.quantity > 0 && (
                                                             <button onClick={() => addToCart(row)} className="text-blue-500 hover:text-blue-700">Add to cart</button>
+                                                        )}
                                                         </td>
                                                     </tr>
                                                 ))}
