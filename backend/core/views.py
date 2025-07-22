@@ -225,12 +225,12 @@ class FundraiserListView(APIView):
         if org:
             qs = Fundraiser.objects.filter(listing__author=org).order_by('listing__start_date','listing__start_time')
             if status:
-                qs = [f for f in qs if FundraiserSerializer(f).data['status'] == status]
+                qs = [f for f in qs if f.status == status]
             return Response(FundraiserSerializer(qs, many=True).data)
         elif vendor:
-            qs = VendorFundraiser.objects.filter(offer__vendor=vendor)
+            qs = VendorFundraiser.objects.filter(offer__vendor=vendor).order_by('org_fundraiser__listing__start_date','org_fundraiser__listing__start_time')
             if status:
-                qs = [f for f in qs if FundraiserSerializer(f.org_fundraiser).data['status'] == status]
+                qs = [f for f in qs if f.org_fundraiser.status == status]
             return Response(VendorFundraiserSerializer(qs, many=True).data)
         else: 
             raise PermissionError('User cannot view fundraisers.')

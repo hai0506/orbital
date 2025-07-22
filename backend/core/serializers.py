@@ -223,7 +223,7 @@ class ProductUpdateSerializer(serializers.ModelSerializer):
 class FundraiserSerializer(serializers.ModelSerializer):
     listing = serializers.PrimaryKeyRelatedField(read_only=True)
     vendors = serializers.SerializerMethodField()
-    status = serializers.SerializerMethodField()
+    status = serializers.CharField(read_only=True)
 
     class Meta:
         model = Fundraiser
@@ -232,20 +232,6 @@ class FundraiserSerializer(serializers.ModelSerializer):
     def get_vendors(self, obj):
         vendors = VendorFundraiser.objects.filter(org_fundraiser=obj)
         return VendorFundraiserSerializer(vendors, many=True).data
-    
-    def get_status(self, obj):
-        listing = obj.listing
-        now = datetime.now()
-
-        start_dt = datetime.combine(listing.start_date, listing.start_time)
-        end_dt = datetime.combine(listing.end_date, listing.end_time)
-
-        if now < start_dt:
-            return "yet to start"
-        elif start_dt <= now and now <= end_dt:
-            return "ongoing"
-        else:
-            return "concluded"
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
@@ -258,9 +244,10 @@ class VendorFundraiserSerializer(serializers.ModelSerializer):
     inventory = serializers.SerializerMethodField()
     org_fundraiser = serializers.PrimaryKeyRelatedField(read_only=True)
     transactions = serializers.SerializerMethodField()
+    status = serializers.CharField(source='org_fundraiser.status', read_only=True)
     class Meta:
         model = VendorFundraiser
-        fields = ['fundraiser_id','offer','revenue','inventory','org_fundraiser','transactions']
+        fields = ['fundraiser_id','offer','revenue','inventory','org_fundraiser','transactions','status']
 
     def get_inventory(self, obj):
         products = Product.objects.filter(vendor=obj)
@@ -304,7 +291,6 @@ class TransactionSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         payment = data.get('payment')
-        print(payment)
         if payment not in ['PayLah','PayNow','Cash','NETS','Card','Others']:
             raise serializers.ValidationError({'payment': 'Invalid payment type.'})
         items = data.get('items')

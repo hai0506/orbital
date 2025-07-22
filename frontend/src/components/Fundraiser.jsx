@@ -100,7 +100,7 @@ const Fundraiser = ({ fundraiser, role }) => {
 
                 {hovered && (
                     <Button 
-                        onClick={fundraiser.status === "yet to start"
+                        onClick={role === "vendor" && fundraiser.status === "yet to start"
                                         ? () => {setOpen(true);setHovered(false);}
                                         : handleClick
                                     } 
