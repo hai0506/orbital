@@ -25,23 +25,36 @@ const VendorOfferFilter = ({ onApply }) => {
                         Filter
                     </PopoverButton>
 
-                    <PopoverPanel anchor="bottom" className="flex flex-col border rounded-lg bg-white p-5">
-                        <select value={status} onChange={e => setStatus(e.target.value)} className="border m-3 p-1 rounded-lg">
-                            <option value="">Choose offer status...</option>
-                            <option value="pending">Pending</option>
-                            <option value="approved">Approved</option>
-                            <option value="rejected">Rejected</option>
-                            <option value="cancelled">Cancelled</option>
-                        </select>
-
-                        <select value={sortby} onChange={e => setSortby(e.target.value)} className="border m-3 p-1 rounded-lg">
-                            <option value="">Sort by...</option>
-                            <option value="start_date">Event start date</option>
-                            <option value="time_created">Latest</option>
-                        </select>
+                    <PopoverPanel
+                        anchor="bottom start"
+                        className="absolute left-0 mt-2 z-10 w-64 flex flex-col border rounded-lg bg-white p-5 shadow-lg"
+                    >
+                        <label className="mb-4 text-sm font-medium text-gray-700 flex flex-col">
+                            Filter by Offer Status
+                            <select
+                                value={status}
+                                onChange={e => setStatus(e.target.value)}
+                                className="border mt-1 p-2 rounded-lg"
+                            >
+                                <option value="">All</option>
+                                <option value="pending">Pending</option>
+                                <option value="approved">Approved</option>
+                                <option value="rejected">Rejected</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </label>
+                        
+                        <label className="mb-4 text-sm font-medium text-gray-700 flex flex-col">
+                            Sort by
+                            <select value={sortby} onChange={e => setSortby(e.target.value)} className="border mt-1 p-2 rounded-lg">
+                                <option value="">None</option>
+                                <option value="start_date">Event start date</option>
+                                <option value="time_created">Latest</option>
+                            </select>
+                        </label>
 
                         <button
-                            className="bg-gray-700 border p-2 rounded-lg text-white"
+                            className="w-fit inline-block bg-gray-700 hover:bg-gray-800 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
                             onClick={() => applyFilters(close)}
                         >
                             Apply

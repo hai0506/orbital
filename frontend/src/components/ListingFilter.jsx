@@ -36,28 +36,43 @@ const ListingFilter = ({ onApply }) => {
                         </svg>
                         Filter
                     </PopoverButton>
-                    <PopoverPanel anchor="bottom" className="flex flex-col border rounded-lg bg-white p-5">
-                        <b>Categories</b>
-                        {categories_list.map((category) => (
-                            <label key={category}>
-                                <input className="mx-4" type="checkbox" value={category}
-                                    checked={categories.includes(category)}
-                                    onChange={(e) => {
-                                        setCategories((all) =>
-                                            e.target.checked ? ([...all, category]) : all.filter((c) => c !== category)
-                                        );
-                                    }}
-                                    /> 
-                                {category}
-                            </label>
-                        ))}
+                    <PopoverPanel
+                        anchor="bottom start"
+                        className="absolute left-0 mt-2 z-10 w-64 flex flex-col border rounded-lg bg-white p-5 shadow-lg"
+                    >
+                        <div className="mb-4">
+                            <h3 className="font-semibold mb-2 text-sm text-gray-700">Filter by Categories</h3>
+                            <div className="flex flex-col space-y-2">
+                                {categories_list.map((category) => (
+                                <label key={category} className="inline-flex items-center space-x-2 text-sm text-gray-700">
+                                    <input
+                                        type="checkbox"
+                                        value={category}
+                                        checked={categories.includes(category)}
+                                        onChange={(e) =>
+                                            setCategories((all) =>
+                                            e.target.checked ? [...all, category] : all.filter((c) => c !== category)
+                                            )
+                                        }
+                                        className="accent-gray-700"
+                                    />
+                                    <span>{category}</span>
+                                </label>
+                                ))}
+                            </div>
+                        </div>
 
-                        <select value={sortby} onChange={e => setSortby(e.target.value)} className="border m-3 p-1 rounded-lg">
-                            <option value="">Sort by...</option>
-                            <option value="start_date">Event start date</option>
-                            <option value="time_created">Latest</option>
-                        </select>
-                        <button className="bg-gray-700 border p-2 rounded-lg text-white"onClick={() => applyFilters(close)}>
+                        
+                        <label className="mt-1 text-sm font-medium text-gray-700 flex flex-col">
+                            Sort by
+                            <select value={sortby} onChange={e => setSortby(e.target.value)} className="border mt-1 p-2 rounded-lg">
+                                <option value="">None</option>
+                                <option value="start_date">Event start date</option>
+                                <option value="time_created">Latest</option>
+                            </select>
+                        </label>
+                        
+                        <button className="mt-2 w-fit inline-block bg-gray-700 hover:bg-gray-800 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors" onClick={() => applyFilters(close)}>
                             Apply
                         </button>
                     </PopoverPanel>

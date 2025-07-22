@@ -29,9 +29,9 @@ const FundraiserFilter = ({ onApply }) => {
             <label className="mb-2 text-sm font-medium text-gray-700">
                 Filter by Fundraiser Status
                 <select
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
-                className="border mb-4 p-2 rounded-lg"
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value)}
+                    className="border mb-2 p-2 rounded-lg"
                 >
                 <option value="">All</option>
                 <option value="yet to start">Yet to start</option>
@@ -41,7 +41,7 @@ const FundraiserFilter = ({ onApply }) => {
             </label>
 
             <button
-              className="bg-gray-700 border p-2 rounded-lg text-white"
+              className="w-fit inline-block bg-gray-700 hover:bg-gray-800 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
               onClick={() => applyFilters(close)}
             >
               Apply
