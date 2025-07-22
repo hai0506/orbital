@@ -12,6 +12,7 @@ import {
   TabsTrigger,
   TabsContent
 } from "@/components/ui/tabs"
+import CountdownClock from '@/components/CountdownClock';
  
 const OrgFundraiser = () => {
     const { id } = useParams();
@@ -90,6 +91,8 @@ const OrgFundraiser = () => {
                         >
                             <MoveLeft/>
                         </button>
+                        <CountdownClock startTime={`${fundraiser?.listing?.start_date}T${fundraiser?.listing?.start_time}`}
+                        endTime={`${fundraiser?.listing?.end_date}T${fundraiser?.listing?.end_time}`} />
                     </div>
                 )}
                 <div className={`relative ${hidden ? 'w-full' : 'w-[75%]'} flex flex-col`}>
