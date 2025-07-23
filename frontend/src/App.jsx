@@ -10,6 +10,7 @@ import Offers from "./pages/Offers";
 import Fundraisers from "./pages/Fundraisers";
 import VendorFundraiser from "./pages/VendorFundraiser";
 import OrgFundraiser from "./pages/OrgFundraiser";
+import Profile from "./pages/Profile";
 import Chat from "./pages/Chat"
 import Chats from "./pages/Chats"
 import Profile from "./pages/Profile";
@@ -103,6 +104,14 @@ function App() {
 
           <Route 
             path="/profile/:id"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route 
+            path="/profile"
             element={
               <ProtectedRoute>
                 <Profile />
