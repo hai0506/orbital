@@ -38,7 +38,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     pfp = serializers.ImageField(required=False)
     class Meta:
         model = Profile
-        fields = ['user','name','description','pfp','user_type','username','email']
+        fields = ['user','description','pfp','user_type','username','email','rating','rating_count']
 
     # def update(self, instance, validated_data):
     #     user_data = validated_data.pop('user', {})

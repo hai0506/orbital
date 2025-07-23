@@ -19,10 +19,11 @@ def filesize_valid(value):
     
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile_user')
-    name = models.CharField(max_length=100, blank=True)
     description = models.TextField(max_length=2000, blank=True)
     pfp = models.ImageField(upload_to='pfp/', blank=True, null=True, validators=[filesize_valid])
     user_type = models.CharField()
+    rating = models.FloatField(validators=[MinValueValidator(0), MaxValueValidator(5)], default=0)
+    rating_count = models.IntegerField(default=0)
     
 class Category(models.Model):
     value = models.CharField(max_length=50, primary_key=True)
