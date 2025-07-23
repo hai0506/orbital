@@ -18,4 +18,5 @@ urlpatterns = [
     path('create-transaction/<int:vendor_fundraiser_id>/', CreateTransactionView.as_view(), name='create-transaction'),
     path('transactions/<int:vendor_fundraiser_id>/', TransactionListView.as_view(), name='transaction-list'),
     path("messages/<int:id>", MessageListView.as_view(), name="messages"),
+    path("chats/", ChatListView.as_view(), name="chats"),
 ]

@@ -346,3 +346,32 @@ class MessageListView(generics.ListAPIView):
             sender__in=[self.request.user, receiver],
             receiver__in=[self.request.user, receiver]
         ).order_by('time_created')
+    
+class ChatListView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        user=User.objects.get(id=request.user.id)
+        messages = Message.objects.filter(Q(sender=user) | Q(receiver=user)).order_by('time_created')
+
+        receivers = set()
+        for msg in messages:
+            receiver = msg.receiver if msg.sender == user else msg.sender
+            receivers.add(receiver)
+
+        chats = []
+        for receiver in receivers:
+            msgs = Message.objects.filter(
+                sender__in=[user, receiver],
+                receiver__in=[user, receiver]
+            ).order_by('time_created')
+
+            chats.append({
+                'chat_history': msgs,
+                'sender': user,
+                'receiver': receiver,
+            })
+
+        return Response(ChatSerializer(chats, many=True).data)
+
+    
+
