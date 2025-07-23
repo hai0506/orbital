@@ -331,8 +331,8 @@ class MessageSerializer(serializers.ModelSerializer):
 
 class ChatSerializer(serializers.Serializer):
     chat_history = MessageSerializer(many=True)
-    sender = UserSerializer()
-    receiver = UserSerializer()
+    me = UserSerializer()
+    other = UserSerializer()
     received = serializers.SerializerMethodField()
     preview = serializers.SerializerMethodField()
 
@@ -340,7 +340,7 @@ class ChatSerializer(serializers.Serializer):
         chat = obj['chat_history']
         if not chat or len(chat) < 1:
             return False
-        return chat[len(chat)-1].sender != obj['sender']
+        return chat[len(chat)-1].sender != obj['me']
     
     def get_preview(self, obj):
         chat = obj['chat_history']
@@ -348,11 +348,3 @@ class ChatSerializer(serializers.Serializer):
             return ""
         content = chat[len(chat)-1].content
         return content if len(content) <= 50 else content[:47] + "..."
-
-    # def to_representation(self, instance):
-    #     return {
-    #         'chat_history': MessageSerializer(instance['chat_history'], many=True).data,
-    #         'sender': UserSerializer(instance['sender']).data,
-    #         'receiver': UserSerializer(instance['receiver']).data,
-    #         'flag': instance['flag']
-    #     }
