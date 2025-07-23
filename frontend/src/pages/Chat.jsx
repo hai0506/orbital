@@ -9,8 +9,6 @@ const Chat = () => {
   const [input, setInput] = useState('');
   const socket = useRef(null);
 
-  const queryParams = new URLSearchParams(window.location.search);
-  // const receiverId = queryParams.get('receiver');
   const location = useLocation();
   const receiverId = location.state.receiverId;
   console.log(receiverId)

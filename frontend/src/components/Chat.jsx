@@ -8,7 +8,7 @@ const Chat = ({chat}) => {
     const navigate = useNavigate();
 
     const handleClick = () => {
-        navigate("/chat");
+        navigate("/chat", {state:{receiverId: chat.other.id}})
     }
 
     return (
@@ -16,7 +16,7 @@ const Chat = ({chat}) => {
             onMouseLeave={() => setHovered(false)} 
             className={`border border-gray-300 rounded-lg p-4 shadow-sm ${chat.received ? "bg-white" : "bg-gray-200"} max-w-md`}
         >
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">{chat.me.username}</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">{chat.other.username}</h3>
             <dl style={{ marginTop: "10px" }} className="space-y-2">
                 <div className="flex text-sm text-gray-700">
                     <MessageCircle className="mr-2" />
