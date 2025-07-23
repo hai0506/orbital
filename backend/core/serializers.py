@@ -347,4 +347,4 @@ class ChatSerializer(serializers.Serializer):
         if not chat:
             return ""
         content = chat[len(chat)-1].content
-        return content if len(content) <= 50 else content[:47] + "..."
+        return content if len(content) <= 30 else content[:27] + "..."
