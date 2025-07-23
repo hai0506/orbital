@@ -48,6 +48,19 @@ class CreateUserView(generics.CreateAPIView): # register
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
 
+class EditProfileView(generics.RetrieveUpdateAPIView):
+    serializer_class = ProfileSerializer
+    permission_classes = [IsAuthenticated]
+    def get_object(self):
+        # return User.objects.get(id=2).profile_user
+        return self.request.user.profile_user
+    
+class RetrieveProfileView(generics.RetrieveAPIView):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+    permission_classes = [AllowAny]
+    lookup_field='user_id'
+
 class CreatePostView(generics.ListCreateAPIView): # create and view own posts
     serializer_class = JobPostSerializer
     permission_classes = [IsAuthenticated]

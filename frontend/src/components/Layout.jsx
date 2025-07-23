@@ -2,6 +2,8 @@ import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuIt
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import PV from "../styles/PV.png"
+import { useState, useEffect } from 'react';
+import api from '../api';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -20,6 +22,20 @@ export default function Layout({ heading, children }) {
   const username = localStorage.getItem("username");
 
   const logo = username.charAt(0).toUpperCase();
+  const [profile, setProfile] = useState();
+  useEffect(() => {
+    async function fetchProfile() {
+      try {
+        const profileRes = await api.get('core/profile/');
+        console.log(profileRes)
+        setProfile(profileRes.data);
+      } catch (error) {
+        console.error('Failed to load profile:', error);
+      }
+    }
+
+    fetchProfile();
+  }, []);
 
   const vendorNavigation = [
     { name: 'Listings', href: '/' },
@@ -94,9 +110,17 @@ export default function Layout({ heading, children }) {
                         <span className="absolute -inset-1.5" />
                         <span className="sr-only">Open user menu</span>
 
-                        <div className="size-8 flex items-center justify-center rounded-full bg-pink-500 text-white font-medium">
-                          {logo}
-                        </div>
+                          {profile && profile.pfp ? (
+                            <img
+                              src={`${profile.pfp}`}
+                              className="size-8 rounded-full"
+                            />
+                          ) : (
+                            <div className="size-8 flex items-center justify-center rounded-full bg-pink-500 text-white font-medium">
+                              {logo}
+                            </div>
+                          )}
+                        
                     </MenuButton>
                     </div>
                     <MenuItems
@@ -157,9 +181,16 @@ export default function Layout({ heading, children }) {
             </div>
             <div className="border-t border-gray-700 pt-4 pb-3">
               <div className="flex items-center px-5">
-                <div className="size-8 flex items-center justify-center rounded-full bg-pink-500 text-white font-medium">
-                  {logo}
-                </div>
+                {profile && profile.pfp ? (
+                  <img
+                    src={`${profile.pfp}`}
+                    className="size-8 rounded-full"
+                  />
+                ) : (
+                  <div className="size-8 flex items-center justify-center rounded-full bg-pink-500 text-white font-medium">
+                    {logo}
+                  </div>
+                )}
                 <div className="ml-3">
                   <div className="text-base/5 font-medium text-white">{username}</div>
                   <div className="text-sm font-medium text-gray-400">{role}</div>
