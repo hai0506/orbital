@@ -11,6 +11,7 @@ import Fundraisers from "./pages/Fundraisers";
 import VendorFundraiser from "./pages/VendorFundraiser";
 import OrgFundraiser from "./pages/OrgFundraiser";
 import Chat from "./pages/Chat"
+import Chats from "./pages/Chats"
 
 function Logout() {
   localStorage.clear()
@@ -86,6 +87,15 @@ function App() {
             element={
               <ProtectedRoute>
                 <Chat />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route 
+            path="/chats"
+            element={
+              <ProtectedRoute>
+                <Chats />
               </ProtectedRoute>
             }
           />
