@@ -367,8 +367,8 @@ class ChatListView(APIView):
 
             chats.append({
                 'chat_history': msgs,
-                'sender': user,
-                'receiver': receiver,
+                'me': user,
+                'other': receiver,
             })
 
         return Response(ChatSerializer(chats, many=True).data)
