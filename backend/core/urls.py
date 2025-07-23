@@ -16,5 +16,6 @@ urlpatterns = [
     path('edit-product/<int:product_id>/', ProductEditView.as_view(), name='edit-product'),
     path('create-transaction/<int:vendor_fundraiser_id>/', CreateTransactionView.as_view(), name='create-transaction'),
     path('transactions/<int:vendor_fundraiser_id>/', TransactionListView.as_view(), name='transaction-list'),
-    path('profile/', EditProfileView.as_view(), name='profile')
+    path('profile/', EditProfileView.as_view(), name='profile'),
+    path('profiles/<int:user_id>', RetrieveProfileView.as_view(), name='retrieve-profile')
 ]
