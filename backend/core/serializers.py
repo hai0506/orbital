@@ -328,3 +328,31 @@ class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
         fields = ['message_id','sender','receiver','content','time_created','read']
+
+class ChatSerializer(serializers.Serializer):
+    chat_history = MessageSerializer(many=True)
+    sender = UserSerializer()
+    receiver = UserSerializer()
+    received = serializers.SerializerMethodField()
+    preview = serializers.SerializerMethodField()
+
+    def get_received(self, obj):
+        chat = obj['chat_history']
+        if not chat or len(chat) < 1:
+            return False
+        return chat[len(chat)-1].sender != obj['sender']
+    
+    def get_preview(self, obj):
+        chat = obj['chat_history']
+        if not chat:
+            return ""
+        content = chat[len(chat)-1].content
+        return content if len(content) <= 50 else content[:47] + "..."
+
+    # def to_representation(self, instance):
+    #     return {
+    #         'chat_history': MessageSerializer(instance['chat_history'], many=True).data,
+    #         'sender': UserSerializer(instance['sender']).data,
+    #         'receiver': UserSerializer(instance['receiver']).data,
+    #         'flag': instance['flag']
+    #     }
