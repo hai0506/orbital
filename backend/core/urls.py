@@ -12,6 +12,7 @@ urlpatterns = [
     path('delete-offer/<int:offer_id>/', DeleteOfferView.as_view(), name='delete-offer'),
     path("fundraisers/", FundraiserListView.as_view(), name="fundraiser-list"),
     path("fundraiser/<int:fundraiser_id>/", RetrieveFundraiserView.as_view(), name="retrieve-fundraiser"),
+    path("edit-inventory/<int:fundraiser_id>/", UpdateInventoryView.as_view(), name="edit-inventory"),
     path("create-product/", CreateProductView.as_view(), name="create-product"),
     path('edit-product/<int:product_id>/', ProductEditView.as_view(), name='edit-product'),
     path('create-transaction/<int:vendor_fundraiser_id>/', CreateTransactionView.as_view(), name='create-transaction'),

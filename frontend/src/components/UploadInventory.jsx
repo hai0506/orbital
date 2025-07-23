@@ -5,7 +5,7 @@ import { Upload } from "lucide-react";
 import { read, utils } from 'xlsx';
 import { Description } from '@headlessui/react'
 
-export default function UpdateInventory({ open, onClose, inventoryProps }) {
+export default function UploadInventory({ open, onClose, inventoryProps }) {
   const { inventory, setInventory, excelSheet, setExcelSheet } = inventoryProps;
   const [localInventory, setLocalInventory] = useState(inventory);
   const [errors, setErrors] = useState({});

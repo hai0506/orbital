@@ -22,12 +22,12 @@ const OfferFilter = ({ onApply }) => {
                     <>
                         <PopoverButton className="flex items-center space-x-2 bg-white px-3 py-2 rounded-md border border-gray-300">
                             <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                strokeWidth="1.5"
-                                stroke="currentColor"
-                                className="size-5"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth="1.5"
+                            stroke="currentColor"
+                            className="size-5"
                             >
                             <path
                                 strokeLinecap="round"
@@ -37,23 +37,37 @@ const OfferFilter = ({ onApply }) => {
                             </svg>
                             <span>Filter</span>
                         </PopoverButton>
-                        <PopoverPanel anchor="bottom" className="flex flex-col border rounded-lg bg-white p-5">
-                        <label className="p-1">
-                            <input className="mx-4" type="checkbox" checked={available} onChange={() => setAvailable(!available)} />
-                                Available all days
-                            </label>
-
-                            <label className="p-1">
-                                <input className="mx-4" type="checkbox" checked={commission} onChange={() => setCommission(!commission)} />
-                                Meet commission requirement only
-                            </label>
-
-                            <select value={sortby} onChange={e => setSortby(e.target.value)} className="border m-3 p-1 rounded-lg">
-                                <option value="">Sort by...</option>
-                                <option value="start_date">Event start date</option>
-                                <option value="time_created">Latest</option>
-                            </select>
-                            <button className="bg-gray-700 border p-2 rounded-lg text-white"onClick={() => applyFilters(close)}>
+                        <PopoverPanel
+                            anchor="bottom start"
+                            className="absolute left-0 mt-2 z-10 w-64 flex flex-col border rounded-lg bg-white p-5 shadow-lg"
+                        >
+                            <div className="mb-4">
+                                <h3 className="font-semibold mb-2 text-sm text-gray-700">Filter by Availability/Commission</h3>
+                                <div className="flex flex-col space-y-2">
+                                    <label key="availability" className="inline-flex items-center space-x-2 text-sm text-gray-700">
+                                        <input
+                                            type="checkbox"
+                                            checked={available}
+                                            onChange={() => setAvailable(!available)}
+                                            className="accent-gray-700"
+                                        />
+                                        <span>Available all days</span>
+                                    </label>
+                                    <label key="commission" className="inline-flex items-center space-x-2 text-sm text-gray-700">
+                                        <input
+                                            type="checkbox"
+                                            checked={commission}
+                                            onChange={() => setCommission(!commission)}
+                                            className="accent-gray-700"
+                                        />
+                                        <span>Meet commission requirement only</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <button
+                                className="w-fit inline-block bg-gray-700 hover:bg-gray-800 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+                                onClick={() => applyFilters(close)}
+                            >
                                 Apply
                             </button>
                         </PopoverPanel>

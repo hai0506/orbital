@@ -21,6 +21,7 @@ import {
   TabsContent
 } from "@/components/ui/tabs"
 import { MoveLeft, MoveRight, X } from "lucide-react";
+import CountdownClock from '@/components/CountdownClock';
 
 // comment this out to test api
 // import transactions from '@/data/Transactions';
@@ -176,6 +177,7 @@ const VendorFundraiser = () => {
                         >
                             <MoveLeft/>
                         </button>
+                        <CountdownClock endTime={`${fundraiser?.offer.listing.end_date}T${fundraiser?.offer.listing.end_time}`} />
                     </div>
                 )}
                 <div className={`relative ${hidden ? 'w-full' : 'w-[75%]'} flex flex-col`}>
