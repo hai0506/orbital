@@ -4,7 +4,7 @@ import Layout from "../components/Layout";
 import Listing from '../components/Listing';
 import Offers from './Offers';
 // JSON mock data
-//import listings from '../data/Listings'; // comment this out
+// import listings from '../data/Listings'; // comment this out
 import ListingFilter from '../components/ListingFilter'
 
 const Home = () => {
@@ -48,14 +48,19 @@ const Home = () => {
     <>
         {role === "vendor" && (
           <Layout heading="Listings">
-            <ListingFilter onApply={applyFilters}/>
-            <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 grid grid-cols-3 gap-4">
-              {listings.map((listing, index) => (
-                <Listing key={listing.id || index} fields={listing} />
-              ))}
-              {listings.length === 0 && (
-                <div>There are no listings available at this time.</div>
-              )}
+            <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+              <div className="mb-4">
+                <ListingFilter onApply={applyFilters} />
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                {listings.map((listing, index) => (
+                  <Listing key={listing.id || index} fields={listing} />
+                ))}
+                {listings.length === 0 && (
+                  <div>There are no listings available at this time.</div>
+                )}
+              </div>
             </div>
           </Layout>
         )}

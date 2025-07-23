@@ -3,14 +3,41 @@ import { Field, Fieldset, Label, Button, Description, Checkbox } from '@headless
 import { CheckIcon } from '@heroicons/react/20/solid'
 import { X, CircleCheckBig, CircleX, Warehouse } from "lucide-react";
 import { Button as ShadcnButton } from "./ui/button";
-
+import api from '@/api';
 import ListingDetails from "./ListingDetails";
+import UploadInventory from './UploadInventory';
 import { useNavigate } from "react-router-dom";
 
 const Fundraiser = ({ fundraiser, role }) => {
+    console.log(fundraiser);
     const [hovered, setHovered] = useState(false);
     const [open, setOpen] = useState(false);
     const [expandedIndex, setExpandedIndex] = useState(null);
+    const [openInventory, setOpenInventory] = useState(false);
+    const [excelSheet, setExcelSheet] = useState(null);
+    // const [inventory, setInventory] = useState(
+    //     fundraiser.inventory.map(({ name, price, quantity, remarks }) => ({
+    //         Item: name,
+    //         Price: price,
+    //         Quantity: quantity,
+    //         Remarks: remarks
+    //     }))
+    // );
+    const [inventory, setInventory] = useState(() => {
+        if (role === 'vendor') {
+            return fundraiser.inventory.map(({ name, price, quantity, remarks }) => ({
+                Item: name,
+                Price: price,
+                Quantity: quantity,
+                Remarks: remarks
+            }));
+        } else if (role === 'organization') {
+            return null;
+        }
+    });
+    const [loading, setLoading] = useState(false);
+    const [updated, setUpdated] = useState(false);
+    const [errors, setErrors] = useState({});
     const navigate = useNavigate();
 
     const handleClick = () => {
@@ -19,6 +46,36 @@ const Fundraiser = ({ fundraiser, role }) => {
             navigate(`/vfundraiser/${fundraiser.fundraiser_id}`);
         } else if (role === 'organization') {
             navigate(`/ofundraiser/${fundraiser.fundraiser_id}`);
+        }
+    }
+
+    const handleUpdate = async () => {
+        setLoading(true);
+        try {
+            const formData = new FormData();
+            formData.append('status', "confirmed");
+            formData.append('agreement', true);
+            formData.append('inventory', JSON.stringify(inventory));
+            // if (excelSheet) {
+            //     formData.append('inventory_file', excelSheet);  
+            // }
+
+            console.log("Sending formData:", formData);
+
+            const route = `core/edit-inventory/${fundraiser.fundraiser_id}/`;
+
+            const res = await api.patch(route, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data', 
+                },
+            });
+            setOpen(false);
+            navigate("/fundraisers");
+        } catch (error) {
+            console.error(error);
+            setErrors(error.response?.data || {detail: "Unknown error"});
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -42,11 +99,14 @@ const Fundraiser = ({ fundraiser, role }) => {
                 </button>
 
                 {hovered && (
-                    <Button onClick={
-                        /*
-                        () => {setOpen(true);setHovered(false);}
-                        */
-                       handleClick} style={{ marginTop: "10px" }} className="inline-flex items-center gap-2 rounded-md bg-gray-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-gray-600 data-open:bg-gray-700">
+                    <Button 
+                        onClick={role === "vendor" && fundraiser.status === "yet to start"
+                                        ? () => {setOpen(true);setHovered(false);}
+                                        : handleClick
+                                    } 
+                        style={{ marginTop: "10px" }} 
+                        className="inline-flex items-center gap-2 rounded-md bg-gray-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-gray-600 data-open:bg-gray-700"
+                    >
                         Check it out!
                     </Button>
                 )}
@@ -187,7 +247,7 @@ const Fundraiser = ({ fundraiser, role }) => {
                                     <>
                                             <Field>
                                                 <Label className="text-base/7 font-medium text-black">Dates</Label>
-                                                {fundraiser.allDays === "Yes" ? (
+                                                {fundraiser.offer.allDays === "Yes" ? (
                                                     <div className="flex items-center gap-2 text-sm text-green-600">
                                                         <CircleCheckBig className="size-4" />
                                                         <span>Able to make it on all days</span>
@@ -199,7 +259,7 @@ const Fundraiser = ({ fundraiser, role }) => {
                                                             <span>Unable to make it on these days:</span>
                                                         </div>
                                                             <ul className="pl-6 list-none space-y-1">
-                                                                {fundraiser.selectedDays?.map((day, index) => (
+                                                                {fundraiser.offer.selectedDays?.map((day, index) => (
                                                                     <li key={index} className="flex items-center gap-2">
                                                                     <span>{new Intl.DateTimeFormat('en-GB').format(new Date(day))}</span>
                                                                     </li>
@@ -211,9 +271,9 @@ const Fundraiser = ({ fundraiser, role }) => {
                                             <Field>
                                                 <Label className="text-base/7 font-medium text-black">Products</Label>
                                                 <div className="flex flex-wrap gap-3">
-                                                    {(fundraiser.selectedCategories ?? []).map((category) => (
+                                                    {(fundraiser.offer.selectedCategories ?? []).map((category) => (
                                                         <span
-                                                            className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${fundraiser.listing.categories.includes(category) ? "bg-green-100 text-green-800" : "bg-orange-100 text-orange-800"}`}
+                                                            className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${fundraiser.offer.listing.categories.includes(category) ? "bg-green-100 text-green-800" : "bg-orange-100 text-orange-800"}`}
                                                         >
                                                             {category}
                                                         </span>
@@ -222,11 +282,11 @@ const Fundraiser = ({ fundraiser, role }) => {
                                             </Field>
                                             <Field>
                                                 <Label className="text-base/7 font-medium text-black">Commission</Label>
-                                                {fundraiser.commission >= fundraiser.listing.commission 
+                                                {fundraiser.offer.commission >= fundraiser.offer.listing.commission 
                                                     ?   ( 
                                                             <div className="flex items-center gap-2 text-sm text-green-600">
                                                                 <CircleCheckBig className="size-4" />
-                                                                <span>{fundraiser.commission}% of revenue</span>
+                                                                <span>{fundraiser.offer.commission}% of revenue</span>
                                                             </div>
                                                         )
                                                     :   ( 
@@ -238,7 +298,7 @@ const Fundraiser = ({ fundraiser, role }) => {
                                                 }
                                             </Field>
                                             <Field>
-                                                {fundraiser.remarks && (
+                                                {fundraiser.offer.remarks && (
                                                     <>
                                                         <Label className="text-base/7 font-medium text-black">Remarks</Label>
                                                         <div className="flex items-center gap-2 text-sm">
@@ -264,11 +324,31 @@ const Fundraiser = ({ fundraiser, role }) => {
                                             </Field>
                                             
                                             <Field style={{ marginTop: "10px"}}>
-                                                <Label className="mb-2 text-base/7 font-medium text-black">Inventory</Label>
-                                                <ShadcnButton type="button" onClick={() => setOpenInventory(true)} variant="outline" size="sm">
-                                                    <Warehouse />View Inventory
-                                                </ShadcnButton>
+                                                <div className="flex flex-col gap-2">
+                                                    <Label className="text-base/7 font-medium text-black">Inventory</Label>
+                                                    <div className="w-fit">
+                                                        <ShadcnButton type="button" onClick={() => {setOpenInventory(true); setUpdated(true)}} variant="outline" size="sm">
+                                                            <Warehouse />View Inventory
+                                                        </ShadcnButton>
+                                                    </div>
+                                                </div>
                                             </Field>
+
+                                            <UploadInventory
+                                                open={openInventory}
+                                                onClose={() => setOpenInventory(false)}
+                                                inventoryProps={{
+                                                    inventory,
+                                                    setInventory,
+                                                    excelSheet,
+                                                    setExcelSheet
+                                                }}
+                                            />
+                                            {updated && (
+                                                <Button onClick={handleUpdate} style={{ marginTop: "10px" }} className="inline-flex items-center gap-2 rounded-md bg-green-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-green-600 data-open:bg-green-700">
+                                                    Update Inventory
+                                                </Button>
+                                            )}
                                     </>
                                 )} 
                             </div>

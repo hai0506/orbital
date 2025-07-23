@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError
 from django.contrib.postgres.fields import ArrayField
+from datetime import datetime
 
 class Organization(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='organization_user')
@@ -61,6 +62,17 @@ class JobOffer(models.Model):
 class Fundraiser(models.Model):
     fundraiser_id = models.AutoField(primary_key=True)
     listing = models.ForeignKey(JobPost, on_delete=models.CASCADE, related_name='fundraisers')
+    @property
+    def status(self):
+        now = datetime.now()
+        start_dt = datetime.combine(self.listing.start_date, self.listing.start_time)
+        end_dt = datetime.combine(self.listing.end_date, self.listing.end_time)
+        if now < start_dt:
+            return "yet to start"
+        elif start_dt <= now and now <= end_dt:
+            return "ongoing"
+        else:
+            return "concluded"
 
 class VendorFundraiser(models.Model):
     fundraiser_id = models.AutoField(primary_key=True)

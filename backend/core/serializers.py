@@ -224,9 +224,11 @@ class ProductUpdateSerializer(serializers.ModelSerializer):
 class FundraiserSerializer(serializers.ModelSerializer):
     listing = serializers.PrimaryKeyRelatedField(read_only=True)
     vendors = serializers.SerializerMethodField()
+    status = serializers.CharField(read_only=True)
+
     class Meta:
         model = Fundraiser
-        fields = ['fundraiser_id','vendors','listing']
+        fields = ['fundraiser_id','vendors','listing','status']
 
     def get_vendors(self, obj):
         vendors = VendorFundraiser.objects.filter(org_fundraiser=obj)
@@ -242,11 +244,11 @@ class VendorFundraiserSerializer(serializers.ModelSerializer):
     offer = serializers.PrimaryKeyRelatedField(read_only=True)
     inventory = serializers.SerializerMethodField()
     org_fundraiser = serializers.PrimaryKeyRelatedField(read_only=True)
-    status = serializers.SerializerMethodField()
     transactions = serializers.SerializerMethodField()
+    status = serializers.CharField(source='org_fundraiser.status', read_only=True)
     class Meta:
         model = VendorFundraiser
-        fields = ['fundraiser_id','offer','status','revenue','inventory','org_fundraiser','transactions']
+        fields = ['fundraiser_id','offer','revenue','inventory','org_fundraiser','transactions','status']
 
     def get_inventory(self, obj):
         products = Product.objects.filter(vendor=obj)
@@ -255,20 +257,6 @@ class VendorFundraiserSerializer(serializers.ModelSerializer):
     def get_transactions(self, obj):
         trs = Transaction.objects.filter(vendor=obj)
         return TransactionSerializer(trs, many=True).data
-    
-    def get_status(self, obj):
-        listing = obj.offer.listing
-        now = datetime.now()
-
-        start_dt = datetime.combine(listing.start_date, listing.start_time)
-        end_dt = datetime.combine(listing.end_date, listing.end_time)
-
-        if now < start_dt:
-            return "yet to start"
-        elif start_dt <= now and now <= end_dt:
-            return "ongoing"
-        else:
-            return "concluded"
     
     def to_representation(self, instance):
         rep = super().to_representation(instance)
@@ -304,7 +292,6 @@ class TransactionSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         payment = data.get('payment')
-        print(payment)
         if payment not in ['PayLah','PayNow','Cash','NETS','Card','Others']:
             raise serializers.ValidationError({'payment': 'Invalid payment type.'})
         items = data.get('items')
