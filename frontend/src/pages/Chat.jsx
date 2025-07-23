@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
 import { useLocation } from 'react-router-dom';
+import Layout from '@/components/Layout';
+import { Button } from '@headlessui/react';
 import api from '../api';
 
 const Chat = () => {
@@ -56,23 +58,48 @@ const Chat = () => {
   };
   console.log(messages)
   return (
-    <div class="p-5">
-      <div>
-        {messages.map((msg, idx) => (
-          <div key={idx}>
-            <strong>{msg.sender.username}</strong>: {msg.content}
-          </div>
-        ))}
+    <Layout heading="Chat">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 flex flex-col gap-4">
+        <div className="max-h-[65vh] overflow-auto border rounded p-4 flex-1">
+          {messages.map((msg, idx) => {
+            const isCurrentUser = msg.sender.username === localStorage.getItem("username");
+
+            return (
+              <div
+                key={idx}
+                className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-2`}
+              >
+                <div
+                  className={`
+                    px-4 py-2 rounded-lg max-w-[70%] 
+                    ${isCurrentUser ? 'bg-blue-500 text-white rounded-br-none' : 'bg-gray-200 text-gray-800 rounded-bl-none'}
+                  `}
+                >
+                  <span className="text-sm block mb-1 font-semibold">{msg.sender.username}</span>
+                  <span className="break-all">{msg.content}</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div className="flex flex-col w-full gap-2">
+          <textarea
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') sendMessage(); }}
+            placeholder="Type a message..."
+            className="flex-1 border px-4 py-2 rounded"
+          />
+          <Button
+            onClick={sendMessage}
+            className="bg-gray-700 text-white px-4 py-2 rounded self-start"
+          >
+            Send
+          </Button>
+        </div>
       </div>
-      <input
-        type="text"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyDown={(e) => { if (e.key === 'Enter') sendMessage(); }}
-        placeholder="Type a message..."
-      />
-      <button onClick={sendMessage}>Send</button>
-    </div>
+    </Layout>
   );
 };
 
