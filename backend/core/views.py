@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from rest_framework.response import Response
 from rest_framework import generics, status
@@ -40,6 +40,25 @@ class CreateUserView(generics.CreateAPIView): # register
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
+
+class EditProfileView(generics.RetrieveUpdateAPIView):
+    serializer_class = ProfileSerializer
+    permission_classes = [IsAuthenticated]
+    def get_object(self):
+        # return User.objects.get(id=2).profile_user
+        return self.request.user.profile_user
+    
+class ProfileListView(generics.ListAPIView):
+    serializer_class = ProfileSerializer
+    permission_classes = [IsAuthenticated]
+    def get_queryset(self):
+        return Profile.objects.all().exclude(user__id=self.request.user.id)
+
+class RetrieveProfileView(generics.RetrieveAPIView):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+    permission_classes = [IsAuthenticated]
+    lookup_field='user_id'
 
 class CreatePostView(generics.ListCreateAPIView): # create and view own posts
     serializer_class = JobPostSerializer
@@ -329,3 +348,42 @@ class TransactionListView(generics.ListAPIView):
             vendor_fundraiser = get_object_or_404(VendorFundraiser, fundraiser_id=vendor_fundraiser_id)
             return Transaction.objects.filter(vendor=vendor_fundraiser)
         else: return Transaction.objects.none()
+        
+class MessageListView(generics.ListAPIView):
+    serializer_class = MessageSerializer
+    permission_classes = [IsAuthenticated]
+    def get_queryset(self): 
+        receiver = self.kwargs['id']
+        return Message.objects.filter(
+            sender__in=[self.request.user, receiver],
+            receiver__in=[self.request.user, receiver]
+        ).order_by('time_created')
+    
+class ChatListView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        user=User.objects.get(id=request.user.id)
+        messages = Message.objects.filter(Q(sender=user) | Q(receiver=user)).order_by('time_created')
+
+        receivers = set()
+        for msg in messages:
+            receiver = msg.receiver if msg.sender == user else msg.sender
+            receivers.add(receiver)
+
+        chats = []
+        for receiver in receivers:
+            msgs = Message.objects.filter(
+                sender__in=[user, receiver],
+                receiver__in=[user, receiver]
+            ).order_by('time_created')
+
+            chats.append({
+                'chat_history': msgs,
+                'me': user,
+                'other': receiver,
+            })
+
+        return Response(ChatSerializer(chats, many=True).data)
+
+    
+

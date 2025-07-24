@@ -24,10 +24,30 @@ class UserSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(**validated_data)
         if user_type == 'Organization':
             Organization.objects.create(user=user)
+            Profile.objects.create(user=user, user_type='Organization')
         elif user_type == 'Vendor':
             Vendor.objects.create(user=user)
+            Profile.objects.create(user=user, user_type='Vendor')
         return user
     
+class ProfileSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
+    username = serializers.CharField(source='user.username', read_only=True)
+    email = serializers.EmailField(source='user.email', read_only=True)
+    user_type = serializers.CharField(read_only=True)
+    pfp = serializers.ImageField(required=False)
+    class Meta:
+        model = Profile
+        fields = ['user','description','pfp','user_type','username','email','rating','rating_count']
+
+    # def update(self, instance, validated_data):
+    #     user_data = validated_data.pop('user', {})
+    #     user = instance.user
+    #     if 'email' in user_data:
+    #         user.email = user_data['email']
+    #     user.save()
+
+    #     return super().update(instance, validated_data)
 
 categories_options = ["Food & Beverages",
             "Accessories",
@@ -127,6 +147,14 @@ class JobPostSerializer(serializers.ModelSerializer):
         post.categories.set(k)
         return post
     
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        rep['author'] = {
+            "id": instance.author.id,
+            "userid": instance.author.user.id
+        }
+        return rep
+    
 class CharBooleanSerializer(serializers.BooleanField):
     def to_internal_value(self, data):
         if data == 'Yes': return True
@@ -196,6 +224,7 @@ class JobOfferSerializer(serializers.ModelSerializer):
                 "id": vendor.id,
                 "username": vendor.user.username,
                 "email": vendor.user.email,
+                "userid": vendor.user.id
             }
         return rep
 
@@ -320,3 +349,30 @@ class TransactionSerializer(serializers.ModelSerializer):
         # rep['vendor'] = VendorFundraiserSerializer(instance.vendor).data
         rep['items']=TransactionItemSerializer(instance.items, many=True).data
         return rep
+    
+class MessageSerializer(serializers.ModelSerializer):
+    sender=UserSerializer(read_only=True)
+    receiver=UserSerializer(read_only=True)
+    class Meta:
+        model = Message
+        fields = ['message_id','sender','receiver','content','time_created','read']
+
+class ChatSerializer(serializers.Serializer):
+    chat_history = MessageSerializer(many=True)
+    me = UserSerializer()
+    other = UserSerializer()
+    received = serializers.SerializerMethodField()
+    preview = serializers.SerializerMethodField()
+
+    def get_received(self, obj):
+        chat = obj['chat_history']
+        if not chat or len(chat) < 1:
+            return False
+        return chat[len(chat)-1].sender != obj['me']
+    
+    def get_preview(self, obj):
+        chat = obj['chat_history']
+        if not chat:
+            return ""
+        content = chat[len(chat)-1].content
+        return content if len(content) <= 30 else content[:27] + "..."

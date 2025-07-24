@@ -10,19 +10,26 @@ class Organization(models.Model):
 
 class Vendor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='vendor_user')
-    
-class Category(models.Model):
-    value = models.CharField(max_length=50, primary_key=True)
-
-    def __str__(self):
-        return self.value
-    
 
 def filesize_valid(value):
     lim = 5
     max_size = lim * 1024 * 1024
     if value.size > max_size:
         raise ValidationError(f"File size must be under {lim}MB.")
+    
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile_user')
+    description = models.TextField(max_length=2000, blank=True)
+    pfp = models.ImageField(upload_to='pfp/', blank=True, null=True, validators=[filesize_valid])
+    user_type = models.CharField()
+    rating = models.FloatField(validators=[MinValueValidator(0), MaxValueValidator(5)], default=0)
+    rating_count = models.IntegerField(default=0)
+    
+class Category(models.Model):
+    value = models.CharField(max_length=50, primary_key=True)
+
+    def __str__(self):
+        return self.value
 
 class JobPost(models.Model):
     post_id = models.AutoField(primary_key=True)
@@ -106,3 +113,12 @@ class TransactionItem(models.Model):
 
     def total_price(self):
         return self.quantity * self.product.price
+
+    
+class Message(models.Model):  
+    message_id = models.AutoField(primary_key=True)
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages')
+    content = models.TextField()
+    time_created = models.DateTimeField(auto_now_add=True)
+    read = models.BooleanField(default=False)
