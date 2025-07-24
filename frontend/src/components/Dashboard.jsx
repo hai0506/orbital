@@ -66,13 +66,27 @@ const Dashboard = ({ fundraiser }) => {
             )}
             {transactions.length > 0 && (
                 <>
-                    <div className="grid grid-cols-3 gap-4">
-                        <RevenueSharing data={revenueSharing} total={revenue} />
-                        <MostSold data={quantitySold} total={quantitySold.reduce((acc, cur) => acc + cur.value, 0)} />
-                        <MostValuable data={mostValuable} total={mostValuable.reduce((acc, cur) => acc + cur.value, 0)} />
-                    </div>
-                    <div className="grid grid-cols-2">
-                        
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="text-center mb-16">
+                            <h3 className="font-semibold text-base mb-2">Revenue Sharing</h3>
+                            <div className="mx-auto">
+                                <RevenueSharing data={revenueSharing} total={revenue} />
+                            </div>
+                        </div>
+
+                        <div className="text-center mb-16">
+                            <h3 className="font-semibold text-base mb-2">Most Sold Item</h3>
+                            <div className="mx-auto">
+                                <MostSold data={quantitySold} total={quantitySold.reduce((acc, cur) => acc + cur.value, 0)} />
+                            </div>
+                        </div>
+
+                        <div className="text-center mb-16">
+                            <h3 className="font-semibold text-base mb-2">Most Valuable Item</h3>
+                            <div className="mx-auto">
+                                <MostValuable data={mostValuable} total={mostValuable.reduce((acc, cur) => acc + cur.value, 0)} />
+                            </div>
+                        </div>
                     </div>
                 </>
             )}
@@ -80,4 +94,4 @@ const Dashboard = ({ fundraiser }) => {
     )
 }
 
-export default Dashboard
+export default Dashboard;
