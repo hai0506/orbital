@@ -13,6 +13,7 @@ import OrgFundraiser from "./pages/OrgFundraiser";
 import Chat from "./pages/Chat"
 import Chats from "./pages/Chats"
 import Profile from "./pages/Profile";
+import Search from "./pages/Search";
 
 function Logout() {
   localStorage.clear()
@@ -100,11 +101,21 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route 
             path="/profile"
             element={
               <ProtectedRoute>
                 <Profile />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route 
+            path="/search"
+            element={
+              <ProtectedRoute>
+                <Search />
               </ProtectedRoute>
             }
           />
