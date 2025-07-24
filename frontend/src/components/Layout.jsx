@@ -42,6 +42,7 @@ export default function Layout({ heading, children }) {
     { name: 'Offers', href: '/offers' },
     { name: 'Fundraisers', href: '/fundraisers' },
     { name: 'Chats', href: '/chats' },
+    { name: 'Search', href: '/search' },
   ]
 
   const orgNavigation = [
@@ -49,6 +50,7 @@ export default function Layout({ heading, children }) {
     { name: 'Create Listing', href: '/create', current: false },
     { name: 'Fundraisers', href: '/fundraisers', current: false },
     { name: 'Chats', href: '/chats' },
+    { name: 'Search', href: '/search' },
   ]
 
   const navigation = role === 'vendor' ? vendorNavigation : orgNavigation;
