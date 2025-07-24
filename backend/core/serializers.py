@@ -249,14 +249,18 @@ class FundraiserSerializer(serializers.ModelSerializer):
     listing = JobPostSerializer(read_only=True)
     vendors = serializers.SerializerMethodField()
     status = serializers.CharField(read_only=True)
-
+    reviews = serializers.SerializerMethodField()
     class Meta:
         model = Fundraiser
-        fields = ['fundraiser_id','vendors','listing','status']
+        fields = ['fundraiser_id','vendors','listing','status','reviews']
 
     def get_vendors(self, obj):
         vendors = VendorFundraiser.objects.filter(org_fundraiser=obj)
         return VendorFundraiserSerializer(vendors, many=True).data
+    
+    def get_reviews(self, obj):
+        reviews = Review.objects.filter(vendor_fundraiser__org_fundraiser=obj,reviewee=obj.listing.author.user)
+        return ReviewSerializer(reviews, many=True).data
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
@@ -270,9 +274,10 @@ class VendorFundraiserSerializer(serializers.ModelSerializer):
     transactions = serializers.SerializerMethodField()
     status = serializers.CharField(source='org_fundraiser.status', read_only=True)
     revenue = serializers.SerializerMethodField()
+    reviews = serializers.SerializerMethodField()
     class Meta:
         model = VendorFundraiser
-        fields = ['fundraiser_id','offer','revenue','inventory','org_fundraiser','transactions','status']
+        fields = ['fundraiser_id','offer','revenue','inventory','org_fundraiser','transactions','status','reviews']
 
     def get_inventory(self, obj):
         products = Product.objects.filter(vendor=obj)
@@ -289,6 +294,10 @@ class VendorFundraiserSerializer(serializers.ModelSerializer):
             for item in transaction.items.all():
                 total += item.product.price * item.quantity
         return total
+    
+    def get_reviews(self, obj):
+        reviews = Review.objects.filter(vendor_fundraiser=obj, reviewee=obj.offer.vendor.user)
+        return ReviewSerializer(reviews, many=True).data
     
 class TransactionItemSerializer(serializers.ModelSerializer):
     transaction = serializers.PrimaryKeyRelatedField(read_only=True)

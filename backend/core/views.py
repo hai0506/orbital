@@ -400,7 +400,7 @@ class CreateReviewView(generics.CreateAPIView):
     
 class ReviewListView(generics.ListAPIView):
     serializer_class = ReviewSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         user_id = self.kwargs.get('user_id')
