@@ -35,7 +35,7 @@ const Profile = () => {
             }
         }
         fetchProfile();
-    }, []);
+    }, [id]);
 
     const confirmChange = (field) => {
         setOriginal((prev) => ({ ...prev, [field]: profile[field] }));
