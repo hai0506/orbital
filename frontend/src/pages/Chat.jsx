@@ -89,7 +89,8 @@ const Chat = () => {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') sendMessage(); }}
             placeholder="Type a message..."
-            className="flex-1 border px-4 py-2 rounded"
+            className="w-full border px-4 py-2 rounded resize-y overflow-hidden"
+            style={{ maxHeight: '300px', minHeight: '50px' }}
           />
           <Button
             onClick={sendMessage}
