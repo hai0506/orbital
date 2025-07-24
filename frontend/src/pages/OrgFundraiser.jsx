@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/tabs"
 import CountdownClock from '@/components/CountdownClock';
 import Dashboard from "@/components/Dashboard";
+import OrgDashboard from "@/components/OrgDashboard";
  
 const OrgFundraiser = () => {
     const { id } = useParams();
@@ -118,7 +119,7 @@ const OrgFundraiser = () => {
                                 ))}
                             </TabsList>
                             <TabsContent value="overall">
-                                
+                                <OrgDashboard fundraiser={fundraiser} />
                             </TabsContent>
                             {fundraiser?.vendors?.map(vendor => (
                                 <TabsContent value={vendor.offer.vendor.username}>
