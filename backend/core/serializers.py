@@ -38,7 +38,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     pfp = serializers.ImageField(required=False)
     class Meta:
         model = Profile
-        fields = ['user','description','pfp','user_type','username','email','rating','rating_count']
+        fields = ['user','description','pfp','user_type','username','email']
 
     # def update(self, instance, validated_data):
     #     user_data = validated_data.pop('user', {})
@@ -150,8 +150,8 @@ class JobPostSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         rep = super().to_representation(instance)
         rep['author'] = {
-            "id": instance.author.id,
-            "userid": instance.author.user.id
+            'id': instance.author.id,
+            'userid': instance.author.user.id
         }
         return rep
     
@@ -221,10 +221,10 @@ class JobOfferSerializer(serializers.ModelSerializer):
         vendor = instance.vendor
         if vendor:
             rep['vendor'] = {
-                "id": vendor.id,
-                "username": vendor.user.username,
-                "email": vendor.user.email,
-                "userid": vendor.user.id
+                'id': vendor.id,
+                'username': vendor.user.username,
+                'email': vendor.user.email,
+                'userid': vendor.user.id
             }
         return rep
 
@@ -242,8 +242,8 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = ['product_id','name', 'quantity', 'price', 'image', 'vendor','remarks']
     
 class ProductUpdateSerializer(serializers.ModelSerializer):
-    item = serializers.CharField(source="name")
-    maxQuantity = serializers.IntegerField(source="quantity", read_only=True)
+    item = serializers.CharField(source='name')
+    maxQuantity = serializers.IntegerField(source='quantity', read_only=True)
 
     class Meta:
         model = Product
@@ -274,6 +274,7 @@ class VendorFundraiserSerializer(serializers.ModelSerializer):
     org_fundraiser = serializers.PrimaryKeyRelatedField(read_only=True)
     transactions = serializers.SerializerMethodField()
     status = serializers.CharField(source='org_fundraiser.status', read_only=True)
+    revenue = serializers.SerializerMethodField()
     class Meta:
         model = VendorFundraiser
         fields = ['fundraiser_id','offer','revenue','inventory','org_fundraiser','transactions','status']
@@ -285,6 +286,14 @@ class VendorFundraiserSerializer(serializers.ModelSerializer):
     def get_transactions(self, obj):
         trs = Transaction.objects.filter(vendor=obj)
         return TransactionSerializer(trs, many=True).data
+    
+    def get_revenue(self, obj):
+        transactions = obj.transactions.all()
+        total = 0
+        for transaction in transactions:
+            for item in transaction.items.all():
+                total += item.product.price * item.quantity
+        return total
     
     def to_representation(self, instance):
         rep = super().to_representation(instance)
@@ -373,6 +382,6 @@ class ChatSerializer(serializers.Serializer):
     def get_preview(self, obj):
         chat = obj['chat_history']
         if not chat:
-            return ""
+            return ''
         content = chat[len(chat)-1].content
-        return content if len(content) <= 30 else content[:27] + "..."
+        return content if len(content) <= 30 else content[:27] + '...'
