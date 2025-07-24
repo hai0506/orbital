@@ -30,13 +30,6 @@ def get_user_profile(request):
         'role': role,
     })
 
-from datetime import datetime
-import asyncio
-from typing import AsyncGenerator
-from django.http import HttpRequest, StreamingHttpResponse, HttpResponse
-import json
-import random
-
 def get_or_none(classmodel, **kwargs):
     try:
         return classmodel.objects.get(**kwargs)
@@ -56,14 +49,15 @@ class EditProfileView(generics.RetrieveUpdateAPIView):
         return self.request.user.profile_user
     
 class ProfileListView(generics.ListAPIView):
-    queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
-    permission_classes = [AllowAny]
-    
+    permission_classes = [IsAuthenticated]
+    def get_queryset(self):
+        return Profile.objects.all().exclude(user__id=self.request.user.id)
+
 class RetrieveProfileView(generics.RetrieveAPIView):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     lookup_field='user_id'
 
 class CreatePostView(generics.ListCreateAPIView): # create and view own posts
