@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/tabs"
 import { MoveLeft, MoveRight, X } from "lucide-react";
 import CountdownClock from '@/components/CountdownClock';
+import Dashboard from '@/components/Dashboard';
 
 // comment this out to test api
 // import transactions from '@/data/Transactions';
@@ -31,6 +32,7 @@ const VendorFundraiser = () => {
     const [fundraiser, setFundraiser] = useState(null);
     const [fullInventory, setFullInventory] = useState([]);
     const [inventory, setInventory] = useState([]);
+    const [ongoing, setOngoing] = useState(false);
     const [loading, setLoading] = useState(false);
     const [hidden, setHidden] = useState(false);
     const [cart, setCart] = useState([]);
@@ -50,6 +52,7 @@ const VendorFundraiser = () => {
                 setFundraiser(fundraiserRes.data);
                 setFullInventory(fundraiserRes.data.inventory);
                 setInventory(fundraiserRes.data.inventory);
+                setOngoing(fundraiserRes.data.status == "ongoing");
                 console.log(fundraiserRes.data);
             } catch (error) {
                 console.error('Failed to load fundraiser:', error);
@@ -194,6 +197,7 @@ const VendorFundraiser = () => {
                             <TabsList className="flex justify-start space-x-2 border-b">
                                 <TabsTrigger value="inventory">Inventory</TabsTrigger>
                                 <TabsTrigger value="transactions">Transactions</TabsTrigger>
+                                <TabsTrigger value="statistics">Statistics</TabsTrigger>
                             </TabsList>
                             <TabsContent value="inventory">
                                 <>
@@ -231,7 +235,7 @@ const VendorFundraiser = () => {
                                                             {row.remarks}
                                                         </td>
                                                         <td className="p-2">
-                                                        {row.quantity > 0 && (
+                                                        {(row.quantity > 0 && ongoing) && (
                                                             <button onClick={() => addToCart(row)} className="text-blue-500 hover:text-blue-700">Add to cart</button>
                                                         )}
                                                         </td>
@@ -241,7 +245,7 @@ const VendorFundraiser = () => {
                                         </table>
                                     </div>
                                     
-                                    {cart.length > 0 && (
+                                    {(cart.length > 0 && ongoing) && (
                                         <>
                                             <h5 className="text-2xl font-semibold mt-6 mb-2">Checkout</h5>
                                             <div className="max-h-[60vh] overflow-auto">
@@ -318,7 +322,7 @@ const VendorFundraiser = () => {
                                                 </table>
                                             </div>
                                             
-                                            {cart && (
+                                            {(cart && ongoing) && (
                                                 <>
                                                     <p className="text-2xl font-semibold mt-6 mb-2">Total Price: ${totalCost.toFixed(2)}</p>
                                                     <div className='grid grid-cols-4 gap-4'>
@@ -512,6 +516,9 @@ const VendorFundraiser = () => {
                                         </div>
                                     </div>
                                 )}
+                            </TabsContent>
+                            <TabsContent value="statistics">
+                                <Dashboard fundraiser={fundraiser} />
                             </TabsContent>
                         </Tabs>
                     </div>
