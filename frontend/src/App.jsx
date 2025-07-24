@@ -112,6 +112,15 @@ function App() {
           />
 
           <Route 
+            path="/profiles/:id"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route 
             path="/search"
             element={
               <ProtectedRoute>
