@@ -111,3 +111,12 @@ class Message(models.Model):
     content = models.TextField()
     time_created = models.DateTimeField(auto_now_add=True)
     read = models.BooleanField(default=False)
+
+class Review(models.Model):
+    review_id = models.AutoField(primary_key=True)
+    vendor_fundraiser = models.ForeignKey(VendorFundraiser, on_delete=models.CASCADE, related_name='review')
+    reviewer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='given_reviews')
+    reviewee = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews')
+    rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+    comment = models.TextField(max_length=2000, blank=True)
+    time_created = models.DateTimeField(auto_now_add=True)

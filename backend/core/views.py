@@ -385,5 +385,24 @@ class ChatListView(APIView):
 
         return Response(ChatSerializer(chats, many=True).data)
 
+class CreateReviewView(generics.CreateAPIView):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        fundraiser_id = self.kwargs.get('fundraiser_id')
+        vendor_fundraiser = VendorFundraiser.objects.get(fundraiser_id=fundraiser_id)
+        serializer.save(
+            reviewer=self.request.user,
+            vendor_fundraiser=vendor_fundraiser
+        )
     
+class ReviewListView(generics.ListAPIView):
+    serializer_class = ReviewSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        user_id = self.kwargs.get('user_id')
+        return Review.objects.filter(reviewee__id=user_id).order_by('-time_created')
 
