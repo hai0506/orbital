@@ -55,6 +55,11 @@ class EditProfileView(generics.RetrieveUpdateAPIView):
         # return User.objects.get(id=2).profile_user
         return self.request.user.profile_user
     
+class ProfileListView(generics.ListAPIView):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+    permission_classes = [AllowAny]
+    
 class RetrieveProfileView(generics.RetrieveAPIView):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
