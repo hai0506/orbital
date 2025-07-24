@@ -52,6 +52,23 @@ const MostSold = ({ data, total }) => {
                     ? `${data[activeIndex].name} ($${data[activeIndex].value})`
                     : `$${total} Total`}
             </div>
+
+            <div style={{ marginTop: 16 }}>
+                {data.map((entry, index) => (
+                    <div key={`legend-${index}`} style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>
+                        <div
+                            style={{
+                                width: 12,
+                                height: 12,
+                                backgroundColor: COLORS[index % COLORS.length],
+                                marginRight: 8,
+                                borderRadius: 2,
+                            }}
+                        />
+                        <span style={{ fontSize: 14 }}>{entry.name}</span>
+                    </div>
+                ))}
+            </div>
         </div>
     )
 }
