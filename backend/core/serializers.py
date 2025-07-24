@@ -147,6 +147,14 @@ class JobPostSerializer(serializers.ModelSerializer):
         post.categories.set(k)
         return post
     
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        rep['author'] = {
+            "id": instance.author.id,
+            "userid": instance.author.user.id
+        }
+        return rep
+    
 class CharBooleanSerializer(serializers.BooleanField):
     def to_internal_value(self, data):
         if data == 'Yes': return True
