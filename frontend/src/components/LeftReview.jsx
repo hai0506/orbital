@@ -34,18 +34,27 @@ const LeftReview = ({ review }) => {
     return (
         <>
             <Fieldset>
-                <Field className={'mb-4'}>
-                    <Label className="text-base/7 font-medium text-black">Rating</Label>
-                    <div className="relative">
-                        <div className="flex items-center mt-1">{renderStars(review.rating)}</div>
-                    </div>
-                </Field>
-                <Field>
-                    <Label className="text-base/7 font-medium text-black">Comment</Label>
+                {review != null && (
+                    <>
+                        <Field className={'mb-4'}>
+                            <Label className="text-base/7 font-medium text-black">Rating</Label>
+                            <div className="relative">
+                                <div className="flex items-center mt-1">{renderStars(review.rating)}</div>
+                            </div>
+                        </Field>
+                        <Field>
+                            <Label className="text-base/7 font-medium text-black">Comment</Label>
+                            <p className="mt-1 text-sm text-gray-700 break-words max-w-md">
+                                {review.comment}
+                            </p>
+                        </Field>
+                    </>
+                )}
+                {review == null && (
                     <p className="mt-1 text-sm text-gray-700 break-words max-w-md">
-                        {review.comment}
+                        {`${isVendor ? "Organisation" : "Vendor"} is yet to leave you a review`}
                     </p>
-                </Field>
+                )}
             </Fieldset>
         </>
     )

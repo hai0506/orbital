@@ -289,7 +289,7 @@ const OrgFundraiser = () => {
                                                     {vendor.review_received && (
                                                         <>
                                                             <h5 className="text-2xl font-semibold mb-2">Review from Vendor</h5>
-                                                            <LeftReview review={{rating: 4, comment: "Great planning!"}} isVendor={false} />
+                                                            <LeftReview review={vendor.review_sent} isVendor={false} />
                                                         </>
                                                     )}
                                                 </TabsContent>
