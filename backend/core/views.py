@@ -168,6 +168,9 @@ class OfferListView(generics.ListAPIView):
                 qs = qs.annotate(required_commission=F('listing__commission')).filter(
                     commission__gte=F('required_commission')
                 )
+            # status
+            if status == 'cancelled': qs = qs.filter(status=status)
+            elif status == 'pending': qs = qs.exclude(status='cancelled')
         elif vendor:
             qs = JobOffer.objects.filter(vendor=vendor).exclude(status='confirmed')
             if status in ['approved','pending','rejected','cancelled']: qs = qs.filter(status=status)
