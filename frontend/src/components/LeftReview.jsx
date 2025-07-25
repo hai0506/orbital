@@ -1,7 +1,7 @@
 import { Star } from "lucide-react"
 import { Field, Fieldset, Label } from '@headlessui/react'
 
-const LeftReview = ({ review, isVendor }) => {
+const LeftReview = ({ review }) => {
     const renderStars = (rating) => {
         return [...Array(5)].map((_, i) => {
             const starValue = i + 1;
@@ -52,7 +52,7 @@ const LeftReview = ({ review, isVendor }) => {
                 )}
                 {review == null && (
                     <p className="mt-1 text-sm text-gray-700 break-words max-w-md">
-                        {`${isVendor ? "The organisation" : "The vendor"} is yet to leave you a review.`}
+                        {`${isVendor ? "Organisation" : "Vendor"} is yet to leave you a review`}
                     </p>
                 )}
             </Fieldset>
