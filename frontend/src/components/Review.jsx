@@ -4,12 +4,13 @@ import { Star } from "lucide-react"
 import { Field, Fieldset, Input, Label, Button, Textarea, Description } from '@headlessui/react'
 import clsx from 'clsx';
 
-const Review = ({ fundraiser, isVendor }) => {
+const Review = ({ fundraiser, isVendor, onSubmitReview }) => {
     const [rating, setRating] = useState(-1);
     const [comment, setComment] = useState("");
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const [hoverValue, setHoverValue] = useState(null);
+    // const recipientId = isVendor ? fundraiser.org_fundraiser : fundraiser.offer.vendor.id;
 
     const handleClick = (val) => {
         setRating(val);
@@ -27,11 +28,24 @@ const Review = ({ fundraiser, isVendor }) => {
         e.preventDefault();
         setLoading(true)
         try {
+            let reviewRecipient;
+            if(isVendor){
+                reviewRecipient = fundraiser.offer.listing.author.userid;
+            }
+            else {
+                reviewRecipient = fundraiser.offer.vendor.userid;
+            }
             const info = {
                 rating: rating,
                 comment: comment,
+                reviewee: reviewRecipient
             }
-            const res = await api.post(`/core/reviews/${recipientId}`, info);
+            const res = await api.post(`/core/create-review/${fundraiser.fundraiser_id}/`, info);
+            console.log(res);
+            
+            if (onSubmitReview) {
+                await onSubmitReview();  
+            }
         } catch(error) {
             console.log(error);
             setErrors(error);
