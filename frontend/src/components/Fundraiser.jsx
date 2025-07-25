@@ -9,7 +9,6 @@ import UploadInventory from './UploadInventory';
 import { useNavigate } from "react-router-dom";
 
 const Fundraiser = ({ fundraiser, role }) => {
-    console.log(fundraiser);
     const [hovered, setHovered] = useState(false);
     const [open, setOpen] = useState(false);
     const [expandedIndex, setExpandedIndex] = useState(null);
