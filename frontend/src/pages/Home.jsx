@@ -55,7 +55,7 @@ const Home = () => {
 
               <div className="grid grid-cols-3 gap-4">
                 {listings.map((listing, index) => (
-                  <Listing key={listing.id || index} fields={listing} />
+                  <Listing key={listing.id || index} fields={listing} role={role}/>
                 ))}
                 {listings.length === 0 && (
                   <div>There are no listings available at this time.</div>
