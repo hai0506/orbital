@@ -42,8 +42,9 @@ const Review = ({ fundraiser, isVendor, onSubmitReview }) => {
             }
             const res = await api.post(`/core/create-review/${fundraiser.fundraiser_id}/`, info);
             console.log(res);
-            if (onReviewSubmitted) {
-                await onReviewSubmitted();  
+            
+            if (onSubmitReview) {
+                await onSubmitReview();  
             }
         } catch(error) {
             console.log(error);
