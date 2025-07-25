@@ -134,7 +134,9 @@ const OrgFundraiser = () => {
                                                 <TabsTrigger value="inventory">Inventory</TabsTrigger>
                                                 <TabsTrigger value="transactions">Transactions</TabsTrigger>
                                                 <TabsTrigger value="statistics">Statistics</TabsTrigger>
-                                                <TabsTrigger value="review">Review</TabsTrigger>
+                                                {vendor.status == "concluded" && (
+                                                    <TabsTrigger value="review">Review</TabsTrigger>
+                                                )}
                                             </TabsList>
                                             <TabsContent value="inventory">
                                                 <>
