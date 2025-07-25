@@ -20,7 +20,7 @@ const options = [
   },
 ]
 
-const ConfirmOffer = ({ id, deleteOffer }) => {
+const ConfirmOffer = ({ id, deleteOffer, setOpen }) => {
     const navigate = useNavigate();
     const [going, setGoing] = useState(null);
     const [agreement, setAgreement] = useState(false);
@@ -52,7 +52,10 @@ const ConfirmOffer = ({ id, deleteOffer }) => {
                 },
             });
             deleteOffer(id);
-            navigate("/fundraisers");
+            if (going) {
+                navigate("/fundraisers");
+            }
+            setOpen(false);
         } catch (error) {
             console.error(error);
             setErrors(error.response?.data || {detail: "Unknown error"});
