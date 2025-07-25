@@ -4,7 +4,7 @@ import { Star } from "lucide-react"
 import { Field, Fieldset, Input, Label, Button, Textarea, Description } from '@headlessui/react'
 import clsx from 'clsx';
 
-const Review = ({ fundraiser }) => {
+const Review = ({ fundraiser, isVendor }) => {
     const [rating, setRating] = useState(-1);
     const [comment, setComment] = useState("");
     const [errors, setErrors] = useState({});
@@ -42,12 +42,11 @@ const Review = ({ fundraiser }) => {
 
     return (
         <>
-            <h5 className="text-2xl font-semibold mb-2">Review Organisation</h5>
             <form onSubmit={handleSubmit}>
                 <Fieldset>
                     <Field className={'mb-4'}>
                         <Label className="text-base/7 font-medium text-black">Rating</Label>
-                        <Description className="text-sm/6 text-black/50">How much did you like the fundraiser?</Description>
+                        <Description className="text-sm/6 text-black/50">How much did you like the {isVendor ? "fundraiser" : "vendor's services"}?</Description>
                         <div className="relative">
                             <div className="flex gap-1">
                                 {[1, 2, 3, 4, 5].map((star) => {
@@ -74,7 +73,7 @@ const Review = ({ fundraiser }) => {
                     </Field>
                     <Field>
                         <Label className="text-base/7 font-medium text-black">Comments</Label>
-                        <Description className="text-sm/6 text-black/50">Do you have any feedback about the fundraiser?</Description>
+                        <Description className="text-sm/6 text-black/50">Do you have any feedback about the {isVendor ? "fundraiser" : "vendor's services"}?</Description>
                         <Textarea
                             value={comment}
                             onChange={e => setComment(e.target.value)}
@@ -97,4 +96,4 @@ const Review = ({ fundraiser }) => {
     )
 }
 
-export default Review
+export default Review;

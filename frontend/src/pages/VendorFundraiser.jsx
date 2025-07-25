@@ -24,6 +24,7 @@ import { MoveLeft, MoveRight, X } from "lucide-react";
 import CountdownClock from '@/components/CountdownClock';
 import Dashboard from '@/components/Dashboard';
 import Review from '@/components/Review';
+import LeftReview from '@/components/LeftReview';
 
 // comment this out to test api
 // import transactions from '@/data/Transactions';
@@ -200,9 +201,9 @@ const VendorFundraiser = () => {
                                 <TabsTrigger value="inventory">Inventory</TabsTrigger>
                                 <TabsTrigger value="transactions">Transactions</TabsTrigger>
                                 <TabsTrigger value="statistics">Statistics</TabsTrigger>
-                                {fundraiser?.status == "concluded" && (
+                                {/*{fundraiser.status == "concluded" && (*/}
                                     <TabsTrigger value="review">Review</TabsTrigger>
-                                )}
+                                {/*)}*/}
                             </TabsList>
                             <TabsContent value="inventory">
                                 <>
@@ -525,11 +526,16 @@ const VendorFundraiser = () => {
                             <TabsContent value="statistics">
                                 <Dashboard fundraiser={fundraiser} />
                             </TabsContent>
-                            {fundraiser?.status == "concluded" && (
+                            {/*{fundraiser.status == "concluded" && (*/}
                                 <TabsContent value="review">
-                                    <Review fundraiser={fundraiser} />
+                                    {/* 
+                                    <h5 className="text-2xl font-semibold mb-2">Review Organisation</h5>
+                                    <Review fundraiser={fundraiser} isVendor={true} />
+                                    */}
+                                    <h5 className="text-2xl font-semibold mb-2">Review from Organisation</h5>
+                                    <LeftReview review={{rating: 4, comment: "Great work!"}} isVendor={true} />
                                 </TabsContent>
-                            )}
+                            {/*)}*/}
                         </Tabs>
                     </div>
                 </div>
