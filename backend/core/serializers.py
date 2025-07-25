@@ -146,10 +146,9 @@ class JobPostSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         rep = super().to_representation(instance)
         rep['author'] = {
-            'id': instance.author.id,
-            'userid': instance.author.user.id,
-            'username': instance.author.username,
-            'email': instance.author.email
+            'id': instance.author.user.id,
+            'username': instance.author.user.username,
+            'email': instance.author.user.email
         }
         return rep
     
@@ -219,10 +218,9 @@ class JobOfferSerializer(serializers.ModelSerializer):
         vendor = instance.vendor
         if vendor:
             rep['vendor'] = {
-                'id': vendor.id,
                 'username': vendor.user.username,
                 'email': vendor.user.email,
-                'userid': vendor.user.id
+                'id': vendor.user.id
             }
         return rep
 
