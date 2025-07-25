@@ -90,7 +90,7 @@ class PostListView(generics.ListAPIView): # view others posts and filters.
         category_values = self.request.query_params.getlist('categories')
 
         # filter categories
-        qs = JobPost.objects.all()
+        qs = JobPost.objects.filter(is_closed=False)
         if len(category_values) > 0:
             filters = Q()
             valid = False
@@ -130,6 +130,18 @@ class DeletePostView(generics.RetrieveDestroyAPIView):
             raise PermissionError('User cannot delete offers.')
 
     lookup_field = 'post_id' # http://127.0.0.1:8000/core/delete-post/<post id>/
+
+class ClosePostView(generics.UpdateAPIView):
+    serializer_class = ClosePostSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        org = get_or_none(Organization, user=self.request.user)
+        org = Organization.objects.get(user_id=1)
+        if not org:
+            raise PermissionError('User cannot close posts.')
+        return JobPost.objects.filter(author=org)
+    lookup_field = 'post_id'
 
 class CreateOfferView(generics.CreateAPIView): # create offers
     serializer_class = JobOfferSerializer

@@ -96,7 +96,7 @@ class JobPostSerializer(serializers.ModelSerializer):
         fields = [
             'post_id', 'title', 'location', 'start_date', 'end_date',
             'start_time', 'end_time', 'remarks', 'commission',
-            'attachment', 'author', 'categories', 'category_list'
+            'attachment', 'author', 'categories', 'category_list','is_closed'
         ]
 
     def validate(self, data):
@@ -151,6 +151,12 @@ class JobPostSerializer(serializers.ModelSerializer):
             'email': instance.author.user.email
         }
         return rep
+    
+class ClosePostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = JobPost
+        fields = ['is_closed']
+        read_only_fields = []
     
 class CharBooleanSerializer(serializers.BooleanField):
     def to_internal_value(self, data):
