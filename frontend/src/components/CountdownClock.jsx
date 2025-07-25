@@ -40,16 +40,16 @@ const CountdownClock = ({ startTime, endTime }) => {
   }
 
   return (
-    <div className="flex gap-2 text-sm font-semibold text-gray-700 mt-2">
-      {tillEnd ? (
-        <div>Fundraiser ends in: </div>
-      ) : (
-        <div>Fundraiser starts in: </div>
-      )}
+    <div className="flex flex-col text-sm font-semibold text-gray-700 mt-2">
+      <div>
+        {tillEnd ? 'Fundraiser ends in:' : 'Fundraiser starts in:'}
+      </div>
+      <div className="flex gap-2 mt-1">
         <div>{timeLeft.days}d</div>
         <div>{timeLeft.hours}h</div>
         <div>{timeLeft.minutes}m</div>
         <div>{timeLeft.seconds}s</div>
+      </div>
     </div>
   );
 };
