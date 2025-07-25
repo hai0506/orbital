@@ -172,7 +172,7 @@ class OfferListView(generics.ListAPIView):
             if status == 'cancelled': qs = qs.filter(status=status)
             elif status == 'pending': qs = qs.exclude(status='cancelled')
         elif vendor:
-            qs = JobOffer.objects.filter(vendor=vendor).exclude(status='confirmed')
+            qs = JobOffer.objects.filter(vendor=vendor).exclude(status__in=['confirmed', 'cancelled'])
             if status in ['approved','pending','rejected','cancelled']: qs = qs.filter(status=status)
         else: qs = JobOffer.objects.none()
 
