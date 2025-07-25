@@ -10,7 +10,7 @@ const Review = ({ fundraiser, isVendor, onSubmitReview }) => {
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const [hoverValue, setHoverValue] = useState(null);
-    const recipientId = isVendor ? fundraiser.org_fundraiser : fundraiser.offer.vendor.id;
+    // const recipientId = isVendor ? fundraiser.org_fundraiser : fundraiser.offer.vendor.id;
 
     const handleClick = (val) => {
         setRating(val);
@@ -42,6 +42,9 @@ const Review = ({ fundraiser, isVendor, onSubmitReview }) => {
             }
             const res = await api.post(`/core/create-review/${fundraiser.fundraiser_id}/`, info);
             console.log(res);
+            if (onReviewSubmitted) {
+                await onReviewSubmitted();  
+            }
         } catch(error) {
             console.log(error);
             setErrors(error);
