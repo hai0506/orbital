@@ -32,20 +32,20 @@ const OrgFundraiser = () => {
     const [filteredTransactions, setFilteredTransactions] = useState({});
     // const [vendor, setVendor] = useState(fundraiser.vendors[0]);
     // uncomment this section to test fundraiser
-    useEffect(() => {
-        async function fetchFundraiser() {
-            // setLoading(true);
-            try {
-                const fundraiserRes = await api.get(`core/fundraiser/${id}`);
-                setFundraiser(fundraiserRes.data);
-                console.log(fundraiserRes);
-            } catch (error) {
-                console.error('Failed to load fundraiser:', error);
-            } finally {
-                setLoading(false);
-            }
-        }
 
+    const fetchFundraiser = async () => {
+        try {
+            const fundraiserRes = await api.get(`core/fundraiser/${id}`);
+            setFundraiser(fundraiserRes.data);
+            console.log(fundraiserRes);
+        } catch (error) {
+            console.error('Failed to load fundraiser:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
         fetchFundraiser();
     }, []);
 
@@ -285,7 +285,7 @@ const OrgFundraiser = () => {
                                                     {!vendor.review_received && (
                                                         <>
                                                             <h5 className="text-2xl font-semibold mb-2">Review Vendor</h5>
-                                                            <Review fundraiser={vendor} isVendor={false} />
+                                                            <Review fundraiser={vendor} isVendor={false} onReviewSubmitted={fetchFundraiser} />
                                                         </>
                                                     )}
                                                     {vendor.review_received && (
