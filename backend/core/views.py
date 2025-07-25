@@ -207,7 +207,7 @@ class UpdateOfferStatusView(generics.RetrieveUpdateAPIView):
             
             instance = self.get_object()
             fundraiser,_ = Fundraiser.objects.get_or_create(listing=instance.listing)
-            vendor_fundraiser = VendorFundraiser.objects.create(offer=instance,revenue=0,org_fundraiser=fundraiser)
+            vendor_fundraiser = VendorFundraiser.objects.create(offer=instance,org_fundraiser=fundraiser)
             
             inv_data = request.data.get('inventory', None)       
             if inv_data:
