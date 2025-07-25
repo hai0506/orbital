@@ -85,8 +85,12 @@ const CreateListing = () => {
 
     return (
         <Layout heading="Create Listing">
-            <form onSubmit={handleSubmit} className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 grid grid-cols-3 gap-4">
-                <Fieldset>
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <form
+                    onSubmit={handleSubmit}
+                    className="w-[1000px] py-6 grid grid-cols-3 gap-4"
+                >
+                    <Fieldset>
                     <Field>
                         <Label className="text-base/7 font-medium text-black">Title</Label>
                         <Description className="text-sm/6 text-black/50">What do you want to call your fundraiser?</Description>
@@ -263,7 +267,8 @@ const CreateListing = () => {
                         Post Listing
                     </Button>
                 </Fieldset>
-            </form>
+                </form>
+            </div>
         </Layout>
     )
 }
