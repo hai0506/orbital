@@ -13,6 +13,8 @@ import {
   TabsContent
 } from "@/components/ui/tabs"
 import CountdownClock from '@/components/CountdownClock';
+import Dashboard from "@/components/Dashboard";
+import OrgDashboard from "@/components/OrgDashboard";
  
 const OrgFundraiser = () => {
     const { id } = useParams();
@@ -107,12 +109,18 @@ const OrgFundraiser = () => {
                         )}
                         <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
                             <TabsList className="flex justify-start space-x-2 border-b mb-2">
-                                {fundraiser?.vendors?.map(vendor => (
-                                <TabsTrigger key={vendor.offer.vendor.username} value={vendor.offer.vendor.username}>
-                                    {vendor.offer.vendor.username}
+                                <TabsTrigger key="overall" value="overall">
+                                    Overall
                                 </TabsTrigger>
+                                {fundraiser?.vendors?.map(vendor => (
+                                    <TabsTrigger key={vendor.offer.vendor.username} value={vendor.offer.vendor.username}>
+                                        {vendor.offer.vendor.username}
+                                    </TabsTrigger>
                                 ))}
                             </TabsList>
+                            <TabsContent value="overall">
+                                <OrgDashboard fundraiser={fundraiser} />
+                            </TabsContent>
                             {fundraiser?.vendors?.map(vendor => (
                                 <TabsContent value={vendor.offer.vendor.username}>
                                     <>
@@ -121,6 +129,7 @@ const OrgFundraiser = () => {
                                             <TabsList className="flex justify-start space-x-2 border-b mb-4">
                                                 <TabsTrigger value="inventory">Inventory</TabsTrigger>
                                                 <TabsTrigger value="transactions">Transactions</TabsTrigger>
+                                                <TabsTrigger value="statistics">Statistics</TabsTrigger>
                                             </TabsList>
                                             <TabsContent value="inventory">
                                                 <>
@@ -260,6 +269,9 @@ const OrgFundraiser = () => {
                                                         </div>
                                                     </div>
                                                 )}
+                                            </TabsContent>
+                                            <TabsContent value="statistics">
+                                                <Dashboard fundraiser={vendor} />
                                             </TabsContent>
                                         </Tabs>
                                         

@@ -46,20 +46,20 @@ const VendorFundraiser = () => {
     const [searchBuyer, setSearchBuyer] = useState("");
     const [errors, setErrors] = useState({});
     
-    useEffect(() => {
-        async function fetchFundraiser() {
-            try {
-                const fundraiserRes = await api.get(`core/fundraiser/${id}`);
-                setFundraiser(fundraiserRes.data);
-                setFullInventory(fundraiserRes.data.inventory);
-                setInventory(fundraiserRes.data.inventory);
-                setOngoing(fundraiserRes.data.status == "ongoing");
-                console.log(fundraiserRes.data);
-            } catch (error) {
-                console.error('Failed to load fundraiser:', error);
-            }
+    async function fetchFundraiser() {
+        try {
+            const fundraiserRes = await api.get(`core/fundraiser/${id}`);
+            setFundraiser(fundraiserRes.data);
+            setFullInventory(fundraiserRes.data.inventory);
+            setInventory(fundraiserRes.data.inventory);
+            setOngoing(fundraiserRes.data.status == "ongoing");
+            console.log(fundraiserRes.data);
+        } catch (error) {
+            console.error('Failed to load fundraiser:', error);
         }
+    }
 
+    useEffect(() => {
         fetchFundraiser();
     }, []);
 
@@ -154,6 +154,7 @@ const VendorFundraiser = () => {
             setCart([]);
             setBuyerDetails({});
             await fetchTransactions();
+            await fetchFundraiser();
         } catch (error) {
             console.error('Failed to update inventory:', error);
             setErrors(error.response.data)
