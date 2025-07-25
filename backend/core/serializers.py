@@ -147,7 +147,9 @@ class JobPostSerializer(serializers.ModelSerializer):
         rep = super().to_representation(instance)
         rep['author'] = {
             'id': instance.author.id,
-            'userid': instance.author.user.id
+            'userid': instance.author.user.id,
+            'username': instance.author.username,
+            'email': instance.author.email
         }
         return rep
     
