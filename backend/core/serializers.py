@@ -6,10 +6,10 @@ from datetime import datetime
 
 class UserSerializer(serializers.ModelSerializer):
     user_type = serializers.ChoiceField(choices=['Organization','Vendor'], write_only=True)
-
+    rating = serializers.SerializerMethodField()
     class Meta:
         model = User
-        fields = ['id','username','password','email','user_type']
+        fields = ['id','username','password','email','user_type','rating']
         extra_kwargs = {'password': {'write_only': True}}
 
     def validate_password(self, value):
@@ -18,6 +18,11 @@ class UserSerializer(serializers.ModelSerializer):
         except DjangoValidationError as e:
             raise serializers.ValidationError(e.messages)
         return value
+    
+    def get_rating(self, obj):
+        reviews = obj.reviews.all()
+        if len(reviews) == 0: return 0
+        return sum([review.rating for review in reviews]) / len(reviews)
 
     def create(self, validated_data):
         user_type = validated_data.pop('user_type')
@@ -39,15 +44,6 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = ['user','description','pfp','user_type','username','email']
-
-    # def update(self, instance, validated_data):
-    #     user_data = validated_data.pop('user', {})
-    #     user = instance.user
-    #     if 'email' in user_data:
-    #         user.email = user_data['email']
-    #     user.save()
-
-    #     return super().update(instance, validated_data)
 
 categories_options = ["Food & Beverages",
             "Accessories",
@@ -250,34 +246,39 @@ class ProductUpdateSerializer(serializers.ModelSerializer):
         fields = ['product_id', 'item', 'quantity', 'price', 'remarks', 'maxQuantity']
 
 class FundraiserSerializer(serializers.ModelSerializer):
-    listing = serializers.PrimaryKeyRelatedField(read_only=True)
+    listing = JobPostSerializer(read_only=True)
     vendors = serializers.SerializerMethodField()
     status = serializers.CharField(read_only=True)
-
+    reviews = serializers.SerializerMethodField()
     class Meta:
         model = Fundraiser
-        fields = ['fundraiser_id','vendors','listing','status']
+        fields = ['fundraiser_id','vendors','listing','status','reviews']
 
     def get_vendors(self, obj):
         vendors = VendorFundraiser.objects.filter(org_fundraiser=obj)
         return VendorFundraiserSerializer(vendors, many=True).data
+    
+    def get_reviews(self, obj):
+        reviews = Review.objects.filter(vendor_fundraiser__org_fundraiser=obj,reviewee=obj.listing.author.user)
+        return ReviewSerializer(reviews, many=True).data
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
-        rep['listing'] = JobPostSerializer(instance.listing).data
-        rep['vendors'] = VendorFundraiserSerializer(instance.vendors.all(), many=True).data
+        rep['vendors'] = VendorFundraiserSerializer(instance.vendors.all(), context=self.context, many=True).data
         return rep
     
 class VendorFundraiserSerializer(serializers.ModelSerializer):
-    offer = serializers.PrimaryKeyRelatedField(read_only=True)
+    offer = JobOfferSerializer(read_only=True)
     inventory = serializers.SerializerMethodField()
     org_fundraiser = serializers.PrimaryKeyRelatedField(read_only=True)
     transactions = serializers.SerializerMethodField()
     status = serializers.CharField(source='org_fundraiser.status', read_only=True)
     revenue = serializers.SerializerMethodField()
+    review_sent = serializers.SerializerMethodField()
+    review_received = serializers.SerializerMethodField()
     class Meta:
         model = VendorFundraiser
-        fields = ['fundraiser_id','offer','revenue','inventory','org_fundraiser','transactions','status']
+        fields = ['fundraiser_id','offer','revenue','inventory','org_fundraiser','transactions','status','review_sent','review_received']
 
     def get_inventory(self, obj):
         products = Product.objects.filter(vendor=obj)
@@ -295,10 +296,13 @@ class VendorFundraiserSerializer(serializers.ModelSerializer):
                 total += item.product.price * item.quantity
         return total
     
-    def to_representation(self, instance):
-        rep = super().to_representation(instance)
-        rep['offer'] = JobOfferSerializer(instance.offer).data
-        return rep
+    def get_review_sent(self, obj):
+        reviews = Review.objects.filter(vendor_fundraiser=obj, reviewer=obj.offer.vendor.user)
+        if len(reviews)>0: return ReviewSerializer(reviews.first()).data
+
+    def get_review_received(self, obj):
+        reviews = Review.objects.filter(vendor_fundraiser=obj, reviewee=obj.offer.vendor.user)
+        if len(reviews)>0: return ReviewSerializer(reviews.first()).data
     
 class TransactionItemSerializer(serializers.ModelSerializer):
     transaction = serializers.PrimaryKeyRelatedField(read_only=True)
@@ -355,7 +359,6 @@ class TransactionSerializer(serializers.ModelSerializer):
     
     def to_representation(self, instance):
         rep = super().to_representation(instance)
-        # rep['vendor'] = VendorFundraiserSerializer(instance.vendor).data
         rep['items']=TransactionItemSerializer(instance.items, many=True).data
         return rep
     
@@ -385,3 +388,19 @@ class ChatSerializer(serializers.Serializer):
             return ''
         content = chat[len(chat)-1].content
         return content if len(content) <= 30 else content[:27] + '...'
+    
+class ReviewSerializer(serializers.ModelSerializer):
+    vendor_fundraiser = serializers.PrimaryKeyRelatedField(read_only=True)
+    reviewer = serializers.PrimaryKeyRelatedField(read_only=True)
+    reviewee = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    class Meta:
+        model = Review
+        fields = ['review_id','vendor_fundraiser','reviewer','reviewee','time_created','rating','comment']
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        rep['reviewer'] = {'username': instance.reviewer.username}
+        reviewee = instance.reviewee
+        if reviewee:
+            rep['reviewee'] = {'username': reviewee.username}
+        return rep

@@ -159,7 +159,7 @@ class OfferListView(generics.ListAPIView):
         commission = self.request.query_params.get('commission')
         status = self.request.query_params.get('status')
         if org:
-            qs = JobOffer.objects.filter(listing__author=org, status='pending')
+            qs = JobOffer.objects.filter(listing__author=org, status__in=['pending', 'cancelled'])
             # available all only
             if available == '1':
                 qs = qs.filter(allDays=True)
@@ -168,8 +168,11 @@ class OfferListView(generics.ListAPIView):
                 qs = qs.annotate(required_commission=F('listing__commission')).filter(
                     commission__gte=F('required_commission')
                 )
+            # status
+            if status == 'cancelled': qs = qs.filter(status=status)
+            elif status == 'pending': qs = qs.exclude(status='cancelled')
         elif vendor:
-            qs = JobOffer.objects.filter(vendor=vendor).exclude(status='confirmed')
+            qs = JobOffer.objects.filter(vendor=vendor).exclude(status__in=['confirmed', 'cancelled'])
             if status in ['approved','pending','rejected','cancelled']: qs = qs.filter(status=status)
         else: qs = JobOffer.objects.none()
 
@@ -385,5 +388,24 @@ class ChatListView(APIView):
 
         return Response(ChatSerializer(chats, many=True).data)
 
+class CreateReviewView(generics.CreateAPIView):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        fundraiser_id = self.kwargs.get('fundraiser_id')
+        vendor_fundraiser = VendorFundraiser.objects.get(fundraiser_id=fundraiser_id)
+        serializer.save(
+            reviewer=self.request.user,
+            vendor_fundraiser=vendor_fundraiser
+        )
     
+class ReviewListView(generics.ListAPIView):
+    serializer_class = ReviewSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user_id = self.kwargs.get('user_id')
+        return Review.objects.filter(reviewee__id=user_id).order_by('-time_created')
 

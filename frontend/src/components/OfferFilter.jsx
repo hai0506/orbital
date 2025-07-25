@@ -4,10 +4,12 @@ import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react'
 const OfferFilter = ({ onApply }) => {
     const [available, setAvailable] = useState(false);
     const [commission, setCommission] = useState(false);
+    const [status, setStatus] = useState("")
     const [sortby, setSortby] = useState("");
 
     const applyFilters = (close) => {
         const params = new URLSearchParams()
+        if (status) params.append('status', status)
         if (available) params.append('available', 1)
         if (commission) params.append('commission', 1)
         if (sortby) params.append('sortby', sortby)
@@ -61,6 +63,18 @@ const OfferFilter = ({ onApply }) => {
                                             className="accent-gray-700"
                                         />
                                         <span>Meet commission requirement only</span>
+                                    </label>
+                                    <label className="mb-4 text-sm font-medium text-gray-700 flex flex-col">
+                                        Filter by Offer Status
+                                        <select
+                                            value={status}
+                                            onChange={e => setStatus(e.target.value)}
+                                            className="border mt-1 p-2 rounded-lg"
+                                        >
+                                            <option value="">All</option>
+                                            <option value="pending">Pending</option>
+                                            <option value="cancelled">Cancelled</option>
+                                        </select>
                                     </label>
                                 </div>
                             </div>
