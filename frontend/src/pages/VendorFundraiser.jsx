@@ -200,7 +200,7 @@ const VendorFundraiser = () => {
                                 <TabsTrigger value="inventory">Inventory</TabsTrigger>
                                 <TabsTrigger value="transactions">Transactions</TabsTrigger>
                                 <TabsTrigger value="statistics">Statistics</TabsTrigger>
-                                {fundraiser.status == "concluded" && (
+                                {fundraiser?.status == "concluded" && (
                                     <TabsTrigger value="review">Review</TabsTrigger>
                                 )}
                             </TabsList>
@@ -525,7 +525,7 @@ const VendorFundraiser = () => {
                             <TabsContent value="statistics">
                                 <Dashboard fundraiser={fundraiser} />
                             </TabsContent>
-                            {fundraiser.status == "concluded" && (
+                            {fundraiser?.status == "concluded" && (
                                 <TabsContent value="review">
                                     <Review fundraiser={fundraiser} />
                                 </TabsContent>
