@@ -47,7 +47,8 @@ export default function Layout({ heading, children }) {
 
   const orgNavigation = [
     { name: 'Offers', href: '/', current: true },
-    { name: 'My Listings', href: '/listings', current: false },
+    { name: 'My Listings', href: '/my-listings', current: false },
+    { name: 'Listings', href: '/listings', current: false },
     { name: 'Create Listing', href: '/create', current: false },
     { name: 'Fundraisers', href: '/fundraisers', current: false },
     { name: 'Chats', href: '/chats' },

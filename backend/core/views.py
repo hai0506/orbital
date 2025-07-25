@@ -103,6 +103,12 @@ class PostListView(generics.ListAPIView): # view others posts and filters.
             if valid: qs = qs.filter(filters).distinct()
             else: qs = qs.none()
 
+        # sort posts
+        if sort_field == 'start_date':
+            qs = qs.order_by(sort_field, 'start_time')
+        else:
+            qs = qs.order_by('-time_created')
+
         # hide posts that the vendor has already made offers for
         vendor = get_or_none(Vendor, user=self.request.user)
         # vendor = Vendor.objects.get(user_id=2)
@@ -111,11 +117,6 @@ class PostListView(generics.ListAPIView): # view others posts and filters.
         offered_posts = JobPost.objects.filter(post_offers__vendor=vendor)
         final_qs = qs.exclude(post_id__in=offered_posts.values_list('post_id', flat=True))
 
-        # sort posts
-        if sort_field == 'start_date':
-            final_qs = final_qs.order_by(sort_field, 'start_time')
-        else:
-            final_qs = final_qs.order_by('-time_created')
         return final_qs
     
 class DeletePostView(generics.RetrieveDestroyAPIView):

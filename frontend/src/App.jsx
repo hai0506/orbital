@@ -14,7 +14,8 @@ import Chat from "./pages/Chat"
 import Chats from "./pages/Chats"
 import Profile from "./pages/Profile";
 import Search from "./pages/Search";
-import Listings from "./pages/Listings";
+import OrgListings from "./pages/OrgListings";
+import GlobalListings from "./pages/GlobalListings";
 
 function Logout() {
   localStorage.clear()
@@ -50,10 +51,19 @@ function App() {
           />
 
           <Route 
+            path="/my-listings"
+            element={
+              <ProtectedRoute authRoles={["organization"]}>
+                <OrgListings />
+              </ProtectedRoute>
+            }
+          />
+
+<Route 
             path="/listings"
             element={
               <ProtectedRoute authRoles={["organization"]}>
-                <Listings />
+                <GlobalListings />
               </ProtectedRoute>
             }
           />

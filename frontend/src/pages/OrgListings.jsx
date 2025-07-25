@@ -3,7 +3,7 @@ import api from '../api';
 import Layout from "../components/Layout";
 import Listing from '../components/Listing';
 
-const Listings = () => {
+const OrgListings = () => {
   const [listings, setListings] = useState([]); // uncomment this
   const [loading, setLoading] = useState(true); // this as well
   const role = localStorage.getItem("ROLE");
@@ -43,4 +43,4 @@ const Listings = () => {
   );
 };
 
-export default Listings;
+export default OrgListings;
