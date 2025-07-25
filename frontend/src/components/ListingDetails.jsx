@@ -1,4 +1,4 @@
-import { MapPinned, Calendar1, Clock, HandCoins, Activity } from "lucide-react";
+import { Building2, MapPinned, Calendar1, Clock, HandCoins, Activity } from "lucide-react";
 import CategoryTags from "./CategoryTags";
 
 const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString("en-GB");
@@ -16,6 +16,10 @@ const ListingDetails = ({ fields, status, days }) => {
             <h3 className="text-lg font-semibold text-gray-900 mb-3">{fields["title"]}</h3>
             <CategoryTags categories={fields.categories}/>
             <dl style={{ marginTop: "10px" }} className="space-y-2">
+                <div className="flex text-sm text-gray-700">
+                    <Building2 className="mr-2" />
+                    <dt className="font-medium">{fields.author.username}</dt>
+                </div>
                 <div className="flex text-sm text-gray-700">
                     <MapPinned className="mr-2" />
                     <dt className="font-medium">{fields["location"]}</dt>
