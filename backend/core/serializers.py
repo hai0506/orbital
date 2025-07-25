@@ -36,7 +36,7 @@ class UserSerializer(serializers.ModelSerializer):
         return user
     
 class ProfileSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(read_only=True)
+    user = UserSerializer(read_only=True)
     username = serializers.CharField(source='user.username', read_only=True)
     email = serializers.EmailField(source='user.email', read_only=True)
     user_type = serializers.CharField(read_only=True)
