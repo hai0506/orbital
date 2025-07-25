@@ -245,12 +245,12 @@ class FundraiserListView(APIView):
             qs = Fundraiser.objects.filter(listing__author=org).order_by('listing__start_date','listing__start_time')
             if status:
                 qs = [f for f in qs if f.status == status]
-            return Response(FundraiserSerializer(qs, context={'request': request}, many=True).data)
+            return Response(FundraiserSerializer(qs, many=True).data)
         elif vendor:
             qs = VendorFundraiser.objects.filter(offer__vendor=vendor).order_by('org_fundraiser__listing__start_date','org_fundraiser__listing__start_time')
             if status:
                 qs = [f for f in qs if f.org_fundraiser.status == status]
-            return Response(VendorFundraiserSerializer(qs, context={'request': request}, many=True).data)
+            return Response(VendorFundraiserSerializer(qs, many=True).data)
         else: 
             raise PermissionError('User cannot view fundraisers.')
         
@@ -261,10 +261,10 @@ class RetrieveFundraiserView(APIView):
         vendor = get_or_none(Vendor, user=self.request.user)
         if org:
             fundraiser = get_object_or_404(Fundraiser, fundraiser_id=fundraiser_id, listing__author=org)
-            return Response(FundraiserSerializer(fundraiser, context={'request': request}).data)
+            return Response(FundraiserSerializer(fundraiser).data)
         elif vendor:
             fundraiser = get_object_or_404(VendorFundraiser, fundraiser_id=fundraiser_id, offer__vendor=vendor)
-            return Response(VendorFundraiserSerializer(fundraiser, context={'request': request}).data)
+            return Response(VendorFundraiserSerializer(fundraiser).data)
         else: 
             raise PermissionError('User cannot view fundraisers.')
         

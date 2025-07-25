@@ -274,11 +274,11 @@ class VendorFundraiserSerializer(serializers.ModelSerializer):
     transactions = serializers.SerializerMethodField()
     status = serializers.CharField(source='org_fundraiser.status', read_only=True)
     revenue = serializers.SerializerMethodField()
-    reviews = serializers.SerializerMethodField()
-    has_reviewed = serializers.SerializerMethodField()
+    review_sent = serializers.SerializerMethodField()
+    review_received = serializers.SerializerMethodField()
     class Meta:
         model = VendorFundraiser
-        fields = ['fundraiser_id','offer','revenue','inventory','org_fundraiser','transactions','status','reviews','has_reviewed']
+        fields = ['fundraiser_id','offer','revenue','inventory','org_fundraiser','transactions','status','review_sent','review_received']
 
     def get_inventory(self, obj):
         products = Product.objects.filter(vendor=obj)
@@ -296,14 +296,13 @@ class VendorFundraiserSerializer(serializers.ModelSerializer):
                 total += item.product.price * item.quantity
         return total
     
-    def get_reviews(self, obj):
+    def get_review_sent(self, obj):
+        reviews = Review.objects.filter(vendor_fundraiser=obj, reviewer=obj.offer.vendor.user)
+        if len(reviews)>0: return ReviewSerializer(reviews.first()).data
+
+    def get_review_received(self, obj):
         reviews = Review.objects.filter(vendor_fundraiser=obj, reviewee=obj.offer.vendor.user)
-        return ReviewSerializer(reviews, many=True).data
-    
-    def get_has_reviewed(self, obj):
-        user = self.context.get('request',None)
-        if user: return Review.objects.filter(vendor_fundraiser=obj,reviewer=user.user).exists()
-        return False
+        if len(reviews)>0: return ReviewSerializer(reviews.first()).data
     
 class TransactionItemSerializer(serializers.ModelSerializer):
     transaction = serializers.PrimaryKeyRelatedField(read_only=True)
