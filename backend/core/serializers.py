@@ -90,7 +90,6 @@ class JobPostSerializer(serializers.ModelSerializer):
             'required': 'End time is required.'
         }
     )
-    is_closed = serializers.SerializerMethodField()
     class Meta:
         model = JobPost
         fields = [
@@ -98,11 +97,6 @@ class JobPostSerializer(serializers.ModelSerializer):
             'start_time', 'end_time', 'remarks', 'commission',
             'attachment', 'author', 'categories', 'category_list','is_closed'
         ]
-
-    def get_is_closed(self, obj):
-        start_dt = datetime.combine(obj.start_date, obj.start_time)
-        if datetime.now() > start_dt: return True
-        else: return obj.is_closed
 
     def validate(self, data):
         # title

@@ -11,6 +11,7 @@ from rest_framework.views import APIView
 import json
 from django.shortcuts import get_object_or_404
 from django.db.models import F,Q
+from datetime import datetime
 
 
 @api_view(['GET'])
@@ -60,6 +61,13 @@ class RetrieveProfileView(generics.RetrieveAPIView):
     permission_classes = [IsAuthenticated]
     lookup_field='user_id'
 
+def UpdatePostIsClosed():
+    for post in JobPost.objects.filter(is_closed=False):
+        end_dt = datetime.combine(post.end_date, post.end_time)
+        if datetime.now() > end_dt:
+            post.is_closed = True
+            post.save(update_fields=['is_closed'])
+
 class CreatePostView(generics.ListCreateAPIView): # create and view own posts
     serializer_class = JobPostSerializer
     permission_classes = [IsAuthenticated]
@@ -67,6 +75,7 @@ class CreatePostView(generics.ListCreateAPIView): # create and view own posts
     def get_queryset(self):
         author = get_or_none(Organization, user=self.request.user)
         if author:
+            UpdatePostIsClosed()
             return JobPost.objects.filter(author=author, is_closed=False)
         else: return JobPost.objects.none()
         # return JobPost.objects.none()
@@ -90,6 +99,7 @@ class PostListView(generics.ListAPIView): # view others posts and filters.
         category_values = self.request.query_params.getlist('categories')
 
         # filter categories
+        UpdatePostIsClosed()
         qs = JobPost.objects.filter(is_closed=False)
         if len(category_values) > 0:
             filters = Q()
