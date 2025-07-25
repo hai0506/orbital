@@ -286,7 +286,7 @@ const Fundraiser = ({ fundraiser, role }) => {
                                                     :   ( 
                                                             <div className="flex items-center gap-2 text-sm text-red-600">
                                                                 <CircleX className="size-4" />
-                                                                <span>{fundraiser.commission}% of revenue ({fundraiser.listing.commission - fundraiser.commission}% less)</span>
+                                                                <span>{fundraiser?.offer?.commission}% of revenue ({fundraiser?.offer?.listing?.commission - fundraiser?.offer?.commission}% less)</span>
                                                             </div>
                                                         )
                                                 }
