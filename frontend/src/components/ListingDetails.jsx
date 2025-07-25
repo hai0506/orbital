@@ -18,7 +18,7 @@ const ListingDetails = ({ fields, status, days }) => {
             <dl style={{ marginTop: "10px" }} className="space-y-2">
                 <div className="flex text-sm text-gray-700">
                     <Building2 className="mr-2" />
-                    <dt className="font-medium">{fields.author.username}</dt>
+                    <dt className="font-medium">{fields.author?.username}</dt>
                 </div>
                 <div className="flex text-sm text-gray-700">
                     <MapPinned className="mr-2" />
