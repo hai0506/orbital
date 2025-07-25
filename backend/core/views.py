@@ -133,11 +133,10 @@ class DeletePostView(generics.RetrieveDestroyAPIView):
 
 class ClosePostView(generics.UpdateAPIView):
     serializer_class = ClosePostSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         org = get_or_none(Organization, user=self.request.user)
-        org = Organization.objects.get(user_id=1)
         if not org:
             raise PermissionError('User cannot close posts.')
         return JobPost.objects.filter(author=org)
