@@ -278,16 +278,23 @@ const OrgFundraiser = () => {
                                             <TabsContent value="statistics">
                                                 <Dashboard fundraiser={vendor} />
                                             </TabsContent>
-                                            <TabsContent value="review">
-                                                {/* 
-                                                    <h5 className="text-2xl font-semibold mb-2">Review Vendor</h5>
-                                                    <Review fundraiser={vendor} isVendor={false} />
-                                                */}
-                                                <h5 className="text-2xl font-semibold mb-2">Review from Vendor</h5>
-                                                <LeftReview review={{rating: 4, comment: "Great planning!"}} isVendor={false} />
-                                            </TabsContent>
+                                            {vendor.status == "concluded" && (
+                                                <TabsContent value="review">
+                                                    {!vendor.review_received && (
+                                                        <>
+                                                            <h5 className="text-2xl font-semibold mb-2">Review Vendor</h5>
+                                                            <Review fundraiser={vendor} isVendor={false} />
+                                                        </>
+                                                    )}
+                                                    {vendor.review_received && (
+                                                        <>
+                                                            <h5 className="text-2xl font-semibold mb-2">Review from Vendor</h5>
+                                                            <LeftReview review={{rating: 4, comment: "Great planning!"}} isVendor={false} />
+                                                        </>
+                                                    )}
+                                                </TabsContent>
+                                            )}
                                         </Tabs>
-                                        
                                     </>
                                 </TabsContent>
                             ))}

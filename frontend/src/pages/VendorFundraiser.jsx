@@ -201,9 +201,9 @@ const VendorFundraiser = () => {
                                 <TabsTrigger value="inventory">Inventory</TabsTrigger>
                                 <TabsTrigger value="transactions">Transactions</TabsTrigger>
                                 <TabsTrigger value="statistics">Statistics</TabsTrigger>
-                                {/*{fundraiser.status == "concluded" && (*/}
+                                {fundraiser.status == "concluded" && (
                                     <TabsTrigger value="review">Review</TabsTrigger>
-                                {/*)}*/}
+                                )}
                             </TabsList>
                             <TabsContent value="inventory">
                                 <>
@@ -526,16 +526,22 @@ const VendorFundraiser = () => {
                             <TabsContent value="statistics">
                                 <Dashboard fundraiser={fundraiser} />
                             </TabsContent>
-                            {/*{fundraiser.status == "concluded" && (*/}
+                            {fundraiser.status == "concluded" && (
                                 <TabsContent value="review">
-                                    {/* 
-                                    <h5 className="text-2xl font-semibold mb-2">Review Organisation</h5>
-                                    <Review fundraiser={fundraiser} isVendor={true} />
-                                    */}
-                                    <h5 className="text-2xl font-semibold mb-2">Review from Organisation</h5>
-                                    <LeftReview review={{rating: 4, comment: "Great work!"}} isVendor={true} />
+                                    {!fundraiser.has_reviewed && (
+                                        <>
+                                            <h5 className="text-2xl font-semibold mb-2">Review Organisation</h5>
+                                            <Review fundraiser={fundraiser} isVendor={true} />
+                                        </>
+                                    )}
+                                    {fundraiser.has_reviewed && (
+                                        <>
+                                            <h5 className="text-2xl font-semibold mb-2">Review from Organisation</h5>
+                                            <LeftReview review={fundraiser.review} isVendor={true} />
+                                        </>
+                                    )}
                                 </TabsContent>
-                            {/*)}*/}
+                            )}
                         </Tabs>
                     </div>
                 </div>
