@@ -159,7 +159,7 @@ class OfferListView(generics.ListAPIView):
         commission = self.request.query_params.get('commission')
         status = self.request.query_params.get('status')
         if org:
-            qs = JobOffer.objects.filter(listing__author=org, status='pending')
+            qs = JobOffer.objects.filter(listing__author=org, status__in=['pending', 'cancelled'])
             # available all only
             if available == '1':
                 qs = qs.filter(allDays=True)
