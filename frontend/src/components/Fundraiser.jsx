@@ -92,12 +92,6 @@ const Fundraiser = ({ fundraiser, role }) => {
                     <ListingDetails fields={fundraiser.listing} />
                 )}
 
-                <button
-                    className="absolute top-2 right-2 text-gray-500 hover:text-black"
-                >
-                    <X/>
-                </button>
-
                 {hovered && (
                     <Button 
                         onClick={role === "vendor" && fundraiser.status === "yet to start"

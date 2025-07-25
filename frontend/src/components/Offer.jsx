@@ -13,6 +13,15 @@ const Offer = ({ offer, onChangeStatus }) => {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
+    const status = offer.status;
+    const statusColours = {
+        pending: "bg-yellow-300",
+        approved: "bg-green-300",
+        rejected: "bg-red-300",
+        confirmed: "bg-green-500",
+        cancelled: "bg-red-300",
+    }
+
     const handleSubmit = async (status) => {
         setLoading(true);
         console.log("Accepting/rejecting offer")
@@ -35,11 +44,29 @@ const Offer = ({ offer, onChangeStatus }) => {
         }
     }
 
+    const handleRemoval = async () => {
+        setLoading(true);
+        console.log("Deleting offer")
+
+        try {
+            const route = `core/delete-offer/${offer.offer_id}/`; 
+            const res = await api.delete(route);
+            onChangeStatus(offer.offer_id);
+            console.log("Deleted offer: ", offer.offer_id);
+            setOpen(false);
+        } catch (error) {
+            console.log(error)
+            setErrors(error.response.data)
+        } finally {
+            setLoading(false)
+        }
+    }
+
     return (
         <>
             <div onMouseEnter={() => setHovered(true)} 
                 onMouseLeave={() => setHovered(false)} 
-                className="border border-gray-300 rounded-lg p-4 shadow-sm bg-white max-w-md"
+                className={`border border-gray-300 rounded-lg p-4 shadow-sm ${statusColours[status]} max-w-md`}
             >
                 <h3 className="text-lg font-semibold text-gray-900 mb-3">{offer.vendor.username}</h3>
                 <dl style={{ marginTop: "10px" }} className="space-y-2">
@@ -48,12 +75,6 @@ const Offer = ({ offer, onChangeStatus }) => {
                         <dt className="font-medium">{offer.listing.title}</dt>
                     </div>
                 </dl>
-
-                <button
-                    className="absolute top-2 right-2 text-gray-500 hover:text-black"
-                >
-                    <X/>
-                </button>
 
                 {hovered && (
                     <Button onClick={() => {setOpen(true);setHovered(false);}} style={{ marginTop: "10px" }} className="inline-flex items-center gap-2 rounded-md bg-gray-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-gray-600 data-open:bg-gray-700">
@@ -141,15 +162,26 @@ const Offer = ({ offer, onChangeStatus }) => {
                                         )}
                                     </Field>
 
-                                    <Button onClick={() => handleSubmit("approved")} style={{ marginTop: "10px", marginRight: "10px" }} className="inline-flex items-center gap-2 rounded-md bg-green-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-green-600 data-open:bg-green-700">
-                                        Approve Offer
-                                    </Button>
+                                    {status == "pending" && (
+                                        <>
+                                            <Button onClick={() => handleSubmit("approved")} style={{ marginTop: "10px", marginRight: "10px" }} className="inline-flex items-center gap-2 rounded-md bg-green-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-green-600 data-open:bg-green-700">
+                                                Approve Offer
+                                            </Button>
 
-                                    <Button onClick={() => handleSubmit("rejected")} style={{ marginTop: "10px" }} className="inline-flex items-center gap-2 rounded-md bg-red-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-red-600 data-open:bg-red-700">
-                                        Reject Offer
-                                    </Button>
+                                            <Button onClick={() => handleSubmit("rejected")} style={{ marginTop: "10px" }} className="inline-flex items-center gap-2 rounded-md bg-red-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-red-600 data-open:bg-red-700">
+                                                Reject Offer
+                                            </Button>
+                                        </>
+                                    )}
+
+                                    {status == "cancelled" && (
+                                        <Button onClick={handleRemoval} style={{ marginTop: "10px" }} className="inline-flex items-center gap-2 rounded-md bg-red-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-red-600 data-open:bg-red-700">
+                                            Remove Offer
+                                        </Button>
+                                    )}
+
                                     <Button type="button" style={{ marginTop: "10px" }} className="ml-8 inline-flex items-center gap-2 rounded-md bg-gray-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-gray-600 data-open:bg-gray-700"
-                                    onClick={() => navigate("/chat", {state:{receiverId: offer.vendor.userid}})} >
+                                        onClick={() => navigate("/chat", {state:{receiverId: offer.vendor.userid}})} >
                                         Contact Vendor
                                     </Button>
                                 </Fieldset>

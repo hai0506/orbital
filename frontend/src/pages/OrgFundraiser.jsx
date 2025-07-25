@@ -13,6 +13,8 @@ import {
   TabsContent
 } from "@/components/ui/tabs"
 import CountdownClock from '@/components/CountdownClock';
+import Review from "@/components/Review";
+import LeftReview from "@/components/LeftReview";
 import Dashboard from "@/components/Dashboard";
 import OrgDashboard from "@/components/OrgDashboard";
  
@@ -93,8 +95,10 @@ const OrgFundraiser = () => {
                         >
                             <MoveLeft/>
                         </button>
-                        <CountdownClock startTime={`${fundraiser?.listing?.start_date}T${fundraiser?.listing?.start_time}`}
-                        endTime={`${fundraiser?.listing?.end_date}T${fundraiser?.listing?.end_time}`} />
+                        <CountdownClock 
+                            startTime={`${fundraiser?.listing?.start_date}T${fundraiser?.listing?.start_time}`}
+                            endTime={`${fundraiser?.listing?.end_date}T${fundraiser?.listing?.end_time}`} 
+                        />
                     </div>
                 )}
                 <div className={`relative ${hidden ? 'w-full' : 'w-[75%]'} flex flex-col`}>
@@ -130,6 +134,9 @@ const OrgFundraiser = () => {
                                                 <TabsTrigger value="inventory">Inventory</TabsTrigger>
                                                 <TabsTrigger value="transactions">Transactions</TabsTrigger>
                                                 <TabsTrigger value="statistics">Statistics</TabsTrigger>
+                                                {vendor.status == "concluded" && (
+                                                    <TabsTrigger value="review">Review</TabsTrigger>
+                                                )}
                                             </TabsList>
                                             <TabsContent value="inventory">
                                                 <>
@@ -273,8 +280,23 @@ const OrgFundraiser = () => {
                                             <TabsContent value="statistics">
                                                 <Dashboard fundraiser={vendor} />
                                             </TabsContent>
+                                            {vendor.status == "concluded" && (
+                                                <TabsContent value="review">
+                                                    {!vendor.review_received && (
+                                                        <>
+                                                            <h5 className="text-2xl font-semibold mb-2">Review Vendor</h5>
+                                                            <Review fundraiser={vendor} isVendor={false} />
+                                                        </>
+                                                    )}
+                                                    {vendor.review_received && (
+                                                        <>
+                                                            <h5 className="text-2xl font-semibold mb-2">Review from Vendor</h5>
+                                                            <LeftReview review={vendor.review_sent} isVendor={false} />
+                                                        </>
+                                                    )}
+                                                </TabsContent>
+                                            )}
                                         </Tabs>
-                                        
                                     </>
                                 </TabsContent>
                             ))}

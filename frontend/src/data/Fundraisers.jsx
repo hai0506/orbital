@@ -76,7 +76,8 @@ const Fundraisers = [
     {
         fundraiser_id: 100,
         vendors: vendors,
-        listing: listings[0]
+        listing: listings[0],
+        status: "concluded",
     }
 ]
 
