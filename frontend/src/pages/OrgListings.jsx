@@ -26,18 +26,17 @@ const OrgListings = () => {
 
   return (
     <>
-        <Layout heading="Listings">
-        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-
-            <div className="grid grid-cols-3 gap-4">
-            {listings.map((listing, index) => (
-                <Listing key={listing.id || index} fields={listing} role={role}/>
-            ))}
-            {listings.length === 0 && (
-                <div>You have no job listings at the moment.</div>
-            )}
-            </div>
-        </div>
+        <Layout heading="My Listings">
+          <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {listings.map((listing, index) => (
+                    <Listing key={listing.id || index} fields={listing} role={role}/>
+                ))}
+                {listings.length === 0 && (
+                    <div>You have no job listings at the moment.</div>
+                )}
+              </div>
+          </div>
         </Layout>
     </>
   );

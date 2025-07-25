@@ -28,11 +28,9 @@ const Home = () => {
   useEffect(() => {
     async function fetchListings() {
       try {
-        if (role === 'vendor') {
-          const listingsRes = await api.get('core/posts/');
-          setListings(listingsRes.data);
-          listings.map(listing => console.log(listing));
-        }
+        const listingsRes = await api.get('core/posts/');
+        setListings(listingsRes.data);
+        listings.map(listing => console.log(listing));
       } catch (error) {
         console.error('Failed to load listings:', error);
       } finally {
@@ -46,27 +44,22 @@ const Home = () => {
 
   return (
     <>
-        {role === "vendor" && (
-          <Layout heading="Listings">
-            <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-              <div className="mb-4">
-                <ListingFilter onApply={applyFilters} />
-              </div>
-
-              <div className="grid grid-cols-3 gap-4">
-                {listings.map((listing, index) => (
-                  <Listing key={listing.id || index} fields={listing} role={role}/>
-                ))}
-                {listings.length === 0 && (
-                  <div>There are no listings available at this time.</div>
-                )}
-              </div>
+        <Layout heading="Listings">
+          <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+            <div className="mb-4">
+              <ListingFilter onApply={applyFilters} />
             </div>
-          </Layout>
-        )}
-        {role === "organization" && (
-          <Offers />
-        )}
+
+            <div className="grid grid-cols-3 gap-4">
+              {listings.map((listing, index) => (
+                <Listing key={listing.id || index} fields={listing} role={role} />
+              ))}
+              {listings.length === 0 && (
+                <div>There are no listings available at this time.</div>
+              )}
+            </div>
+          </div>
+        </Layout>
     </>
   );
 };

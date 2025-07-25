@@ -3,6 +3,7 @@ import { X } from "lucide-react";
 import { Button } from "@headlessui/react";
 import MakeOffer from "./MakeOffer";
 import ListingDetails from "./ListingDetails";
+import { useNavigate } from "react-router-dom";
 
 const Listing = ({fields, role}) => {
     const dates = [];
@@ -17,6 +18,7 @@ const Listing = ({fields, role}) => {
 
     const [hovered, setHovered] = useState(false);
     const [open, setOpen] = useState(false);
+    const navigate = useNavigate();
 
     return (
         <>
@@ -26,9 +28,15 @@ const Listing = ({fields, role}) => {
             >
                 <ListingDetails fields={fields} />
 
-                {hovered && (
+                {(role === "vendor" && hovered) && (
                     <Button onClick={() => {setOpen(true);setHovered(false);}} style={{ marginTop: "10px" }} className="inline-flex items-center gap-2 rounded-md bg-gray-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-gray-600 data-open:bg-gray-700">
                         Check it out!
+                    </Button>
+                )}
+
+                {(role === "organization" && hovered) && (
+                    <Button onClick={() => navigate("/chat", {state:{receiverId: fields.author.userid}})} style={{ marginTop: "10px" }} className="inline-flex items-center gap-2 rounded-md bg-gray-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-gray-600 data-open:bg-gray-700">
+                        Contact Organization
                     </Button>
                 )}
             </div>
@@ -48,30 +56,6 @@ const Listing = ({fields, role}) => {
 
                             <div className="w-[70%] border-l border-gray-300 p-4">
                                 <MakeOffer dates={dates} listing={fields}  />
-                            </div>
-                        </div>
-
-                        <button
-                            onClick={() => setOpen(false)}
-                            className="absolute top-2 right-2 text-gray-500 hover:text-black"
-                        >
-                            <X/>
-                        </button>
-                    </div>
-                </div>
-            )}
-            {role === "organization" && open && (
-                <div 
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm"
-                    onClick={() => setOpen(false)}
-                >
-                    <div 
-                        className="max-w-2xl w-full rounded-lg bg-white p-6 shadow-lg relative"
-                        onClick={e => e.stopPropagation()}
-                    >
-                        <div className="flex h-full w-full">
-                            <div className="w-[50%] p-4">
-                                <ListingDetails fields={fields} />
                             </div>
                         </div>
 
