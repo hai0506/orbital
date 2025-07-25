@@ -28,12 +28,20 @@ const Review = ({ fundraiser, isVendor, onSubmitReview }) => {
         e.preventDefault();
         setLoading(true)
         try {
+            let reviewRecipient;
+            if(isVendor){
+                reviewRecipient = fundraiser.offer.listing.author.userid;
+            }
+            else {
+                reviewRecipient = fundraiser.offer.vendor.userid;
+            }
             const info = {
                 rating: rating,
                 comment: comment,
+                reviewee: reviewRecipient
             }
-            const res = await api.post(`/core/reviews/${recipientId}`, info);
-            if (onSubmitReview) await onSubmitReview();
+            const res = await api.post(`/core/create-review/${fundraiser.fundraiser_id}/`, info);
+            console.log(res);
         } catch(error) {
             console.log(error);
             setErrors(error);
