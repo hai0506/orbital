@@ -8,7 +8,7 @@ const UserProfile = ({ profile }) => {
     const navigate = useNavigate();
 
     const handleClick = () => {
-        navigate(`/profiles/${profile.user}`);
+        navigate(`/profiles/${profile.user.id}`);
     }
 
     return (

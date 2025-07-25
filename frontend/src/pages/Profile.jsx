@@ -160,7 +160,7 @@ const Profile = () => {
 
                     <div className="flex flex-col justify-start mt-1">
                         <div className="text-2xl font-bold text-gray-900">{profile.username}</div>
-                        <div className="flex items-center mt-1">{profile.rating_count === 0 ? "No ratings yet" : renderStars(profile.rating)}</div>
+                        <div className="flex items-center mt-1">{profile.rating_count === 0 ? "No ratings yet" : renderStars(profile.user.rating)}</div>
                     </div>
                 </div>
 
