@@ -4,8 +4,9 @@ import { Button } from "@headlessui/react";
 import MakeOffer from "./MakeOffer";
 import ListingDetails from "./ListingDetails";
 import { useNavigate } from "react-router-dom";
+import api from "@/api";
 
-const Listing = ({fields, role}) => {
+const Listing = ({fields, role, onCloseListing}) => {
     const dates = [];
     const start = new Date(fields.start_date);
     const end = new Date(fields.end_date);
@@ -18,7 +19,33 @@ const Listing = ({fields, role}) => {
 
     const [hovered, setHovered] = useState(false);
     const [open, setOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [errors, setErrors] = useState({});
+    const username = localStorage.getItem("username");
     const navigate = useNavigate();
+
+    const handleClose = async () => {
+        setLoading(true);
+        console.log("Deleting offer")
+
+        try {
+            const route = `core/close-post/${fields.post_id}/`; 
+            const info = {
+                is_closed: true,
+            }
+            const res = await api.patch(route, info);
+            console.log("Closed listing: ", fields.post_id);
+            setHovered(false);
+            if (onCloseListing) {
+                await onCloseListing();
+            }
+        } catch (error) {
+            console.log(error)
+            setErrors(error.response.data)
+        } finally {
+            setLoading(false)
+        }
+    }
 
     return (
         <>
@@ -34,9 +61,15 @@ const Listing = ({fields, role}) => {
                     </Button>
                 )}
 
-                {(role === "organization" && hovered) && (
+                {(role === "organization" && hovered && username != fields.author.username) && (
                     <Button onClick={() => navigate("/chat", {state:{receiverId: fields.author.userid}})} style={{ marginTop: "10px" }} className="inline-flex items-center gap-2 rounded-md bg-gray-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-gray-600 data-open:bg-gray-700">
                         Contact Organization
+                    </Button>
+                )}
+
+                {(role === "organization" && hovered && username == fields.author.username) && (
+                    <Button onClick={handleClose} style={{ marginTop: "10px" }} className="inline-flex items-center gap-2 rounded-md bg-red-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-red-600 data-open:bg-red-700">
+                        Close Listing
                     </Button>
                 )}
             </div>
