@@ -67,7 +67,7 @@ class CreatePostView(generics.ListCreateAPIView): # create and view own posts
     def get_queryset(self):
         author = get_or_none(Organization, user=self.request.user)
         if author:
-            return JobPost.objects.filter(author=author)
+            return JobPost.objects.filter(author=author, is_closed=False)
         else: return JobPost.objects.none()
         # return JobPost.objects.none()
 
