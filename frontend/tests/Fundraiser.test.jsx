@@ -19,24 +19,27 @@ const mockFundraiser = {
 };
 
 it("shows modal when vendor clicks on 'Check it out!' and fundraiser is yet to start", () => {
-  render(
-    <MemoryRouter>
-      <Fundraiser fundraiser={mockFundraiser} role="vendor" />
-    </MemoryRouter>
-  );
+    render(
+      <MemoryRouter>
+        <Fundraiser fundraiser={mockFundraiser} role="vendor" />
+      </MemoryRouter>
+    );
 
-  // Hover to reveal the button
-  fireEvent.mouseEnter(screen.getByText(/Cool Fundraiser/i));
-  
-  // check modal is rendered
-  const button1 = screen.getByRole("button", { name: /Check it out!/i });
-  fireEvent.click(button1);
-  expect(screen.getAllByText(/Terms and Conditions/i).length).toBeGreaterThan(0);
+    // Hover to reveal the button
+    fireEvent.mouseEnter(screen.getByText(/Cool Fundraiser/i));
+    
+    // check modal is rendered
+    const button1 = screen.getByRole("button", { name: /Check it out!/i });
+    fireEvent.click(button1);
+    expect(screen.getAllByText(/Terms and Conditions/i).length).toBeGreaterThan(0);
 
-  // inventory opens
-  const button2 = screen.getByRole("button", { name: /View Inventory/i });
-  fireEvent.click(button2);
-  expect(screen.getByText(/Your Inventory/i));
-  expect(screen.getByText(/Item/i));
+    // inventory opens
+    const button2 = screen.getByRole("button", { name: /View Inventory/i });
+    fireEvent.click(button2);
+    expect(screen.getByText(/Your Inventory/i));
+    expect(screen.getByText(/Item/i));
+    expect(screen.getByText(/Price/i));
+    expect(screen.getByText(/Quantity/i));
+    expect(screen.getByText(/Remarks/i));
 });
 
