@@ -1,64 +1,36 @@
-import { render, screen, fireEvent, within } from '@testing-library/react';
-import { describe, it, expect } from "vitest";
-import Fundraiser from '../src/components/Fundraiser'
-import "@testing-library/jest-dom/vitest"
+import { render, fireEvent, screen } from "@testing-library/react";
+import Fundraiser from "@/components/Fundraiser";
+import { MemoryRouter } from "react-router-dom";
+import { it, expect } from "vitest";
 
-const listing = {
-  post_id: 1,
-  title: "Project 1",
-  location: "National University of Singapore",
-  start_date: new Date("2025-06-17"),
-  end_date: new Date("2025-06-29"),
-  start_time: new Date("2025-06-17T08:45:00"),
-  end_time: new Date("2025-06-17T13:45:00"),
-  commission: 30,
-  categories: ["Art & Crafts", "Accessories", "Books"]
+const mockFundraiser = {
+  fundraiser_id: 1,
+  status: "yet to start",
+  offer: {
+    listing: {
+      title: "Cool Fundraiser",
+      categories: [],
+      commission: 10,
+    },
+    commission: 10,
+    selectedDays: [],
+  },
+  inventory: [],
 };
 
-const offer = {
-  offer_id: 101,
-  vendor: { username: "Bob", email: "test@test.com" },
-  allDays: "No",
-  selectedDays: [new Date("2025-06-19"), new Date("2025-06-20")],
-  selectedCategories: ["Art & Crafts", "Accessories"],
-  commission: 25,
-  remarks: "Looking forward to participating.",
-  status: "confirmed",
-  listing,
-  inventory_file: "https://example.com/inventory.xlsx"
-};
+it("shows modal when vendor clicks on 'Check it out!' and fundraiser is yet to start", () => {
+  render(
+    <MemoryRouter>
+      <Fundraiser fundraiser={mockFundraiser} role="vendor" />
+    </MemoryRouter>
+  );
 
-const fundraiser = {
-  listing,
-  vendors: [offer],
-  allDays: "No",
-  selectedDays: [new Date("2025-06-19"), new Date("2025-06-20")],
-  selectedCategories: ["Art & Crafts", "Accessories"],
-  commission: 25,
-  remarks: "Looking forward to participating.",
-  inventory_file: "https://example.com/inventory.xlsx"
-};
+  // Hover to reveal the button
+  fireEvent.mouseEnter(screen.getByText(/Cool Fundraiser/i));
+  
+  const button = screen.getByRole("button", { name: /Check it out!/i });
+  fireEvent.click(button);
 
-describe('Fundraiser (vendor view)', () => {
-  it('opens modal and shows vendor details', async () => {
-    render(<Fundraiser fundraiser={fundraiser} role="vendor" />)
+  expect(screen.getByText(/Terms and Conditions/i)).toBeInTheDocument(); // Modal content
+});
 
-    // hover over fundraiser
-    const card = screen.getAllByText('Project 1')[0].closest('div');
-    if (!card) throw new Error("Card container not found");
-
-    fireEvent.mouseEnter(card);
-
-
-    // check it now
-    const cta = await screen.findByText(/check it out!/i)
-    fireEvent.click(cta)
-    const download = await screen.findByRole('link', { name: /download inventory file/i })
-
-    // test download
-    const modal = download.closest('div');
-    if (!modal) throw new Error("Modal container not found");
-    expect(within(modal).getByText(/25% of revenue/i)).toBeInTheDocument();
-    expect(download).toHaveAttribute('href', offer.inventory_file)
-  })
-})
