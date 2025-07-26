@@ -10,7 +10,6 @@ RUN npm run build
 
 FROM nginx:alpine
 COPY --from=build /app/frontend/dist /usr/share/nginx/html
-COPY ../backend/media /app/backend/media
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
