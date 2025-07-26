@@ -15,7 +15,7 @@ const mockFundraiser = {
     commission: 10,
     selectedDays: [],
   },
-  inventory: [],
+  inventory: [{ Item: "Necklace", Price: 15.0, Quantity: 40, Remarks: "Handmade" },],
 };
 
 it("shows modal when vendor clicks on 'Check it out!' and fundraiser is yet to start", () => {
@@ -28,9 +28,15 @@ it("shows modal when vendor clicks on 'Check it out!' and fundraiser is yet to s
   // Hover to reveal the button
   fireEvent.mouseEnter(screen.getByText(/Cool Fundraiser/i));
   
-  const button = screen.getByRole("button", { name: /Check it out!/i });
-  fireEvent.click(button);
+  // check modal is rendered
+  const button1 = screen.getByRole("button", { name: /Check it out!/i });
+  fireEvent.click(button1);
+  expect(screen.getAllByText(/Terms and Conditions/i).length).toBeGreaterThan(0);
 
-  expect(screen.getByText(/Terms and Conditions/i)).toBeInTheDocument(); // Modal content
+  // inventory opens
+  const button2 = screen.getByRole("button", { name: /View Inventory/i });
+  fireEvent.click(button2);
+  expect(screen.getByText(/Your Inventory/i));
+  expect(screen.getByText(/Item/i));
 });
 
