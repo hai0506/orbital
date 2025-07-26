@@ -64,12 +64,12 @@ class Fundraiser(models.Model):
     listing = models.ForeignKey(JobPost, on_delete=models.CASCADE, related_name='fundraisers')
     @property
     def status(self):
-        now = localtime(now())
+        current_time = localtime(now())
         start_dt = datetime.combine(self.listing.start_date, self.listing.start_time)
         end_dt = datetime.combine(self.listing.end_date, self.listing.end_time)
-        if now < start_dt:
+        if current_time < start_dt:
             return 'yet to start'
-        elif start_dt <= now and now <= end_dt:
+        elif start_dt <= current_time and current_time <= end_dt:
             return 'ongoing'
         else:
             return 'concluded'

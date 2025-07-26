@@ -115,7 +115,7 @@ class JobPostSerializer(serializers.ModelSerializer):
         
         start_dt = datetime.combine(start_date, start_time)
         end_dt = datetime.combine(end_date, end_time)
-        now=localtime(now())
+        current_time=localtime(now())
 
         if start_date > end_date:
             raise serializers.ValidationError({'end_date': 'End date cannot be before start date.'})
@@ -123,9 +123,9 @@ class JobPostSerializer(serializers.ModelSerializer):
             if start_dt >= end_dt:
                 raise serializers.ValidationError({'end_time': 'Start time cannot be after end time.'})
         
-        if start_date < now.date():
+        if start_date < current_time.date():
             raise serializers.ValidationError({'start_date': 'Start date cannot be in the past.'})
-        elif start_date == now.date() and start_dt < now:
+        elif start_date == current_time.date() and start_dt < current_time:
             raise serializers.ValidationError({'start_time': 'Start time cannot be in the past.'})
     
         return data 
