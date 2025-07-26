@@ -13,6 +13,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import F,Q
 from datetime import datetime
 from django.utils.timezone import now, localtime
+import pytz
 
 @api_view(['GET'])
 def get_user_profile(request):
@@ -63,8 +64,10 @@ class RetrieveProfileView(generics.RetrieveAPIView):
 
 def UpdatePostIsClosed():
     for post in JobPost.objects.filter(is_closed=False):
-        end_dt = datetime.combine(post.end_date, post.end_time)
-        if localtime(now()) > end_dt:
+        SINGAPORE_TZ = pytz.timezone("Asia/Singapore")
+        current_time = localtime(now(), timezone=SINGAPORE_TZ)
+        end_dt = SINGAPORE_TZ.localize(datetime.combine(post.end_date, post.end_time))
+        if current_time > end_dt:
             post.is_closed = True
             post.save(update_fields=['is_closed'])
 

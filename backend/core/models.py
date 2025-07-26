@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.postgres.fields import ArrayField
 from django.utils.timezone import now, localtime
 from datetime import datetime
+import pytz
 
 class Organization(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='organization_user')
@@ -58,15 +59,15 @@ class JobOffer(models.Model):
     status = models.CharField()
     time_created = models.DateTimeField(auto_now_add=True)
 
-
 class Fundraiser(models.Model):
     fundraiser_id = models.AutoField(primary_key=True)
     listing = models.ForeignKey(JobPost, on_delete=models.CASCADE, related_name='fundraisers')
     @property
     def status(self):
-        current_time = localtime(now())
-        start_dt = datetime.combine(self.listing.start_date, self.listing.start_time)
-        end_dt = datetime.combine(self.listing.end_date, self.listing.end_time)
+        SINGAPORE_TZ = pytz.timezone("Asia/Singapore")
+        current_time = localtime(now(), timezone=SINGAPORE_TZ)
+        start_dt = SINGAPORE_TZ.localize(datetime.combine(self.listing.start_date, self.listing.start_time))
+        end_dt = SINGAPORE_TZ.localize(datetime.combine(self.listing.end_date, self.listing.end_time))
         if current_time < start_dt:
             return 'yet to start'
         elif start_dt <= current_time and current_time <= end_dt:
