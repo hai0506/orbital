@@ -83,11 +83,11 @@ const Listing = ({fields, role, onCloseListing}) => {
                         onClick={e => e.stopPropagation()}
                     >
                         <div className="flex flex-col md:flex-row h-full w-full">
-                            <div className="w-full md:w-1/2 p-4">
+                            <div className="w-full md:w-2/5 p-4">
                                 <ListingDetails fields={fields} />
                             </div>
 
-                            <div className="w-full md:w-1/2 border-t md:border-t-0 md:border-l border-gray-300 p-4">
+                            <div className="w-full md:w-3/5 border-t md:border-t-0 md:border-l border-gray-300 p-4">
                                 <MakeOffer dates={dates} listing={fields} />
                             </div>
                         </div>
