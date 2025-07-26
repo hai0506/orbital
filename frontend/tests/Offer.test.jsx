@@ -4,11 +4,11 @@ import Offer from "../src/components/Offer"
 import "@testing-library/jest-dom/vitest"
 import { MemoryRouter } from "react-router-dom"
 
-vi.mock("../src/components/ListingDetails", () => ({
-  default: () => <div>ListingDetailsMock</div>,
-}))
-
 describe("Offer", () => {
+    vi.mock("../src/components/ListingDetails", () => ({
+      default: () => <div>ListingDetailsMock</div>,
+    }))
+    
     const listing = {
       title: "Project 1",
       location: "NUS",
