@@ -3,6 +3,7 @@ from .models import *
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError as DjangoValidationError
 from datetime import datetime
+from django.utils.timezone import now, localtime
 
 class UserSerializer(serializers.ModelSerializer):
     user_type = serializers.ChoiceField(choices=['Organization','Vendor'], write_only=True)
@@ -114,7 +115,7 @@ class JobPostSerializer(serializers.ModelSerializer):
         
         start_dt = datetime.combine(start_date, start_time)
         end_dt = datetime.combine(end_date, end_time)
-        now=datetime.now()
+        now=localtime(now())
 
         if start_date > end_date:
             raise serializers.ValidationError({'end_date': 'End date cannot be before start date.'})

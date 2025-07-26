@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError
 from django.contrib.postgres.fields import ArrayField
+from django.utils.timezone import now, localtime
 from datetime import datetime
 
 class Organization(models.Model):
@@ -63,7 +64,7 @@ class Fundraiser(models.Model):
     listing = models.ForeignKey(JobPost, on_delete=models.CASCADE, related_name='fundraisers')
     @property
     def status(self):
-        now = datetime.now()
+        now = localtime(now())
         start_dt = datetime.combine(self.listing.start_date, self.listing.start_time)
         end_dt = datetime.combine(self.listing.end_date, self.listing.end_time)
         if now < start_dt:

@@ -12,7 +12,7 @@ import json
 from django.shortcuts import get_object_or_404
 from django.db.models import F,Q
 from datetime import datetime
-
+from django.utils.timezone import now, localtime
 
 @api_view(['GET'])
 def get_user_profile(request):
@@ -64,7 +64,7 @@ class RetrieveProfileView(generics.RetrieveAPIView):
 def UpdatePostIsClosed():
     for post in JobPost.objects.filter(is_closed=False):
         end_dt = datetime.combine(post.end_date, post.end_time)
-        if datetime.now() > end_dt:
+        if localtime(now()) > end_dt:
             post.is_closed = True
             post.save(update_fields=['is_closed'])
 
