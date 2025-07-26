@@ -1,5 +1,6 @@
 import { Building2, MapPinned, Calendar1, Clock, HandCoins, Activity } from "lucide-react";
 import CategoryTags from "./CategoryTags";
+import { Link } from "react-router-dom";
 
 const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString("en-GB");
 
@@ -16,10 +17,13 @@ const ListingDetails = ({ fields, status, days }) => {
             <h3 className="text-lg font-semibold text-gray-900 mb-3">{fields["title"]}</h3>
             <CategoryTags categories={fields.categories}/>
             <dl style={{ marginTop: "10px" }} className="space-y-2">
-                <div className="flex text-sm text-gray-700">
+                <Link
+                    to={`/profiles/${fields.author?.id}`}
+                    className="flex text-sm text-gray-700 hover:underline"
+                >
                     <Building2 className="mr-2" />
                     <dt className="font-medium">{fields.author?.username}</dt>
-                </div>
+                </Link>
                 <div className="flex text-sm text-gray-700">
                     <MapPinned className="mr-2" />
                     <dt className="font-medium">{fields["location"]}</dt>
@@ -28,7 +32,7 @@ const ListingDetails = ({ fields, status, days }) => {
                     <div className="flex items-center">
                         <Calendar1 className="mr-2" />
                         <dt className="font-medium">
-                        {formatDate(fields.start_date)} - {formatDate(fields.end_date)}
+                            {formatDate(fields.start_date)} - {formatDate(fields.end_date)}
                         </dt>
                     </div>
 
@@ -40,8 +44,8 @@ const ListingDetails = ({ fields, status, days }) => {
                         </div>
                         {days.map((day, index) => (
                             <div key={index} className="flex items-center">
-                            <Calendar1 className="mr-2 invisible" />
-                            <dt className="font-medium">{formatDate(day)}</dt>
+                                <Calendar1 className="mr-2 invisible" />
+                                <dt className="font-medium">{formatDate(day)}</dt>
                             </div>
                         ))}
                         </>
