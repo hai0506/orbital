@@ -16,3 +16,4 @@ channels==4.2.2
 uvicorn[standard]
 gunicorn
 dj_database_url
+whitenoise
