@@ -171,6 +171,7 @@ const Profile = () => {
                             {(!editMode.bio && !id) && (
                                 <button
                                     type="button"
+                                    aria-label="pencil"
                                     onClick={() => setEditMode((prev) => ({ ...prev, bio: true }))}
                                 >
                                     <Pencil className="h-4 w-4 text-gray-500" />
