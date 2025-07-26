@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
 import { useLocation } from 'react-router-dom';
 import Layout from '@/components/Layout';
-import { Button } from '@headlessui/react';
+import { Button as ShadcnButton } from "@/components/ui/button"
+import { Send } from "lucide-react";
 import api from '../api';
 
 const Chat = () => {
@@ -92,12 +93,15 @@ const Chat = () => {
             className="w-full border px-4 py-2 rounded resize-y overflow-hidden"
             style={{ maxHeight: '300px', minHeight: '50px' }}
           />
-          <Button
+          <ShadcnButton 
+            variant="outline" 
+            size="sm" 
             onClick={sendMessage}
-            className="bg-gray-700 text-white px-4 py-2 rounded self-start"
+            className=" text-black px-4 py-2 rounded self-start"
           >
-            Send
-          </Button>
+                <Send /> 
+                Send Message
+          </ShadcnButton>
         </div>
       </div>
     </Layout>
