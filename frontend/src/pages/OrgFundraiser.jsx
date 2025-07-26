@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import Layout from "@/components/Layout";
 import ListingDetails from "@/components/ListingDetails";
 // import Fundraisers from "@/data/Fundraisers";
-import { MoveLeft, MoveRight, X } from "lucide-react";
+import { MoveLeft, MoveRight, MoveDown, MoveUp, X } from "lucide-react";
 import {
   Tabs,
   TabsList,
@@ -85,19 +85,29 @@ const OrgFundraiser = () => {
     // if (loading || !fundraiser.listing || !fundraiser.vendors) return <p>Loading...</p>;
     return (
         <Layout heading="View Fundraiser">
-            <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 flex gap-4">
+            <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 flex flex-col md:flex-row gap-4">
                 {!hidden && (
-                    <div className="relative w-[25%] p-4 border-r border-gray-300">
-                        <ListingDetails fields={{...fundraiser?.listing, commission: fundraiser?.listing?.commission}} days={fundraiser?.selectedDays} />
+                    <div className="relative w-full md:w-[20%] p-4 pt-8 border-b md:border-b-0 md:border-r border-gray-300">
                         <button
                             onClick={() => setHidden(true)}
-                            className="absolute top-2 right-2 text-gray-500 hover:text-black"
+                            className="absolute top-2 right-2 text-gray-500 hover:text-black flex items-center"
                         >
-                            <MoveLeft/>
+                            <MoveUp className="md:hidden" />
+                            <MoveLeft className="hidden md:inline" />
+                            <span className="text-sm ml-1">Hide Info</span>
                         </button>
-                        <CountdownClock 
+
+                        <ListingDetails
+                            fields={{
+                                ...fundraiser?.listing,
+                                commission: fundraiser?.listing?.commission
+                            }}
+                            days={fundraiser?.selectedDays}
+                        />
+
+                        <CountdownClock
                             startTime={`${fundraiser?.listing?.start_date}T${fundraiser?.listing?.start_time}`}
-                            endTime={`${fundraiser?.listing?.end_date}T${fundraiser?.listing?.end_time}`} 
+                            endTime={`${fundraiser?.listing?.end_date}T${fundraiser?.listing?.end_time}`}
                         />
                     </div>
                 )}
@@ -108,7 +118,9 @@ const OrgFundraiser = () => {
                                 onClick={() => setHidden(false)}
                                 className="mb-2 self-start text-gray-500 hover:text-black"
                             >
-                                <MoveRight/>
+                                <MoveDown className="md:hidden" />
+                                <MoveRight className="hidden md:inline" />
+                                <span className="text-sm">Show Info</span>
                             </button>
                         )}
                         <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
@@ -140,7 +152,7 @@ const OrgFundraiser = () => {
                                             </TabsList>
                                             <TabsContent value="inventory">
                                                 <>
-                                                    <h5 className="text-2xl font-semibold mb-2">Transactions</h5>
+                                                    <h5 className="text-2xl font-semibold mb-2">Inventory</h5>
                                                     <Input
                                                         type="search"
                                                         placeholder="Search by Item Name"
