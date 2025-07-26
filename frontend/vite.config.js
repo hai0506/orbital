@@ -16,6 +16,9 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
   },
+  build: {
+    outDir: 'dist',
+  },
   optimizeDeps: {
     include: ['react-split'],
   },
