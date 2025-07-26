@@ -21,7 +21,7 @@ export default function Layout({ heading, children }) {
   const role = localStorage.getItem("ROLE");
   const username = localStorage.getItem("username");
 
-  const logo = username.charAt(0).toUpperCase();
+  const logo = username?.charAt(0)?.toUpperCase() || "?";
   const [profile, setProfile] = useState();
   useEffect(() => {
     async function fetchProfile() {
