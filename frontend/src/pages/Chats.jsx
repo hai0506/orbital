@@ -40,15 +40,14 @@ const Chats = () => {
 
   return (
     <Layout heading="Chats">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-3">
         <Input
           type="search"
           placeholder="Search by Username"
           onChange={e => setSearchUsername(e.target.value)}
-          className="w-full md:w-1/3 mt-5"
+          className="w-full md:w-1/3 mb-4"
         />
-      </div>
-          <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {chats?.map(chat => (
               <Chat chat={chat} />
             ))}
@@ -56,8 +55,9 @@ const Chats = () => {
               <p>No chats found.</p>
             )}
         </div>
+      </div>
     </Layout>
-  )
+  );
 }
 
 export default Chats

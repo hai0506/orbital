@@ -101,7 +101,7 @@ const Profile = () => {
 
 
     return (
-        <Layout heading="Your Profile">
+        <Layout heading={id? "User Profile":"Your Profile"}>
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-3">
                 <div className="flex items-start space-x-6 mb-4 max-w-4xl">
                     <div className="relative">
@@ -160,7 +160,7 @@ const Profile = () => {
 
                     <div className="flex flex-col justify-start mt-1">
                         <div className="text-2xl font-bold text-gray-900">{profile.username}</div>
-                        <div className="flex items-center mt-1">{profile.rating_count === 0 ? "No ratings yet" : renderStars(profile.rating)}</div>
+                        <div className="flex items-center mt-1">{profile.rating_count === 0 ? "No ratings yet" : renderStars(profile.user.rating)}</div>
                     </div>
                 </div>
 

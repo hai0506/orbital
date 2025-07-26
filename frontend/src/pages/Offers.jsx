@@ -60,19 +60,21 @@ const Offers = () => {
                 )}
             </div>
 
-            <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 grid grid-cols-3 gap-4">
-                {offers.map((offer, index) => {
-                    if (role === "organization") {
-                        return <Offer key={offer.offer_id ?? `fallback-${index}`} offer={offer} onChangeStatus={removeOffer} />;
-                    }
-                    if (role === "vendor") {
-                        return <VendorOffer key={offer.offer_id ?? `fallback-${index}`} offer={offer} deleteOffer={removeOffer} />;
-                    }
-                    return null;
-                })}
-                {offers.length === 0 && (
-                    <div>You have no job offers at this time.</div>
-                )}
+            <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {offers.map((offer, index) => {
+                        if (role === "organization") {
+                            return <Offer key={offer.offer_id ?? `fallback-${index}`} offer={offer} onChangeStatus={removeOffer} />;
+                        }
+                        if (role === "vendor") {
+                            return <VendorOffer key={offer.offer_id ?? `fallback-${index}`} offer={offer} deleteOffer={removeOffer} />;
+                        }
+                        return null;
+                    })}
+                    {offers.length === 0 && (
+                        <div>You have no job offers at this time.</div>
+                    )}
+                </div>
             </div>
         </Layout>
     )

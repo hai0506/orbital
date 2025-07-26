@@ -56,113 +56,110 @@ const VendorOffer = ({ offer, deleteOffer }) => {
 
             {open && (
                 <div 
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm"
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm overflow-y-auto"
                     onClick={() => setOpen(false)}
                 >
                     <div 
-                        className="max-w-2xl w-full rounded-lg bg-white p-6 shadow-lg relative"
+                        className="max-w-2xl w-full rounded-lg bg-white p-6 shadow-lg relative max-h-[90vh] overflow-y-auto"
                         onClick={e => e.stopPropagation()}
                     >
-                        <div className="flex h-full w-full">
-                            {status !== "approved" && (
-                                <div className="w-[50%] p-4">
-                                    <ListingDetails fields={offer.listing} />
-                                </div>
-                            )}
-
-                            {status === "approved" && (
-                                <div className="w-[50%] p-4">
-                                    <ListingDetails fields={{...offer.listing, commission: offer.commission, categories: offer.selectedCategories}} days={offer.selectedDays} />
-                                </div>
-                            )}
-
-                            
-                                <div className="w-[70%] border-l border-gray-300 p-4">
-                                    <Fieldset className="w-full max-w-lg px-4">
-                                        {status === "approved" && (
-                                            <h3 className="text-lg font-semibold text-green-700 mb-3">Congratulations on the offer!</h3>
-                                        )}
-                                        {status === "rejected" && (
-                                            <h3 className="text-lg font-semibold text-red-700 mb-3">Better luck next time!</h3>
-                                        )}
-                                        {status !== "approved" && (
-                                            <>
-                                                <Field>
-                                                    <Label className="text-base/7 font-medium text-black">Dates</Label>
-                                                    {offer.allDays === "Yes" ? (
-                                                        <div className="flex items-center gap-2 text-sm text-green-600">
-                                                            <CircleCheckBig className="size-4" />
-                                                            <span>Able to make it on all days</span>
-                                                        </div>
-                                                        ) : (
-                                                        <div className="text-sm text-red-600">
-                                                            <div className="flex items-center gap-2 mb-1">
-                                                                <CircleX className="size-4" />
-                                                                <span>Unable to make it on these days:</span>
-                                                            </div>
-                                                                <ul className="pl-6 list-none space-y-1">
-                                                                    {offer.selectedDays.map((day, index) => (
-                                                                        <li key={index} className="flex items-center gap-2">
-                                                                        <span>{new Intl.DateTimeFormat('en-GB').format(new Date(day))}</span>
-                                                                        </li>
-                                                                    ))}
-                                                                </ul>
-                                                        </div>
-                                                    )}
-                                                </Field>
-                                                <Field>
-                                                    <Label className="text-base/7 font-medium text-black">Products</Label>
-                                                    <div className="flex flex-wrap gap-3">
-                                                        {(offer.selectedCategories ?? []).map((category) => (
-                                                            <span
-                                                                className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${offer.listing.categories.includes(category) ? "bg-green-100 text-green-800" : "bg-orange-100 text-orange-800"}`}
-                                                            >
-                                                                {category}
-                                                            </span>
-                                                        ))}
+                        <div className="flex flex-col md:flex-row h-full w-full">
+                            <div className="w-full md:w-2/5 p-4">
+                                {status === "approved" 
+                                    ? (
+                                        <ListingDetails fields={{...offer.listing, commission: offer.commission, categories: offer.selectedCategories}} days={offer.selectedDays} />
+                                    )
+                                    : (
+                                        <ListingDetails fields={offer.listing} />
+                                    )
+                                }
+                            </div>
+                            <div className="w-full md:w-3/5 border-t md:border-t-0 md:border-l border-gray-300 p-4">
+                                <Fieldset className="w-full max-w-lg px-4">
+                                    {status === "approved" && (
+                                        <h3 className="text-lg font-semibold text-green-700 mb-3">Congratulations on the offer!</h3>
+                                    )}
+                                    {status === "rejected" && (
+                                        <h3 className="text-lg font-semibold text-red-700 mb-3">Better luck next time!</h3>
+                                    )}
+                                    {status !== "approved" && (
+                                        <>
+                                            <Field>
+                                                <Label className="text-base/7 font-medium text-black">Dates</Label>
+                                                {offer.allDays === "Yes" ? (
+                                                    <div className="flex items-center gap-2 text-sm text-green-600">
+                                                        <CircleCheckBig className="size-4" />
+                                                        <span>Able to make it on all days</span>
                                                     </div>
-                                                </Field>
-                                                <Field>
-                                                    <Label className="text-base/7 font-medium text-black">Commission</Label>
-                                                    {offer.commission >= offer.listing.commission 
-                                                        ?   ( 
-                                                                <div className="flex items-center gap-2 text-sm text-green-600">
-                                                                    <CircleCheckBig className="size-4" />
-                                                                    <span>{offer.commission}% of revenue</span>
-                                                                </div>
-                                                            )
-                                                        :   ( 
-                                                                <div className="flex items-center gap-2 text-sm text-red-600">
-                                                                    <CircleX className="size-4" />
-                                                                    <span>{offer.commission}% of revenue ({offer.listing.commission - offer.commission}% less)</span>
-                                                                </div>
-                                                            )
-                                                    }
-                                                </Field>
-                                                <Field>
-                                                    {offer.remarks && (
-                                                        <>
-                                                            <Label className="text-base/7 font-medium text-black">Remarks</Label>
-                                                            <div className="flex items-center gap-2 text-sm">
-                                                                {offer.remarks}
+                                                    ) : (
+                                                    <div className="text-sm text-red-600">
+                                                        <div className="flex items-center gap-2 mb-1">
+                                                            <CircleX className="size-4" />
+                                                            <span>Unable to make it on these days:</span>
+                                                        </div>
+                                                            <ul className="pl-6 list-none space-y-1">
+                                                                {offer.selectedDays.map((day, index) => (
+                                                                    <li key={index} className="flex items-center gap-2">
+                                                                    <span>{new Intl.DateTimeFormat('en-GB').format(new Date(day))}</span>
+                                                                    </li>
+                                                                ))}
+                                                            </ul>
+                                                    </div>
+                                                )}
+                                            </Field>
+                                            <Field>
+                                                <Label className="text-base/7 font-medium text-black">Products</Label>
+                                                <div className="flex flex-wrap gap-3">
+                                                    {(offer.selectedCategories ?? []).map((category) => (
+                                                        <span
+                                                            className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${offer.listing.categories.includes(category) ? "bg-green-100 text-green-800" : "bg-orange-100 text-orange-800"}`}
+                                                        >
+                                                            {category}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            </Field>
+                                            <Field>
+                                                <Label className="text-base/7 font-medium text-black">Commission</Label>
+                                                {offer.commission >= offer.listing.commission 
+                                                    ?   ( 
+                                                            <div className="flex items-center gap-2 text-sm text-green-600">
+                                                                <CircleCheckBig className="size-4" />
+                                                                <span>{offer.commission}% of revenue</span>
                                                             </div>
-                                                        </>
-                                                    )}
-                                                </Field>
-                                            </>
-                                        )}
+                                                        )
+                                                    :   ( 
+                                                            <div className="flex items-center gap-2 text-sm text-red-600">
+                                                                <CircleX className="size-4" />
+                                                                <span>{offer.commission}% of revenue ({offer.listing.commission - offer.commission}% less)</span>
+                                                            </div>
+                                                        )
+                                                }
+                                            </Field>
+                                            <Field>
+                                                {offer.remarks && (
+                                                    <>
+                                                        <Label className="text-base/7 font-medium text-black">Remarks</Label>
+                                                        <div className="flex items-center gap-2 text-sm">
+                                                            {offer.remarks}
+                                                        </div>
+                                                    </>
+                                                )}
+                                            </Field>
+                                        </>
+                                    )}
 
-                                        {status === "approved" && (
-                                            <ConfirmOffer id={offer.offer_id} deleteOffer={deleteOffer} setOpen={setOpen} />
-                                        )}
-                                            
-                                        {(status === "rejected" || status === "cancelled") && (
-                                            <Button onClick={() => handleSubmit()} style={{ marginTop: "10px" }} className="inline-flex items-center gap-2 rounded-md bg-red-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-red-600 data-open:bg-red-700">
-                                                Remove Offer
-                                            </Button>
-                                        )}
-                                    </Fieldset>
-                                </div>
+                                    {status === "approved" && (
+                                        <ConfirmOffer id={offer.offer_id} deleteOffer={deleteOffer} setOpen={setOpen} />
+                                    )}
+                                        
+                                    {(status === "rejected" || status === "cancelled") && (
+                                        <Button onClick={() => handleSubmit()} style={{ marginTop: "10px" }} className="inline-flex items-center gap-2 rounded-md bg-red-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-red-600 data-open:bg-red-700">
+                                            Remove Offer
+                                        </Button>
+                                    )}
+                                </Fieldset>
+                            </div>
                         </div>
 
                         <button

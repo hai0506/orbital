@@ -46,7 +46,9 @@ export default function Layout({ heading, children }) {
   ]
 
   const orgNavigation = [
-    { name: 'Offers', href: '/', current: true },
+    { name: 'Listings', href: '/', current: true },
+    { name: 'Offers', href: '/offers', current: false },
+    { name: 'My Listings', href: '/listings', current: false },
     { name: 'Create Listing', href: '/create', current: false },
     { name: 'Fundraisers', href: '/fundraisers', current: false },
     { name: 'Chats', href: '/chats' },
@@ -207,16 +209,27 @@ export default function Layout({ heading, children }) {
                 </button>
               </div>
               <div className="mt-3 space-y-1 px-2">
-                {userNavigation.map((item) => (
-                  <DisclosureButton
-                    key={item.name}
-                    as="a"
-                    href={item.href}
-                    className="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
-                  >
-                    {item.name}
-                  </DisclosureButton>
-                ))}
+                {userNavigation.map((item) =>
+                  item.onClick ? (
+                    <DisclosureButton
+                      key={item.name}
+                      as="button"
+                      onClick={item.onClick}
+                      className="w-full text-left block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
+                    >
+                      {item.name}
+                    </DisclosureButton>
+                  ) : (
+                    <DisclosureButton
+                      key={item.name}
+                      as="a"
+                      href={item.href}
+                      className="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
+                    >
+                      {item.name}
+                    </DisclosureButton>
+                  )
+                )}
               </div>
             </div>
           </DisclosurePanel>

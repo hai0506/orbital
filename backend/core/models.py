@@ -43,7 +43,7 @@ class JobPost(models.Model):
     attachment = models.FileField(upload_to='post_attachments/', blank=True, null=True, validators=[filesize_valid])
     categories = models.ManyToManyField(Category, blank=True)
     author = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name='job_posts')
-
+    is_closed = models.BooleanField(default=False)
 
 class JobOffer(models.Model):
     offer_id = models.AutoField(primary_key=True)

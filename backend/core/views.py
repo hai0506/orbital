@@ -11,6 +11,7 @@ from rest_framework.views import APIView
 import json
 from django.shortcuts import get_object_or_404
 from django.db.models import F,Q
+from datetime import datetime
 
 
 @api_view(['GET'])
@@ -60,6 +61,13 @@ class RetrieveProfileView(generics.RetrieveAPIView):
     permission_classes = [IsAuthenticated]
     lookup_field='user_id'
 
+def UpdatePostIsClosed():
+    for post in JobPost.objects.filter(is_closed=False):
+        end_dt = datetime.combine(post.end_date, post.end_time)
+        if datetime.now() > end_dt:
+            post.is_closed = True
+            post.save(update_fields=['is_closed'])
+
 class CreatePostView(generics.ListCreateAPIView): # create and view own posts
     serializer_class = JobPostSerializer
     permission_classes = [IsAuthenticated]
@@ -67,7 +75,8 @@ class CreatePostView(generics.ListCreateAPIView): # create and view own posts
     def get_queryset(self):
         author = get_or_none(Organization, user=self.request.user)
         if author:
-            return JobPost.filter(author=author)
+            UpdatePostIsClosed()
+            return JobPost.objects.filter(author=author, is_closed=False)
         else: return JobPost.objects.none()
         # return JobPost.objects.none()
 
@@ -90,7 +99,8 @@ class PostListView(generics.ListAPIView): # view others posts and filters.
         category_values = self.request.query_params.getlist('categories')
 
         # filter categories
-        qs = JobPost.objects.all()
+        UpdatePostIsClosed()
+        qs = JobPost.objects.filter(is_closed=False)
         if len(category_values) > 0:
             filters = Q()
             valid = False
@@ -103,6 +113,12 @@ class PostListView(generics.ListAPIView): # view others posts and filters.
             if valid: qs = qs.filter(filters).distinct()
             else: qs = qs.none()
 
+        # sort posts
+        if sort_field == 'start_date':
+            qs = qs.order_by(sort_field, 'start_time')
+        else:
+            qs = qs.order_by('-time_created')
+
         # hide posts that the vendor has already made offers for
         vendor = get_or_none(Vendor, user=self.request.user)
         # vendor = Vendor.objects.get(user_id=2)
@@ -111,11 +127,6 @@ class PostListView(generics.ListAPIView): # view others posts and filters.
         offered_posts = JobPost.objects.filter(post_offers__vendor=vendor)
         final_qs = qs.exclude(post_id__in=offered_posts.values_list('post_id', flat=True))
 
-        # sort posts
-        if sort_field == 'start_date':
-            final_qs = final_qs.order_by(sort_field, 'start_time')
-        else:
-            final_qs = final_qs.order_by('-time_created')
         return final_qs
     
 class DeletePostView(generics.RetrieveDestroyAPIView):
@@ -129,6 +140,17 @@ class DeletePostView(generics.RetrieveDestroyAPIView):
             raise PermissionError('User cannot delete offers.')
 
     lookup_field = 'post_id' # http://127.0.0.1:8000/core/delete-post/<post id>/
+
+class ClosePostView(generics.UpdateAPIView):
+    serializer_class = ClosePostSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        org = get_or_none(Organization, user=self.request.user)
+        if not org:
+            raise PermissionError('User cannot close posts.')
+        return JobPost.objects.filter(author=org)
+    lookup_field = 'post_id'
 
 class CreateOfferView(generics.CreateAPIView): # create offers
     serializer_class = JobOfferSerializer

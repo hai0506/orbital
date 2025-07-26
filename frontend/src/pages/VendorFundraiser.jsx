@@ -20,7 +20,7 @@ import {
   TabsTrigger,
   TabsContent
 } from "@/components/ui/tabs"
-import { MoveLeft, MoveRight, X } from "lucide-react";
+import { MoveLeft, MoveRight, MoveDown, MoveUp, X } from "lucide-react";
 import CountdownClock from '@/components/CountdownClock';
 import Dashboard from '@/components/Dashboard';
 import Review from '@/components/Review';
@@ -167,9 +167,17 @@ const VendorFundraiser = () => {
     // if (loading || !fundraiser || !fundraiser.inventory) return <p>Loading...</p>;
     return (
         <Layout heading="View Fundraiser">
-            <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 flex gap-4">
+            <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 flex flex-col md:flex-row gap-4">
                 {!hidden && (
-                    <div className="relative w-[25%] p-4 border-r border-gray-300">
+                    <div className="relative w-full md:w-[20%] p-4 pt-8 border-b md:border-b-0 md:border-r border-gray-300">
+                        <button
+                            onClick={() => setHidden(true)}
+                            className="absolute top-2 right-2 text-gray-500 hover:text-black flex items-center"
+                        >
+                            <MoveUp className="md:hidden" />
+                            <MoveLeft className="hidden md:inline" />
+                            <span className="text-sm ml-1">Hide Info</span>
+                        </button>
                         <ListingDetails 
                             fields={{...fundraiser?.offer.listing, 
                                         commission: fundraiser?.offer.listing.commission, 
@@ -177,23 +185,19 @@ const VendorFundraiser = () => {
                                     }} 
                             days={fundraiser?.offer.selectedDays} 
                         />
-                        <button
-                            onClick={() => setHidden(true)}
-                            className="absolute top-2 right-2 text-gray-500 hover:text-black"
-                        >
-                            <MoveLeft/>
-                        </button>
                         <CountdownClock endTime={`${fundraiser?.offer.listing.end_date}T${fundraiser?.offer.listing.end_time}`} />
                     </div>
                 )}
-                <div className={`relative ${hidden ? 'w-full' : 'w-[75%]'} flex flex-col`}>
+                <div className={`transition-all duration-300 w-full md:w-[80%]`}>
                     <div className="flex flex-col">
                         {hidden && (
                             <button
                                 onClick={() => setHidden(false)}
-                                className="mb-2 self-start text-gray-500 hover:text-black"
+                                className="mb-2 self-start md:self-end text-gray-500 hover:text-black flex items-center gap-1"
                             >
-                                <MoveRight/>
+                                <MoveDown className="md:hidden" />
+                                <MoveRight className="hidden md:inline" />
+                                <span className="text-sm">Show Info</span>
                             </button>
                         )}
                         <Tabs defaultValue="inventory" className="w-full">

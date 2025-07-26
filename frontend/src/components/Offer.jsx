@@ -85,19 +85,19 @@ const Offer = ({ offer, onChangeStatus }) => {
 
             {open && (
                 <div 
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm"
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm overflow-y-auto"
                     onClick={() => setOpen(false)}
                 >
                     <div 
-                        className="max-w-2xl w-full rounded-lg bg-white p-6 shadow-lg relative"
+                        className="max-w-2xl w-full rounded-lg bg-white p-6 shadow-lg relative max-h-[90vh] overflow-y-auto"
                         onClick={e => e.stopPropagation()}
                     >
-                        <div className="flex h-full w-full">
-                            <div className="w-[50%] p-4">
+                        <div className="flex flex-col md:flex-row h-full w-full">
+                            <div className="w-full md:w-2/5 p-4">
                                 <ListingDetails fields={offer.listing} />
                             </div>
 
-                            <div className="w-[70%] border-l border-gray-300 p-4">
+                            <div className="w-full md:w-3/5 border-t md:border-t-0 md:border-l border-gray-300 p-4">
                                 <Fieldset className="w-full max-w-lg px-4">
                                     <Field>
                                         <Label className="text-base/7 font-medium text-black">Dates</Label>
@@ -168,7 +168,7 @@ const Offer = ({ offer, onChangeStatus }) => {
                                                 Approve Offer
                                             </Button>
 
-                                            <Button onClick={() => handleSubmit("rejected")} style={{ marginTop: "10px" }} className="inline-flex items-center gap-2 rounded-md bg-red-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-red-600 data-open:bg-red-700">
+                                            <Button onClick={() => handleSubmit("rejected")} style={{ marginTop: "10px", marginRight: "10px" }} className="inline-flex items-center gap-2 rounded-md bg-red-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-red-600 data-open:bg-red-700">
                                                 Reject Offer
                                             </Button>
                                         </>
@@ -180,8 +180,8 @@ const Offer = ({ offer, onChangeStatus }) => {
                                         </Button>
                                     )}
 
-                                    <Button type="button" style={{ marginTop: "10px" }} className="ml-8 inline-flex items-center gap-2 rounded-md bg-gray-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-gray-600 data-open:bg-gray-700"
-                                        onClick={() => navigate("/chat", {state:{receiverId: offer.vendor.userid}})} >
+                                    <Button type="button" style={{ marginTop: "10px" }} className="inline-flex items-center gap-2 rounded-md bg-gray-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-gray-600 data-open:bg-gray-700"
+                                        onClick={() => navigate("/chat", {state:{receiverId: offer.vendor.id}})} >
                                         Contact Vendor
                                     </Button>
                                 </Fieldset>

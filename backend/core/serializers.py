@@ -36,7 +36,7 @@ class UserSerializer(serializers.ModelSerializer):
         return user
     
 class ProfileSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(read_only=True)
+    user = UserSerializer(read_only=True)
     username = serializers.CharField(source='user.username', read_only=True)
     email = serializers.EmailField(source='user.email', read_only=True)
     user_type = serializers.CharField(read_only=True)
@@ -90,13 +90,12 @@ class JobPostSerializer(serializers.ModelSerializer):
             'required': 'End time is required.'
         }
     )
-
     class Meta:
         model = JobPost
         fields = [
             'post_id', 'title', 'location', 'start_date', 'end_date',
             'start_time', 'end_time', 'remarks', 'commission',
-            'attachment', 'author', 'categories', 'category_list'
+            'attachment', 'author', 'categories', 'category_list','is_closed'
         ]
 
     def validate(self, data):
@@ -146,10 +145,17 @@ class JobPostSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         rep = super().to_representation(instance)
         rep['author'] = {
-            'id': instance.author.id,
-            'userid': instance.author.user.id
+            'id': instance.author.user.id,
+            'username': instance.author.user.username,
+            'email': instance.author.user.email
         }
         return rep
+    
+class ClosePostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = JobPost
+        fields = ['is_closed']
+        read_only_fields = []
     
 class CharBooleanSerializer(serializers.BooleanField):
     def to_internal_value(self, data):
@@ -217,10 +223,9 @@ class JobOfferSerializer(serializers.ModelSerializer):
         vendor = instance.vendor
         if vendor:
             rep['vendor'] = {
-                'id': vendor.id,
                 'username': vendor.user.username,
                 'email': vendor.user.email,
-                'userid': vendor.user.id
+                'id': vendor.user.id
             }
         return rep
 
