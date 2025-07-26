@@ -5,7 +5,6 @@ from django.urls import reverse
 from rest_framework import status
 from django.utils import timezone
 from datetime import timedelta, time
-from django.core.files.uploadedfile import SimpleUploadedFile
 
 # Create your tests here.
 class AuthTest(APITestCase):
@@ -230,8 +229,9 @@ class JobOfferTest(APITestCase):
         Category.objects.create(value='Food & Beverages')
         Category.objects.create(value='Art & Crafts')
         self.job_post.categories.set(['Food & Beverages', 'Art & Crafts'])
+        self.url = reverse('create-offer')
 
-    def test_valid_offer(self):
+    def test_create_offer(self):
         data = {
             'listing': self.job_post.post_id,
             'allDays': 'Yes',
@@ -240,7 +240,7 @@ class JobOfferTest(APITestCase):
             'remarks': 'hi',
             'commission': 10,
         }
-        response = self.client.post('/core/create-offer/', data, format='json')
+        response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(JobOffer.objects.count(), 1)
         self.assertEqual(JobOffer.objects.first().status, 'pending')
@@ -254,7 +254,7 @@ class JobOfferTest(APITestCase):
             'remarks': '',
             'commission': 10,
         }
-        response = self.client.post('/core/create-offer/', data, format='json')
+        response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn('selectedDays', response.data)
 
@@ -267,7 +267,7 @@ class JobOfferTest(APITestCase):
             'remarks': '',
             'commission': 10,
         }
-        response = self.client.post('/core/create-offer/', data, format='json')
+        response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn('selectedDays', response.data)
 
@@ -280,7 +280,7 @@ class JobOfferTest(APITestCase):
             'remarks': '',
             'commission': 500,
         }
-        response = self.client.post('/core/create-offer/', data, format='json')
+        response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn('commission', response.data)
 
@@ -293,7 +293,7 @@ class JobOfferTest(APITestCase):
             'remarks': '',
             'commission': 10,
         }
-        response = self.client.post('/core/create-offer/', data, format='json')
+        response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         offer = JobOffer.objects.first()
         self.assertTrue(offer.selectedCategories.filter(value='New category').exists())
@@ -304,12 +304,6 @@ class JobOfferStatusTest(APITestCase):
         self.org = Organization.objects.create(user=self.org_user)
         self.vendor_user = User.objects.create_user(username='vendoruser', password='vendor123')
         self.vendor = Vendor.objects.create(user=self.vendor_user)
-
-        org_token = self.client.post(reverse('get_token'), {
-            'username': 'orguser',
-            'password': 'orguser123'
-        }).data['access']
-        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + org_token)
 
         self.job_post = JobPost.objects.create(
             title= 'Project 1',
@@ -326,14 +320,13 @@ class JobOfferStatusTest(APITestCase):
         Category.objects.create(value='Art & Crafts')
         self.job_post.categories.set(['Food & Beverages', 'Art & Crafts'])
 
-        self.client.credentials()  # clear headers
         vendor_token = self.client.post(reverse('get_token'), {
             'username': 'vendoruser',
             'password': 'vendor123'
         }).data['access']
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + vendor_token)
 
-        offer_response = self.client.post('/core/create-offer/', {
+        self.offer_response = self.client.post('/core/create-offer/', {
             'listing': self.job_post.post_id,
             'allDays': 'Yes',
             'selectedDays': [],
@@ -341,56 +334,37 @@ class JobOfferStatusTest(APITestCase):
             'remarks': 'gimme',
             'commission': 15,
         }, format='json')
-        self.offer_id = offer_response.data['offer_id']
+        self.offer_id = self.offer_response.data['offer_id']
 
         self.client.credentials()
-        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + org_token)
+        token = self.client.post(reverse('get_token'), {
+            'username': 'vendoruser',
+            'password': 'vendor123'
+        }).data['access']
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
 
     def test_confirm_offer_valid(self):
-        file = SimpleUploadedFile("inventory.xlsx", b"filecontent", content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
         data = {
             'status': 'confirmed',
-            'inventory_file': file,
-            'agreement': True
+            'agreement': 'true'
         }
         response = self.client.patch(f'/core/edit-offer-status/{self.offer_id}/', data, format='multipart')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(JobOffer.objects.get(offer_id=self.offer_id).status, 'confirmed')
-        self.assertTrue(Fundraiser.objects.filter(listing=self.job_post).exists())
-
-    def test_confirm_offer_missing_file(self):
-        data = {
-            'status': 'confirmed',
-            'agreement': True
-        }
-        response = self.client.patch(f'/core/edit-offer-status/{self.offer_id}/', data, format='multipart')
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn('inventory_list', response.data)
-
-    def test_confirm_offer_file_invalid(self):
-        file = SimpleUploadedFile("text.txt", b"filecontent", content_type="text/plain")
-        data = {
-            'status': 'confirmed',
-            'inventory_file': file,
-            'agreement': True
-        }
-        response = self.client.patch(f'/core/edit-offer-status/{self.offer_id}/', data, format='multipart')
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn('inventory_list', response.data)
+        self.assertTrue(Fundraiser.objects.filter(listing=self.job_post).exists()) # test fundraiser creation
+        self.assertTrue(VendorFundraiser.objects.filter(offer__offer_id=self.offer_id).exists()) # test vendorfundraiser creation
 
     def test_confirm_offer_no_agreement(self):
-        file = SimpleUploadedFile("inventory.xlsx", b"filecontent", content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
         data = {
             'status': 'confirmed',
-            'inventory_file': file,
-            'agreement': False
+            'agreement': 'false'
         }
         response = self.client.patch(f'/core/edit-offer-status/{self.offer_id}/', data, format='multipart')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn('agreement', response.data)
 
     def test_other_statuses(self):
-        for status_val in ['approved', 'rejected', 'cancelled']:
+        for status_val in ['pending', 'approved', 'rejected','confirmed','cancelled']:
             data = {
                 'status': status_val
             }
@@ -405,3 +379,204 @@ class JobOfferStatusTest(APITestCase):
         response = self.client.patch(f'/core/edit-offer-status/{self.offer_id}/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn('status', response.data)
+
+class FundraiserTest(APITestCase):
+    def setUp(self):
+        self.org_user = User.objects.create_user(username='orguser', password='orguser123')
+        self.org = Organization.objects.create(user=self.org_user)      
+        self.job_post = JobPost.objects.create(
+            title= 'Project 1',
+            location= 'Room 1',
+            start_date= (timezone.now() + timedelta(days=2)),
+            end_date= (timezone.now() + timedelta(days=3)),
+            start_time=time(10, 0),
+            end_time=time(18, 0),
+            commission= 20,
+            remarks= 'pls pls pls',
+            author=self.org
+        )
+        self.fundraiser = Fundraiser.objects.create(listing=self.job_post)
+
+    def test_status_yet_to_start(self):
+        self.assertEqual(self.fundraiser.status, 'yet to start')
+
+    def test_status_ongoing(self):
+        self.job_post.start_date = timezone.now().date() - timedelta(days=1)
+        self.job_post.end_date = timezone.now().date() + timedelta(days=1)
+        self.job_post.save()
+        self.assertEqual(self.fundraiser.status, 'ongoing')
+
+    def test_status_concluded(self):
+        self.job_post.start_date = timezone.now().date() - timedelta(days=2)
+        self.job_post.end_date = timezone.now().date() - timedelta(days=1)
+        self.job_post.save()
+        self.assertEqual(self.fundraiser.status, 'concluded')
+
+class TransactionTest(APITestCase):
+    def setUp(self):
+        self.org_user = User.objects.create_user(username='orguser', password='orguser123')
+        self.org = Organization.objects.create(user=self.org_user)      
+        self.vendor_user = User.objects.create_user(username='vendoruser', password='vendor123')
+        self.vendor = Vendor.objects.create(user=self.vendor_user)
+
+        self.job_post = JobPost.objects.create(
+            title= 'Project 1',
+            location= 'Room 1',
+            start_date= (timezone.now() - timedelta(days=2)),
+            end_date= (timezone.now() + timedelta(days=3)),
+            start_time=time(10, 0),
+            end_time=time(18, 0),
+            commission= 20,
+            remarks= 'pls pls pls',
+            author=self.org
+        )
+        offer = JobOffer.objects.create(
+            vendor=self.vendor, listing=self.job_post,
+            allDays=True, commission=10, status='accepted'
+        )
+        self.fundraiser = Fundraiser.objects.create(listing=self.job_post)
+        self.vf = VendorFundraiser.objects.create(offer=offer, org_fundraiser=self.fundraiser)
+        self.product1 = Product.objects.create(name='Water', quantity=20, price=2, vendor=self.vf)
+        self.product2 = Product.objects.create(name='Gold', quantity=1, price=999, vendor=self.vf)
+
+        response = self.client.post(reverse('get_token'), {
+            'username': 'vendoruser',
+            'password': 'vendor123'
+        })
+        access_token = response.data['access']
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
+
+        self.url = reverse('create-transaction', args=[self.vf.fundraiser_id])
+
+    def test_create_valid_transaction(self):
+        data = {
+            'name':'me',
+            'payment':'Cash',
+            'items':[
+                {
+                    'product':self.product1.product_id,
+                    'quantity':3
+                },
+                {
+                    'product':self.product2.product_id,
+                    'quantity':1
+                }
+            ]
+        }
+
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.data['total_price'], 1005)
+
+    def test_out_of_stock_transaction(self):
+        data = {
+            'name':'me',
+            'payment':'Cash',
+            'items':[
+                {
+                    'product':self.product1.product_id,
+                    'quantity':1
+                },
+                {
+                    'product':self.product2.product_id,
+                    'quantity':2
+                }
+            ]
+        }
+
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, 400)
+
+    def test_missing_name_transaction(self):
+        data = {
+            'name':'',
+            'payment':'Cash',
+            'items':[
+                {
+                    'product':self.product1.product_id,
+                    'quantity':1
+                },
+                {
+                    'product':self.product2.product_id,
+                    'quantity':1
+                }
+            ]
+        }
+
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, 400)
+
+    def test_invalid_payment_transaction(self):
+        data = {
+            'name':'me',
+            'payment':'money',
+            'items':[
+                {
+                    'product':self.product1.product_id,
+                    'quantity':1
+                },
+                {
+                    'product':self.product2.product_id,
+                    'quantity':1
+                }
+            ]
+        }
+
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, 400)
+
+class ReviewTest(APITestCase):
+    def setUp(self):
+        self.org_user = User.objects.create_user(username='orguser', password='orguser123')
+        self.org = Organization.objects.create(user=self.org_user)      
+        self.vendor_user = User.objects.create_user(username='vendoruser', password='vendor123')
+        self.vendor = Vendor.objects.create(user=self.vendor_user)
+
+        self.job_post = JobPost.objects.create(
+            title= 'Project 1',
+            location= 'Room 1',
+            start_date= (timezone.now() - timedelta(days=2)),
+            end_date= (timezone.now() + timedelta(days=3)),
+            start_time=time(10, 0),
+            end_time=time(18, 0),
+            commission= 20,
+            remarks= 'pls pls pls',
+            author=self.org
+        )
+        offer = JobOffer.objects.create(
+            vendor=self.vendor, listing=self.job_post,
+            allDays=True, commission=10, status='accepted'
+        )
+        self.fundraiser = Fundraiser.objects.create(listing=self.job_post)
+        self.vf = VendorFundraiser.objects.create(offer=offer, org_fundraiser=self.fundraiser)
+
+        response = self.client.post(reverse('get_token'), {
+            'username': 'vendoruser',
+            'password': 'vendor123'
+        })
+        access_token = response.data['access']
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
+
+        self.url = reverse('create-review', args=[self.vf.fundraiser_id])
+
+    def test_create_valid_review(self):
+        data = {
+            'rating': 5,
+            'comment': 'nice',
+            'reviewee': self.org_user.id
+        }
+        response = self.client.post(self.url, data)
+        self.assertEqual(response.status_code, 201)
+        review = Review.objects.first()
+        self.assertEqual(review.rating, 5)
+        self.assertEqual(review.comment, 'nice')
+        self.assertEqual(review.reviewer, self.vendor_user)
+        self.assertEqual(review.reviewee, self.org_user)
+
+    def test_invalid_rating(self):
+        data = {
+            'rating': 10,
+            'comment': '',
+            'reviewee': self.org_user.id
+        }
+        response = self.client.post(self.url, data)
+        self.assertEqual(response.status_code, 400)
