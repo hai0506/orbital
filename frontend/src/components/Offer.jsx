@@ -85,11 +85,11 @@ const Offer = ({ offer, onChangeStatus }) => {
 
             {open && (
                 <div 
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm"
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm overflow-y-auto"
                     onClick={() => setOpen(false)}
                 >
                     <div 
-                        className="max-w-2xl w-full rounded-lg bg-white p-6 shadow-lg relative"
+                        className="max-w-2xl w-full rounded-lg bg-white p-6 shadow-lg relative max-h-[90vh] overflow-y-auto"
                         onClick={e => e.stopPropagation()}
                     >
                         <div className="flex flex-col md:flex-row h-full w-full">
