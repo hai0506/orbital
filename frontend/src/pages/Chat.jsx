@@ -21,13 +21,13 @@ const Chat = () => {
   useEffect(() => {
     if (!token || !receiverId) return;
 
-    socket.client = new WebSocket(`wss://orbital-backend-1axc.onrender.com/ws/chat/${receiverId}/?token=${token}`);
+    socket.current = new WebSocket(`wss://orbital-backend-1axc.onrender.com/ws/chat/${receiverId}/?token=${token}`);
 
-    socket.client.onmessage = (event) => {
+    socket.current.onmessage = (event) => {
       setMessages((prev) => [...prev, JSON.parse(event.data)]);
     };
 
-    socket.client.onclose = () => {
+    socket.current.onclose = () => {
       console.log('WebSocket disconnected');
     };
 
@@ -47,13 +47,13 @@ const Chat = () => {
       fetchMessages();
 
     return () => {
-      socket.client.close();
+      socket.current.close();
     };
   }, []);
 
   const sendMessage = () => {
-    if (input.trim() && socket.client.readyState === WebSocket.OPEN) {
-      socket.client.send(JSON.stringify({ message: input }));
+    if (input.trim() && socket.current.readyState === WebSocket.OPEN) {
+      socket.current.send(JSON.stringify({ message: input }));
       setInput('');
     }
   };
