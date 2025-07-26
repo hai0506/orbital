@@ -21,7 +21,7 @@ const Chat = () => {
   useEffect(() => {
     if (!token || !receiverId) return;
 
-    socket.client = new WebSocket(`ws://localhost:8000/ws/chat/${receiverId}/?token=${token}`);
+    socket.client = new WebSocket(`ws://orbital-backend-1vfp.onrender.com/ws/chat/${receiverId}/?token=${token}`);
 
     socket.client.onmessage = (event) => {
       setMessages((prev) => [...prev, JSON.parse(event.data)]);
