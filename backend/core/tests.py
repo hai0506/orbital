@@ -5,6 +5,7 @@ from django.urls import reverse
 from rest_framework import status
 from django.utils import timezone
 from datetime import timedelta, time
+import json
 
 # Create your tests here.
 class AuthTest(APITestCase):
@@ -411,6 +412,123 @@ class FundraiserTest(APITestCase):
         self.job_post.end_date = timezone.now().date() - timedelta(days=1)
         self.job_post.save()
         self.assertEqual(self.fundraiser.status, 'concluded')
+
+class ProductTest(APITestCase):
+    def setUp(self):
+        self.org_user = User.objects.create_user(username='orguser', password='orguser123')
+        self.org = Organization.objects.create(user=self.org_user)      
+        self.vendor_user = User.objects.create_user(username='vendoruser', password='vendor123')
+        self.vendor = Vendor.objects.create(user=self.vendor_user)
+
+        self.job_post = JobPost.objects.create(
+            title= 'Project 1',
+            location= 'Room 1',
+            start_date= (timezone.now() - timedelta(days=2)),
+            end_date= (timezone.now() + timedelta(days=3)),
+            start_time=time(10, 0),
+            end_time=time(18, 0),
+            commission= 20,
+            remarks= 'pls pls pls',
+            author=self.org
+        )
+        offer = JobOffer.objects.create(
+            vendor=self.vendor, listing=self.job_post,
+            allDays=True, commission=10, status='accepted'
+        )
+
+        response = self.client.post(reverse('get_token'), {
+            'username': 'vendoruser',
+            'password': 'vendor123'
+        })
+        access_token = response.data['access']
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
+
+        self.url = reverse('edit-offer-status',args=[offer.offer_id])
+
+    def test_create_valid_product(self):
+        data = {
+            "status":"confirmed",
+            "agreement":"true",
+            "inventory": json.dumps([
+                {
+                    "Item": "Water",
+                    "Price": 2.4,
+                    "Quantity": 20,
+                    "Remarks":""
+                }
+            ])
+        }
+        response = self.client.patch(self.url,data=data)
+        self.assertEqual(response.status_code, 200)
+        review = Product.objects.first()
+        self.assertEqual(review.name, 'Water')
+        self.assertEqual(review.price, 2.4)
+        self.assertEqual(review.quantity, 20)
+        self.assertEqual(review.vendor.offer.vendor, self.vendor)
+
+    def test_invalid_name(self):
+        data = {
+            "status":"confirmed",
+            "agreement":"true",
+            "inventory": json.dumps([
+                {
+                    "Item": "    ",
+                    "Price": 2.4,
+                    "Quantity": 20,
+                    "Remarks":""
+                }
+            ])
+        }
+        response = self.client.patch(self.url,data=data)
+        self.assertEqual(response.status_code, 400)
+
+    def test_invalid_price(self):
+        data = {
+            "status":"confirmed",
+            "agreement":"true",
+            "inventory": json.dumps([
+                {
+                    "Item": "Water",
+                    "Price": -2.4,
+                    "Quantity": 20,
+                    "Remarks":""
+                }
+            ])
+        }
+        response = self.client.patch(self.url,data=data)
+        self.assertEqual(response.status_code, 400)
+
+    def test_negative_quantity(self):
+        data = {
+            "status":"confirmed",
+            "agreement":"true",
+            "inventory": json.dumps([
+                {
+                    "Item": "Water",
+                    "Price": 2.4,
+                    "Quantity": -20,
+                    "Remarks":""
+                }
+            ])
+        }
+        response = self.client.patch(self.url,data=data)
+        self.assertEqual(response.status_code, 400)
+
+    def test_invalid_quantity(self):
+        data = {
+            "status":"confirmed",
+            "agreement":"true",
+            "inventory": json.dumps([
+                {
+                    "Item": "Water",
+                    "Price": 2.4,
+                    "Quantity": 2.6,
+                    "Remarks":""
+                }
+            ])
+        }
+        response = self.client.patch(self.url,data=data)
+        self.assertEqual(response.status_code, 400)
 
 class TransactionTest(APITestCase):
     def setUp(self):
