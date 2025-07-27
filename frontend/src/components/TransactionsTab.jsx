@@ -7,6 +7,7 @@ export default function TransactionsTab({ transactions, setSearchBuyer, setRecei
             <h5 className="text-2xl font-semibold mb-2">Transactions</h5>
             <Input
                 type="search"
+                data-testid="search-item-input"
                 placeholder="Search by Buyer Name"
                 onChange={e => setSearchBuyer(e.target.value)}
                 className="w-full md:w-1/3 mb-2"
