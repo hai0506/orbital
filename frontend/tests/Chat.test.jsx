@@ -49,8 +49,8 @@ describe("chat", () => {
             </MemoryRouter>
         )
 
-        expect(screen.queryByRole("button", { name: "Check it out!" })).not.toBeInTheDocument();
+        expect(screen.queryByRole("button", { name: "Open chat" })).not.toBeInTheDocument();
         fireEvent.mouseEnter(screen.getByText(/vendor5/i));
-        expect(screen.getByRole("button", { name: "Check it out!" })).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: "Open chat" })).toBeInTheDocument();
     })
 })
