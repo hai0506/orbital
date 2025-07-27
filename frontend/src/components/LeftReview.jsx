@@ -1,7 +1,7 @@
 import { Star } from "lucide-react"
 import { Field, Fieldset, Label } from '@headlessui/react'
 
-const LeftReview = ({ review }) => {
+const LeftReview = ({ review, isVendor }) => {
     const renderStars = (rating) => {
         return [...Array(5)].map((_, i) => {
             const starValue = i + 1;
@@ -10,6 +10,7 @@ const LeftReview = ({ review }) => {
                 return (
                     <Star
                         key={i}
+                        data-testid="filled-star"
                         className="w-5 h-5 fill-yellow-400 stroke-yellow-600"
                     />
                 );
@@ -17,6 +18,7 @@ const LeftReview = ({ review }) => {
                 return (
                     <StarHalf
                         key={i}
+                        data-testid="half-star"
                         className="w-5 h-5 fill-yellow-400 stroke-yellow-600"
                     />
                 );
@@ -24,6 +26,7 @@ const LeftReview = ({ review }) => {
                 return (
                     <Star
                         key={i}
+                        data-testid="unfilled-star"
                         className="w-5 h-5 fill-white stroke-gray-300"
                     />
                 );
@@ -45,7 +48,7 @@ const LeftReview = ({ review }) => {
                         <Field>
                             <Label className="text-base/7 font-medium text-black">Comment</Label>
                             <p className="mt-1 text-sm text-gray-700 break-words max-w-md">
-                                {review.comment}
+                                {review.comment || "No comments."}
                             </p>
                         </Field>
                     </>

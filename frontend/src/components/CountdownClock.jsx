@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
 
 const CountdownClock = ({ startTime, endTime }) => {
-  const [tillEnd, setTillEnd] = useState(true);
+  const [tillEnd, setTillEnd] = useState(() => {
+    const now = new Date();
+    return !(new Date(startTime) > now);
+  });
+  
   const calculateTimeLeft = () => {
     const now = new Date();
     let difference;
