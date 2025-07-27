@@ -238,6 +238,10 @@ class UpdateOfferStatusView(generics.RetrieveUpdateAPIView):
             if inv_data:
                 products = json.loads(inv_data) 
                 for product in products:
+                    if len(product['Item'].strip()) == 0: return Response({'name': 'Product name cannot be blank'}, status=status.HTTP_400_BAD_REQUEST)
+                    if product['Quantity'] <= 0: return Response({'quantity': 'Quantity must be greater than 0.'}, status=status.HTTP_400_BAD_REQUEST)
+                    if product['Price'] < 0: return Response({'price': 'Price cannot be negative.'}, status=status.HTTP_400_BAD_REQUEST)
+                    if not isinstance(product['Quantity'], (int)): return Response({'quantity': 'Quantity must be a whole number.'}, status=status.HTTP_400_BAD_REQUEST)
                     Product.objects.create(name=product['Item'],quantity=product['Quantity'],price=product['Price'],remarks=product['Remarks'],vendor=vendor_fundraiser)
             
         return super().update(request, *args, **kwargs)
@@ -292,41 +296,6 @@ class RetrieveFundraiserView(APIView):
             return Response(VendorFundraiserSerializer(fundraiser).data)
         else: 
             raise PermissionError('User cannot view fundraisers.')
-        
-class CreateProductView(generics.ListCreateAPIView):
-    serializer_class = ProductSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        vendor = get_or_none(Vendor, user=self.request.user)
-        if vendor:
-            return Product.filter(vendor=vendor)
-        else: return Product.objects.none()
-        # return JobPost.objects.none()
-    
-    def perform_create(self, serializer):
-        # vendor = Vendor.objects.get(user_id=2)
-        # serializer.save(vendor=vendor)
-
-        vendor = get_or_none(Vendor, user=self.request.user)
-        if vendor:
-            serializer.save(vendor=vendor)
-        else:
-            raise PermissionError('User cannot create products')
-        
-class ProductEditView(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = ProductSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        vendor = get_or_none(Vendor, user=self.request.user)
-        if vendor:
-            return Product.filter(vendor=vendor)
-        else: 
-            raise PermissionError('User cannot edit products')
-        # return Product.objects.all()
-
-    lookup_field = 'product_id' # to edit: go http://127.0.0.1:8000/core/edit-product/<whatever product id>/
 
 class UpdateInventoryView(APIView):
     permission_classes = [IsAuthenticated]
@@ -344,6 +313,10 @@ class UpdateInventoryView(APIView):
             products = json.loads(inv_data)
             Product.objects.filter(vendor=vendor_fundraiser).delete()
             for product in products:
+                if len(product['Item'].strip()) == 0: return Response({'name': 'Product name cannot be blank'}, status=status.HTTP_400_BAD_REQUEST)
+                if product['Quantity'] <= 0: return Response({'quantity': 'Quantity must be greater than 0.'}, status=status.HTTP_400_BAD_REQUEST)
+                if product['Price'] < 0: return Response({'price': 'Price cannot be negative.'}, status=status.HTTP_400_BAD_REQUEST)
+                if not isinstance(product['Quantity'], (int)): return Response({'quantity': 'Quantity must be a whole number.'}, status=status.HTTP_400_BAD_REQUEST)
                 Product.objects.create(name=product['Item'],quantity=product['Quantity'],price=product['Price'],remarks=product['Remarks'],vendor=vendor_fundraiser)
             return Response({'inventory_update':'Update successful.'}, status=status.HTTP_200_OK)
         return Response({'inventory_update': 'No inventory provided.'}, status=status.HTTP_400_BAD_REQUEST)
