@@ -48,7 +48,7 @@ const LeftReview = ({ review, isVendor }) => {
                         <Field>
                             <Label className="text-base/7 font-medium text-black">Comment</Label>
                             <p className="mt-1 text-sm text-gray-700 break-words max-w-md">
-                                {review.comment}
+                                {review.comment || "No comments."}
                             </p>
                         </Field>
                     </>

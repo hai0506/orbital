@@ -1,7 +1,12 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, cleanup } from '@testing-library/react';
 import LeftReview from '@/components/LeftReview';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, afterEach } from 'vitest';
 import "@testing-library/jest-dom/vitest"
+import { comment } from 'postcss';
+
+afterEach(() => {
+  cleanup()
+})
 
 describe('left review', () => {
   const mockReview = {
@@ -31,6 +36,14 @@ describe('left review', () => {
 
     expect(
       screen.getByText(/is yet to leave you a review/i)
+    ).toBeInTheDocument();
+  });
+
+  it('shows fallback text when comment is null', () => {
+    render(<LeftReview review={{...mockReview, comment: null}} />);
+
+    expect(
+      screen.getByText(/No comments./i)
     ).toBeInTheDocument();
   });
 });
