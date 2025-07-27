@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import ListingDetails from "../src/components/ListingDetails";
 import "@testing-library/jest-dom/vitest";
+import { MemoryRouter } from "react-router-dom";
 
 describe("ListingDetails", () => {
   const sampleFields = {
@@ -17,7 +18,11 @@ describe("ListingDetails", () => {
   };
 
   it("renders listing details correctly", () => {
-    render(<ListingDetails fields={sampleFields} />);
+    render(
+      <MemoryRouter>
+        <ListingDetails fields={sampleFields} />
+      </MemoryRouter>
+    );
 
     // Title
     expect(screen.getByText("Project 1")).toBeInTheDocument();

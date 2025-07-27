@@ -73,9 +73,9 @@ const Form = ({route, method}) => {
                     <img
                         alt="Your Company"
                         src={PV}
-                        className="mx-auto w-68 h-50"
+                        className="mx-auto max-w-[350px] h-auto block mb-2"
                     />
-                    <h2 className="mt-0.5 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
+                    <h2 className="mt-1 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
                         {
                         method === "register" 
                             ? "Register your account"
