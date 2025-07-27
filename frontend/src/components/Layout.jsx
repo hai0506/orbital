@@ -1,7 +1,7 @@
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import PV from "../styles/PV.png"
+import PV2 from "../styles/PV2.png"
 import { useState, useEffect } from 'react';
 import api from '../api';
 
@@ -73,8 +73,8 @@ export default function Layout({ heading, children }) {
                 <div className="shrink-0">
                   <img
                     alt="Your Company"
-                    src={PV}
-                    className="size-8"
+                    src={PV2}
+                    className="h-13 w-auto"
                   />
                 </div>
                 <div className="hidden md:block">
