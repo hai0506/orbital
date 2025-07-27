@@ -25,6 +25,8 @@ import CountdownClock from '@/components/CountdownClock';
 import Dashboard from '@/components/Dashboard';
 import Review from '@/components/Review';
 import LeftReview from '@/components/LeftReview';
+import Cart from '@/components/Cart';
+import InventoryTab from '@/components/InventoryTab';
 
 // comment this out to test api
 // import transactions from '@/data/Transactions';
@@ -214,211 +216,28 @@ const VendorFundraiser = () => {
                             </TabsList>
                             <TabsContent value="inventory">
                                 <>
-                                    <h5 className="text-2xl font-semibold mb-2">Inventory</h5>
-                                    <Input
-                                        type="search"
-                                        placeholder="Search by Item Name"
-                                        onChange={e => setSearchItem(e.target.value)}
-                                        className="w-full md:w-1/3 mb-2"
+                                    <InventoryTab
+                                        inventory={inventory}
+                                        searchItem={searchItem}
+                                        setSearchItem={setSearchItem}
+                                        addToCart={addToCart}
+                                        ongoing={ongoing}
+                                        isVendor={true}
                                     />
-                                    <div className="max-h-[60vh] overflow-auto">
-                                        <table className="w-full text-sm overflow-auto max-h-[60vh]">
-                                            <thead className="sticky top-0 bg-gray-100">
-                                                <tr>
-                                                    <th key='name' className="p-2 text-left">Item</th>
-                                                    <th key='price' className="p-2 text-left">Price</th>
-                                                    <th key='quantity' className="p-2 text-left">Quantity</th>
-                                                    <th key='remarks' className="p-2 text-left">Remarks</th>
-                                                    <th />
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {inventory?.map(row => (
-                                                    <tr className="border-b">
-                                                        <td className="p-2">
-                                                            {row.name}
-                                                        </td>
-                                                        <td className="p-2">
-                                                            ${row.price.toFixed(2)}
-                                                        </td>
-                                                        <td className="p-2">
-                                                            {row.quantity}
-                                                        </td>
-                                                        <td className="p-2">
-                                                            {row.remarks}
-                                                        </td>
-                                                        <td className="p-2">
-                                                        {(row.quantity > 0 && ongoing) && (
-                                                            <button onClick={() => addToCart(row)} className="text-blue-500 hover:text-blue-700">Add to cart</button>
-                                                        )}
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    
+
                                     {(cart.length > 0 && ongoing) && (
-                                        <>
-                                            <h5 className="text-2xl font-semibold mt-6 mb-2">Checkout</h5>
-                                            <div className="max-h-[60vh] overflow-auto">
-                                                <table className="w-full text-sm">
-                                                    <thead className="sticky top-0 bg-gray-100">
-                                                        <tr>
-                                                            <th className="p-2 text-left">Item</th>
-                                                            <th className="p-2 text-left">Price</th>
-                                                            <th className="p-2 text-left">Quantity</th>
-                                                            <th className="p-2 text-left">Qty Left</th>
-                                                            <th className="p-2 text-left">Total Cost</th>
-                                                            <th />
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {cart.map((row, idx) => (
-                                                            <>
-                                                                <tr className="border-b">
-                                                                    <td className="p-2">{row.item}</td>
-                                                                    <td className="p-2">${row.price.toFixed(2)}</td>
-                                                                    <td className="p-2">
-                                                                        <input
-                                                                            type="number"
-                                                                            className="w-16 border rounded px-2 py-1"
-                                                                            value={row.quantity}
-                                                                            min={1}
-                                                                            max={row.maxQuantity}
-                                                                            onChange={(e) => {
-                                                                                const max = row.maxQuantity; 
-                                                                                let newQuantity = parseInt(e.target.value);
-
-                                                                                if (isNaN(newQuantity)) return;
-
-                                                                                newQuantity = Math.max(1, Math.min(max, newQuantity));
-
-                                                                                const updatedCart = [...cart];
-                                                                                const oldQuantity = updatedCart[idx].quantity;
-                                                                                const change = newQuantity - oldQuantity;
-
-                                                                                if (change === 0) return;
-
-                                                                                updatedCart[idx].quantity = newQuantity;
-                                                                                setCart(updatedCart);
-
-                                                                                setInventory(prevInventory =>
-                                                                                    prevInventory.map(product => {
-                                                                                        if (product.name === row.item) {
-                                                                                            return {
-                                                                                                ...product,
-                                                                                                quantity: product.quantity - change,
-                                                                                            };
-                                                                                        }
-                                                                                        return product;
-                                                                                    })
-                                                                                );
-                                                                            }}
-                                                                        />
-                                                                    </td>
-                                                                    <td className="p-2">
-                                                                        {row.maxQuantity - row.quantity}
-                                                                    </td>
-                                                                    <td className="p-2">
-                                                                        ${(Number(row.price) * Number(row.quantity)).toFixed(2)}
-                                                                    </td>
-                                                                    <td className="p-2">
-                                                                        <button onClick={() => removeItem(row)} className="text-red-500 hover:text-red-700" >
-                                                                            <X />
-                                                                        </button>
-                                                                    </td>
-                                                                </tr>
-                                                            </>
-                                                        ))}
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                            
-                                            {(cart && ongoing) && (
-                                                <>
-                                                    <p className="text-2xl font-semibold mt-6 mb-2">Total Price: ${totalCost.toFixed(2)}</p>
-                                                    <div className='grid grid-cols-4 gap-4'>
-                                                        <div className="flex flex-col">
-                                                            <Input
-                                                                onChange={e =>
-                                                                    setBuyerDetails(prev => ({
-                                                                        ...prev,
-                                                                        name: e.target.value
-                                                                    }))
-                                                                }
-                                                                type="text"
-                                                                placeholder="Name of Buyer"
-                                                            />
-                                                            {errors.name && (
-                                                                <p className="mt-1 text-sm text-red-600">{errors.name}</p>
-                                                            )}
-                                                        </div>
-                                                        <Input
-                                                            onChange={e =>
-                                                                setBuyerDetails(prev => ({
-                                                                    ...prev,
-                                                                    phone: e.target.value
-                                                                }))
-                                                            }
-                                                            type="text"
-                                                            placeholder="Phone Number (optional)"
-                                                        />
-                                                        
-                                                        <Input
-                                                            onChange={e =>
-                                                                setBuyerDetails(prev => ({
-                                                                    ...prev,
-                                                                    email: e.target.value
-                                                                }))
-                                                            }
-                                                            type="email" 
-                                                            placeholder="Email Address (optional)"
-                                                        />
-                                                        <div className="flex flex-col">
-                                                        <Select
-                                                            onValueChange={value =>
-                                                                setBuyerDetails(prev => ({
-                                                                    ...prev,
-                                                                    payment: value
-                                                                }))
-                                                            }
-                                                        >
-                                                            <SelectTrigger className="w-full">
-                                                                <SelectValue placeholder="Payment Method" />
-                                                            </SelectTrigger>
-                                                            <SelectContent>
-                                                                <SelectGroup>
-                                                                    <SelectItem value="PayLah">PayLah</SelectItem>
-                                                                    <SelectItem value="PayNow">PayNow</SelectItem>
-                                                                    <SelectItem value="Cash">Cash</SelectItem>
-                                                                    <SelectItem value="Card">Card</SelectItem>
-                                                                    <SelectItem value="NETS">NETS</SelectItem>
-                                                                    <SelectItem value="Others">Others</SelectItem>
-                                                                </SelectGroup>
-                                                            </SelectContent>
-                                                        </Select>
-                                                        {errors.payment && (
-                                                            <p className="mt-1 text-sm text-red-600">{errors.payment}</p>
-                                                        )}
-                                                        </div>
-                                                    </div>
-                                                </>
-                                            )}
-                                            {errors && (
-                                                <p className="mt-1 text-sm text-red-600">
-                                                    {errors[0]}
-                                                </p>
-                                            )}
-                                            <div className="flex gap-4 mt-4">
-                                                <Button onClick={handleCheckout} style={{ marginTop: "10px" }} className="self-start inline-flex items-center gap-2 rounded-md bg-green-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-green-600 data-open:bg-green-700">
-                                                    Checkout Items
-                                                </Button>
-                                                <Button onClick={() => setCart([])} style={{ marginTop: "10px" }} className="self-start inline-flex items-center gap-2 rounded-md bg-red-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-red-600 data-open:bg-red-700">
-                                                    Clear Items
-                                                </Button>
-                                            </div>
-                                        </>
+                                        <Cart
+                                            cart={cart}
+                                            ongoing={ongoing}
+                                            setCart={setCart}
+                                            setInventory={setInventory}
+                                            removeItem={removeItem}
+                                            buyerDetails={buyerDetails}
+                                            setBuyerDetails={setBuyerDetails}
+                                            errors={errors}
+                                            handleCheckout={handleCheckout}
+                                            totalCost={totalCost}
+                                        />
                                     )}
                                 </>
                             </TabsContent>
