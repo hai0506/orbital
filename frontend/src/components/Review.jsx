@@ -4,7 +4,7 @@ import { Star } from "lucide-react"
 import { Field, Fieldset, Input, Label, Button, Textarea, Description } from '@headlessui/react'
 import clsx from 'clsx';
 
-const Review = ({ fundraiser, isVendor }) => {
+const Review = ({ fundraiser, isVendor, onSubmitReview }) => {
     const [rating, setRating] = useState(-1);
     const [comment, setComment] = useState("");
     const [errors, setErrors] = useState({});
@@ -31,9 +31,10 @@ const Review = ({ fundraiser, isVendor }) => {
             const info = {
                 rating: rating,
                 comment: comment,
-                reviewee: recipientId
+                reviewee: isVendor ? fundraiser?.listing?.author?.id : fundraiser?.offer?.vendor?.id,
             }
-            const res = await api.post(`/core/create-review/${fundraiser.fundraiser_id}/`, info);
+            const res = await api.post(`/core/create-review/${fundraiserId}/`, info);
+            await onSubmitReview();
         } catch(error) {
             console.log(error);
             setErrors(error);

@@ -538,7 +538,7 @@ const VendorFundraiser = () => {
                                     {!fundraiser?.review_sent && (
                                         <>
                                             <h5 className="text-2xl font-semibold mb-2">Review Organisation</h5>
-                                            <Review fundraiser={fundraiser} isVendor={true} />
+                                            <Review fundraiser={fundraiser} isVendor={true} onSubmitReview={fetchFundraiser} />
                                         </>
                                     )}
                                     {fundraiser?.review_sent && (
