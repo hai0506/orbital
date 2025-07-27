@@ -185,7 +185,10 @@ const VendorFundraiser = () => {
                                     }} 
                             days={fundraiser?.offer.selectedDays} 
                         />
-                        <CountdownClock endTime={`${fundraiser?.offer.listing.end_date}T${fundraiser?.offer.listing.end_time}`} />
+                        <CountdownClock 
+                            startTime={`${fundraiser?.listing?.start_date}T${fundraiser?.listing?.start_time}`}
+                            endTime={`${fundraiser?.offer.listing.end_date}T${fundraiser?.offer.listing.end_time}`} 
+                        />
                     </div>
                 )}
                 <div className={`transition-all duration-300 w-full md:w-[80%]`}>
