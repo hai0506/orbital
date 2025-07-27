@@ -2,6 +2,7 @@ import { render, fireEvent, screen } from "@testing-library/react";
 import Fundraiser from "@/components/Fundraiser";
 import { MemoryRouter } from "react-router-dom";
 import { it, expect } from "vitest";
+import "@testing-library/jest-dom/vitest";
 
 const mockFundraiser = {
   fundraiser_id: 1,

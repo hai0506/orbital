@@ -23,14 +23,14 @@ describe('InventoryTab', () => {
 
     it('renders inventory items', () => {
         render(
-        <InventoryTab
-            inventory={sampleInventory}
-            searchItem=""
-            setSearchItem={setSearchItemMock}
-            addToCart={addToCartMock}
-            ongoing={true}
-            isVendor={true}
-        />
+            <InventoryTab
+                inventory={sampleInventory}
+                searchItem=""
+                setSearchItem={setSearchItemMock}
+                addToCart={addToCartMock}
+                ongoing={true}
+                isVendor={true}
+            />
         );
 
         expect(screen.getByText('Inventory')).toBeInTheDocument();
