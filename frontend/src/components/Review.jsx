@@ -31,9 +31,9 @@ const Review = ({ fundraiser, isVendor }) => {
             const info = {
                 rating: rating,
                 comment: comment,
-                reviewee: isVendor ? fundraiser?.offer?.listing?.author?.id : fundraiser?.offer?.vendor?.id,
+                reviewee: recipientId
             }
-            const res = await api.post(`/core/create-review/${fundraiserId}/`, info);
+            const res = await api.post(`/core/create-review/${fundraiser.fundraiser_id}/`, info);
         } catch(error) {
             console.log(error);
             setErrors(error);
