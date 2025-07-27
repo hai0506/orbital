@@ -25,19 +25,21 @@ const Review = ({ fundraiser, isVendor, onSubmitReview }) => {
     };
 
     const handleSubmit = async (e) => {
+        console.log(fundraiser)
         e.preventDefault();
         setLoading(true)
         try {
             const info = {
                 rating: rating,
                 comment: comment,
-                reviewee: isVendor ? fundraiser?.listing?.author?.id : fundraiser?.offer?.vendor?.id,
+                reviewee: isVendor ? fundraiser?.offer?.listing?.author?.id : fundraiser?.offer?.vendor?.id,
+
             }
             const res = await api.post(`/core/create-review/${fundraiserId}/`, info);
             await onSubmitReview();
         } catch(error) {
             console.log(error);
-            setErrors(error);
+            setErrors(error.response.data);
         } finally {
             setLoading(false);
         }
