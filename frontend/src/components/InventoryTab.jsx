@@ -7,6 +7,7 @@ export default function InventoryTab({ inventory, searchItem, setSearchItem, add
       <h5 className="text-2xl font-semibold mb-2">Inventory</h5>
       <Input
         type="search"
+        data-testid="search-item-input"
         placeholder="Search by Item Name"
         onChange={e => setSearchItem(e.target.value)}
         className="w-full md:w-1/3 mb-2"
