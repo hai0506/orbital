@@ -2,7 +2,7 @@
 Our project is a role-based web application built with Django and React, designed for a university setting where students and vendors interact. The application enables users to register as either a student or a vendor. Students can place job offers, while vendors can browse events and accept offers. Our website also facilitates discussions and negotiations between both parties. The app also allows vendors to upload and manage items in their inventories as sales happen during the event. 
 This project was created as part of NUS' Orbital Apollo 11 program. 
 
-LINK TO DEPLOYED APP: https://orbital-frontend-w4z9.onrender.com/
+LINK TO DEPLOYED APP: https://orbital-frontend-w4z9.onrender.com/ (deployment expired, please manually set it up on your local machine)
 
 ## Motivation 
 There are many CCAs and societies in NUS that hold fundraisers to raise money for their CCAs, projects and causes. Oftentimes, they call down small local vendors to sell their items. The relationship between these two parties are symbiotic as these NUS based CCAs offer the vendors a chance to sell their items while the vendors help the students to raise money. However, there seems to be a lack of a centralised platform for both parties to connect with one another as they are unaware of each other’s existence. As a result, these student groups often spam many of these vendors DMs on social media platforms. With a more centralised platform like ours, they could essentially save the time spent chasing these vendors.  During the fundraisers, inventory management and revenue sharing becomes a very tricky affair. Whilst excel sheets can be used, nothing beats a human-friendly UI that is also able to automate some transactions. 
