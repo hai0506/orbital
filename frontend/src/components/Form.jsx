@@ -10,7 +10,7 @@ const Form = ({route, method}) => {
     const [password, setPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
     const [email, setEmail] = useState("")
-    const [userType, setUserType] = useState("Organization")
+    const [userType, setUserType] = useState("organization")
     const [wrongRegister, setWrongRegister] = useState({})
     const [wrongLogin, setWrongLogin] = useState(false)
     const [loading, setLoading] = useState(false)
@@ -28,7 +28,7 @@ const Form = ({route, method}) => {
             const info = {username, password}
 
             if (method !== 'login') {
-                info.user_type = userType
+                info.role = userType
                 info.email = email
             }
 
@@ -186,9 +186,9 @@ const Form = ({route, method}) => {
                                     required
                                     className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                                 >
-                                {["Organization", "Vendor"].map((item) => (
-                                    <option key={item} value={item}>
-                                    {item}
+                                {[["organization", "Organization"], ["vendor", "Vendor"]].map(([value, label]) => (
+                                    <option key={value} value={value}>
+                                        {label}
                                     </option>
                                 ))}
                                 </select>

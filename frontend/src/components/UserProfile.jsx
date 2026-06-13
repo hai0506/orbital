@@ -8,7 +8,7 @@ const UserProfile = ({ profile }) => {
     const navigate = useNavigate();
 
     const handleClick = () => {
-        navigate(`/profiles/${profile.user.id}`);
+        navigate(`/profiles/${profile.id}`);
     }
 
     return (
@@ -20,7 +20,7 @@ const UserProfile = ({ profile }) => {
             <dl style={{ marginTop: "10px" }} className="space-y-2">
                 <div className="flex text-sm text-gray-700">
                     <CircleUserRound className="mr-2" />
-                    <dt className="font-medium">{profile.user_type}</dt>
+                    <dt className="font-medium">{profile.role ? profile.role.charAt(0).toUpperCase() + profile.role.slice(1) : ''}</dt>
                 </div>
             </dl>
             {hovered && (

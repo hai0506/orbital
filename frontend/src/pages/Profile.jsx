@@ -160,7 +160,7 @@ const Profile = () => {
 
                     <div className="flex flex-col justify-start mt-1">
                         <div className="text-2xl font-bold text-gray-900">{profile.username}</div>
-                        <div className="flex items-center mt-1">{profile.rating_count === 0 ? "No ratings yet" : renderStars(profile.user.rating)}</div>
+                        <div className="flex items-center mt-1">{profile.rating ? renderStars(profile.rating) : "No ratings yet"}</div>
                     </div>
                 </div>
 
@@ -219,7 +219,7 @@ const Profile = () => {
                     )}
                     {id && (
                         <Button onClick={() => navigate("/chat", {state:{receiverId: id}})} style={{ marginTop: "10px" }} className="inline-flex items-center gap-2 rounded-md bg-gray-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-gray-600 data-open:bg-gray-700">
-                            {`Contact ${profile.user_type}`}
+                            {`Contact ${profile.role ? profile.role.charAt(0).toUpperCase() + profile.role.slice(1) : ''}`}
                         </Button>
                     )}
                 </form>

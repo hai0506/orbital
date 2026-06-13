@@ -32,8 +32,6 @@ const Review = ({ fundraiser, isVendor, onSubmitReview }) => {
             const info = {
                 rating: rating,
                 comment: comment,
-                reviewee: isVendor ? fundraiser?.offer?.listing?.author?.id : fundraiser?.offer?.vendor?.id,
-
             }
             const res = await api.post(`/core/create-review/${fundraiserId}/`, info);
             await onSubmitReview();
