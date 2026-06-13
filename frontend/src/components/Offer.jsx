@@ -152,7 +152,12 @@ const Offer = ({ offer, onChangeStatus }) => {
                                         }
                                     </Field>
                                     <Field>
-                                        {offer.remarks && (
+                                        {status == "cancelled" && (
+                                            <div className="flex items-center gap-2 text-sm py-2 mt-2 text-red-600">
+                                                The vendor has cancelled and will not be participating.
+                                            </div>
+                                        )}
+                                        {status != "cancelled" && offer.remarks && (
                                             <>
                                                 <Label className="text-base/7 font-medium text-black">Remarks</Label>
                                                 <div className="flex items-center gap-2 text-sm">

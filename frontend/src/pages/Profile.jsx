@@ -101,7 +101,7 @@ const Profile = () => {
 
 
     return (
-        <Layout heading="Profile">
+        <Layout heading={id? "User Profile":"Your Profile"}>
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-3">
                 <div className="flex items-start space-x-6 mb-4 max-w-4xl">
                     <div className="relative">
