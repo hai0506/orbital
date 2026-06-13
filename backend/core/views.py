@@ -46,8 +46,10 @@ class EditProfileView(generics.RetrieveUpdateAPIView):
     serializer_class = ProfileSerializer
     permission_classes = [IsAuthenticated]
     def get_object(self):
-        # return User.objects.get(id=2).profile_user
-        return self.request.user.profile_user
+        user = self.request.user
+        user_type = 'Organization' if hasattr(user, 'organization_user') else 'Vendor'
+        profile, _ = Profile.objects.get_or_create(user=user, defaults={'user_type': user_type})
+        return profile
     
 class ProfileListView(generics.ListAPIView):
     serializer_class = ProfileSerializer
