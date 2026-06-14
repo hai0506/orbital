@@ -1,0 +1,30 @@
+# Backend-only compose for development.
+# Spin up with: docker compose -f docker-compose.dev.yml up --build -d
+# Then run the frontend separately: cd frontend && npm run dev
+#
+# The backend connects to your local Postgres (via host.docker.internal) so
+# Docker and native dev share the same database and data.
+# The ./backend volume mount enables Django's dev server to auto-reload on code changes.
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    env_file:
+      - backend/.env
+    environment:
+      DB_HOST: host.docker.internal
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - media_dev_data:/app/media
+    command: >
+      sh -c "python manage.py migrate --no-input &&
+             python manage.py runserver 0.0.0.0:8000"
+
+volumes:
+  media_dev_data:

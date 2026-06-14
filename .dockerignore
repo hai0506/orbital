@@ -1,0 +1,11 @@
+.git
+.gitignore
+env/
+frontend/
+**/__pycache__
+**/*.pyc
+**/*.pyo
+*.md
+.env
+backend/media/
+backend/db.sqlite3

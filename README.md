@@ -28,9 +28,87 @@ There are many apps out there that aim to bring buyers and sellers together such
 
 
 ## Getting Started
-Follow the steps below to get this project running on your local machine.
 
-### Prerequisites
+There are two ways to run this project locally: using **Docker** (recommended, no manual setup) or the **manual** approach.
+
+---
+
+### Option 1 — Docker (Recommended)
+
+Docker handles PostgreSQL, the Django backend, and the React frontend for you. No virtual environments or database setup needed.
+
+#### Prerequisites
+- Git
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) — install for your OS, then start it
+
+#### Installing Docker Desktop
+
+**Windows / macOS:**
+Download and run the installer from https://www.docker.com/products/docker-desktop/, then launch Docker Desktop. Verify it's running:
+```
+docker --version
+```
+
+**Linux (Ubuntu/Debian):**
+```bash
+sudo apt-get update
+sudo apt-get install -y ca-certificates curl gnupg
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo $VERSION_CODENAME) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+sudo usermod -aG docker $USER   # log out and back in after this
+```
+
+#### 1. Clone the repository
+```bash
+git clone https://github.com/hai0506/orbital.git
+cd orbital
+```
+
+#### 2a. Full stack — spins up everything with one command
+```bash
+docker compose -f docker-compose.yml up --force-recreate --build -d
+```
+| Service  | URL |
+|----------|-----|
+| Frontend | http://localhost:3000 |
+| Backend  | http://localhost:8000 |
+
+Migrations run automatically on startup. To stop:
+```bash
+docker compose -f docker-compose.yml down
+```
+
+#### 2b. Dev mode — backend in Docker, frontend with hot reload
+Use this when actively working on the frontend so Vite's hot module replacement works.
+
+```bash
+# Terminal 1 — start the database and backend
+docker compose -f docker-compose.dev.yml up --build -d
+
+# Terminal 2 — start the frontend dev server
+cd frontend
+npm install   # first time only
+npm run dev
+```
+
+| Service  | URL |
+|----------|-----|
+| Frontend | http://localhost:5173 |
+| Backend  | http://localhost:8000 |
+
+Backend code changes (files inside `backend/`) are picked up automatically by Django's dev server. To stop the Docker services:
+```bash
+docker compose -f docker-compose.dev.yml down
+```
+
+---
+
+### Option 2 — Manual Setup
+
+#### Prerequisites
 - Python 3.6+
 - pip
 - Node.js v14+
@@ -39,7 +117,7 @@ Follow the steps below to get this project running on your local machine.
 - Git
 - A web browser
 
-### Setting up the Backend
+#### Setting up the Backend
 
 1. **Clone the Repository**
 ```
@@ -78,8 +156,8 @@ In psql, enter:
 CREATE DATABASE orbital;
 CREATE USER myuser WITH ENCRYPTED PASSWORD 'pass';
 ALTER ROLE myuser SET client_encoding TO 'utf8';
- ALTER ROLE myuser SET default_transaction_isolation TO 'read committed';
- ALTER ROLE myuser SET timezone TO 'UTC';
+ALTER ROLE myuser SET default_transaction_isolation TO 'read committed';
+ALTER ROLE myuser SET timezone TO 'UTC';
 GRANT ALL PRIVILEGES ON DATABASE orbital TO myuser;
 \c orbital
 GRANT ALL ON SCHEMA public TO myuser;
@@ -93,7 +171,8 @@ python manage.py migrate
 ```
 uvicorn backend.asgi:application
 ```
-### Setting up the Frontend
+
+#### Setting up the Frontend
 
 1. **Install frontend dependencies**
 ```
