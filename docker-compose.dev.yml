@@ -24,7 +24,7 @@ services:
       - media_dev_data:/app/media
     command: >
       sh -c "python manage.py migrate --no-input &&
-             python manage.py runserver 0.0.0.0:8000"
+             uvicorn backend.asgi:application --host 0.0.0.0 --port 8000 --reload"
 
 volumes:
   media_dev_data:

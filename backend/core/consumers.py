@@ -3,7 +3,7 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 import json
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from .models import Message
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -14,6 +14,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return
         self.sender = sender
 
+        User = get_user_model()
         receiver_id = self.scope['url_route']['kwargs']['id']
         try:
             self.receiver = await database_sync_to_async(User.objects.get)(id=receiver_id)

@@ -11,7 +11,8 @@ from urllib.parse import parse_qs
 
 @database_sync_to_async
 def authenticate_websocket(token): # decodes token into user
-    from django.contrib.auth.models import User
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
     try:
         decoded = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
         user_id = decoded["user_id"]

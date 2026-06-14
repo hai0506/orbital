@@ -14,40 +14,45 @@ const Chat = () => {
 
   const location = useLocation();
   const receiverId = location.state.receiverId;
-  console.log(receiverId)
 
   const token = localStorage.getItem(ACCESS_TOKEN);
 
   useEffect(() => {
     if (!token || !receiverId) return;
 
-    socket.client = new WebSocket(`ws://localhost:8000/ws/chat/${receiverId}/?token=${token}`);
+    let cancelled = false;
+    const ws = new WebSocket(`ws://localhost:8000/ws/chat/${receiverId}/?token=${token}`);
+    socket.client = ws;
 
-    socket.client.onmessage = (event) => {
+    ws.onopen = () => {
+      if (cancelled) ws.close();
+    };
+
+    ws.onmessage = (event) => {
       setMessages((prev) => [...prev, JSON.parse(event.data)]);
     };
 
-    socket.client.onclose = () => {
-      console.log('WebSocket disconnected');
+    ws.onclose = () => {
+      if (!cancelled) console.log('WebSocket disconnected');
     };
 
     async function fetchMessages() {
-        try {
-          setLoading(true);
-          const messagesRes = await api.get(`core/messages/${receiverId}`);
-          setMessages(messagesRes.data);
-          messages.map(message => console.log(message));
-        } catch (error) {
-          console.error('Failed to retrieve past messages:', error);
-        } finally {
-          setLoading(false);
-        }
+      try {
+        setLoading(true);
+        const messagesRes = await api.get(`core/messages/${receiverId}`);
+        setMessages(messagesRes.data);
+      } catch (error) {
+        console.error('Failed to retrieve past messages:', error);
+      } finally {
+        setLoading(false);
       }
-  
-      fetchMessages();
+    }
+
+    fetchMessages();
 
     return () => {
-      socket.client.close();
+      cancelled = true;
+      if (ws.readyState === WebSocket.OPEN) ws.close();
     };
   }, []);
 
@@ -57,7 +62,6 @@ const Chat = () => {
       setInput('');
     }
   };
-  console.log(messages)
   return (
     <Layout heading="Chat">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 flex flex-col gap-4">
