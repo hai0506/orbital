@@ -1,18 +1,315 @@
-.center-container {
-    display: flex;
-    justify-content: center; 
-    align-items: center;     
-    height: 100vh;
-}
-
-.form-container {
+/* ── Root layout ─────────────────────────────────────────────────── */
+.auth-root {
   display: flex;
-  flex-direction: column; 
-  gap: 1rem;              
-  width: 300px;           
-  margin: 0 auto;         
+  min-height: 100vh;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-.link {
-  color: blue;
+/* ── Brand panel (left) ──────────────────────────────────────────── */
+.brand-panel {
+  position: relative;
+  flex: 1;
+  background: linear-gradient(145deg, #0a0818 0%, #1e1045 40%, #150d35 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 3rem 2.5rem;
+}
+
+/* animated glow orbs */
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.4;
+  animation: drift 12s ease-in-out infinite;
+}
+.orb-1 {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, #7c3aed, #4f46e5);
+  top: -160px; left: -140px;
+  animation-duration: 13s;
+}
+.orb-2 {
+  width: 380px; height: 380px;
+  background: radial-gradient(circle, #db2777, #9333ea);
+  bottom: -110px; right: -90px;
+  animation-duration: 15s;
+  animation-delay: -5s;
+}
+.orb-3 {
+  width: 240px; height: 240px;
+  background: radial-gradient(circle, #2563eb, #7c3aed);
+  top: 52%; left: 58%;
+  animation-duration: 10s;
+  animation-delay: -8s;
+}
+
+@keyframes drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%       { transform: translate(18px, -28px) scale(1.07); }
+  66%       { transform: translate(-14px, 18px) scale(0.95); }
+}
+
+.brand-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  width: 100%;
+  max-width: 500px;
+}
+
+/* ── Logo ────────────────────────────────────────────────────────── */
+.brand-logo-img {
+  width: 260px;
+  filter: drop-shadow(0 0 18px rgba(167, 139, 250, 0.45));
+}
+
+/* ── Tagline ─────────────────────────────────────────────────────── */
+.brand-tagline {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.65;
+  letter-spacing: 0.01em;
+  max-width: 380px;
+}
+
+/* ── Portrait feature cards ──────────────────────────────────────── */
+.feat-cards {
+  display: flex;
+  gap: 0.875rem;
+}
+
+.feat-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+  transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+  cursor: default;
+}
+
+.feat-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(167, 139, 250, 0.4);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* illustration area — taller than the text area */
+.feat-card-img {
+  position: relative;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.feat-deco {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.feat-card-icon {
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.3));
+}
+
+.feat-card-glow {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 40px;
+  border-radius: 50%;
+  filter: blur(24px);
+  opacity: 0.5;
+}
+
+/* text area */
+.feat-card-body {
+  padding: 0.875rem 0.875rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1;
+}
+
+.feat-card-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.92);
+  line-height: 1.2;
+}
+
+.feat-card-desc {
+  font-size: 0.775rem;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.5;
+}
+
+/* ── Form panel (right) ──────────────────────────────────────────── */
+.form-panel {
+  width: 500px;
+  flex-shrink: 0;
+  background: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2.5rem;
+}
+
+.form-card {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.form-header { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.form-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+.form-subtitle {
+  font-size: 0.9375rem;
+  color: #64748b;
+}
+
+/* ── Fields ──────────────────────────────────────────────────────── */
+.form-body { display: flex; flex-direction: column; gap: 1.25rem; }
+
+.field-group { display: flex; flex-direction: column; gap: 0.4rem; }
+
+.field-label { font-size: 0.875rem; font-weight: 600; color: #1e293b; }
+
+.field-input {
+  padding: 0.8rem 1rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 0.9375rem;
+  color: #0f172a;
+  background: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+.field-input::placeholder { color: #94a3b8; }
+.field-input:focus {
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.08);
+}
+.field-input.field-error {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.08);
+}
+
+.error-msg { font-size: 0.8125rem; color: #ef4444; font-weight: 500; }
+
+/* ── Role toggle ─────────────────────────────────────────────────── */
+.role-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 0.625rem; }
+
+.role-btn {
+  padding: 0.8rem 0.5rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  background: #fff;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #64748b;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, background 0.2s, box-shadow 0.2s, transform 0.15s;
+}
+.role-btn:hover { border-color: #a78bfa; color: #7c3aed; transform: translateY(-1px); }
+.role-btn--active {
+  border-color: transparent;
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);
+}
+.role-btn--active:hover { color: #fff; }
+
+/* ── Login error ─────────────────────────────────────────────────── */
+.login-error {
+  padding: 0.75rem 1rem;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  color: #dc2626;
+  font-weight: 500;
+}
+
+/* ── Submit button ───────────────────────────────────────────────── */
+.submit-btn {
+  margin-top: 0.25rem;
+  padding: 0.9rem;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 4px 16px rgba(124, 58, 237, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.01em;
+}
+.submit-btn:hover:not(:disabled) {
+  opacity: 0.92;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.5);
+}
+.submit-btn:active:not(:disabled) { transform: translateY(0); }
+.submit-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.btn-loader {
+  display: inline-block;
+  width: 18px; height: 18px;
+  border: 2px solid rgba(255,255,255,0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Footer ──────────────────────────────────────────────────────── */
+.form-footer {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-top: -0.5rem;
+}
+.form-link { color: #7c3aed; font-weight: 600; text-decoration: none; transition: color 0.15s; }
+.form-link:hover { color: #6d28d9; text-decoration: underline; }
+
+/* ── Responsive ──────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .auth-root { flex-direction: column; }
+  .brand-panel { padding: 2.5rem 2rem; min-height: 260px; }
+  .brand-tagline { display: none; }
+  .feat-cards { display: none; }
+  .form-panel { width: 100%; padding: 2.5rem 1.5rem; }
 }
