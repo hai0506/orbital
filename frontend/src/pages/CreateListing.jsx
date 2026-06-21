@@ -52,8 +52,8 @@ const CreateListing = () => {
 
     return (
         <Layout heading="Create Listing">
-            <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 py-6">
-                <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+                <form onSubmit={handleSubmit} className="flex flex-col gap-6 max-w-xl">
 
                     {/* Title */}
                     <div>
