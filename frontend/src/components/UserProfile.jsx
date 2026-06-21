@@ -1,39 +1,36 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { CircleUserRound } from 'lucide-react';
-import { Button } from '@headlessui/react';
 
 const UserProfile = ({ profile }) => {
     const [hovered, setHovered] = useState(false);
     const navigate = useNavigate();
 
-    const handleClick = () => {
-        navigate(`/profiles/${profile.id}`);
-    }
-
     return (
-        <div onMouseEnter={() => setHovered(true)} 
-            onMouseLeave={() => setHovered(false)} 
-            className={`border border-gray-300 rounded-lg p-4 shadow-sm bg-white max-w-md`}
+        <div
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => setHovered(false)}
+            className="pv-card max-w-md cursor-default"
         >
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">{profile.username}</h3>
-            <dl style={{ marginTop: "10px" }} className="space-y-2">
-                <div className="flex text-sm text-gray-700">
-                    <CircleUserRound className="mr-2" />
-                    <dt className="font-medium">{profile.role ? profile.role.charAt(0).toUpperCase() + profile.role.slice(1) : ''}</dt>
+            <div className="flex items-center gap-3 mb-3">
+                <div className="size-10 flex items-center justify-center rounded-full pv-avatar text-white font-bold text-base flex-shrink-0">
+                    {profile.username?.charAt(0).toUpperCase() || "?"}
                 </div>
-            </dl>
+                <h3 className="pv-heading font-semibold text-base">{profile.username}</h3>
+            </div>
+            <div className="pv-detail-row">
+                <CircleUserRound size={15} />
+                <span className="pv-body font-medium">
+                    {profile.role ? profile.role.charAt(0).toUpperCase() + profile.role.slice(1) : ''}
+                </span>
+            </div>
             {hovered && (
-                <Button 
-                    onClick={handleClick} 
-                    style={{ marginTop: "10px" }} 
-                    className="inline-flex items-center gap-2 rounded-md bg-gray-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-gray-600 data-open:bg-gray-700"
-                >
+                <button onClick={() => navigate(`/profiles/${profile.id}`)} style={{ marginTop: '12px' }} className="pv-btn">
                     Open profile
-                </Button>
+                </button>
             )}
         </div>
-    )
+    );
 }
 
-export default UserProfile
+export default UserProfile;

@@ -1,102 +1,87 @@
 import { useState } from "react";
 import { X } from "lucide-react";
-import { Button } from "@headlessui/react";
 import MakeOffer from "./MakeOffer";
 import ListingDetails from "./ListingDetails";
 import { useNavigate } from "react-router-dom";
 import api from "@/api";
 
-const Listing = ({fields, role, onCloseListing}) => {
+const Listing = ({ fields, role, onCloseListing }) => {
     const dates = [];
     const start = new Date(fields.start_date);
     const end = new Date(fields.end_date);
     const current = new Date(start);
-
     while (current <= end) {
-        dates.push(new Date(current)); 
+        dates.push(new Date(current));
         current.setDate(current.getDate() + 1);
     }
 
     const [hovered, setHovered] = useState(false);
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [errors, setErrors] = useState({});
     const username = localStorage.getItem("username");
     const navigate = useNavigate();
 
     const handleClose = async () => {
         setLoading(true);
-        console.log("Deleting offer")
-
         try {
-            const route = `core/close-post/${fields.post_id}/`; 
-            const info = {
-                is_closed: true,
-            }
-            const res = await api.patch(route, info);
-            console.log("Closed listing: ", fields.post_id);
+            await api.patch(`core/close-post/${fields.post_id}/`, { is_closed: true });
             setHovered(false);
-            if (onCloseListing) {
-                await onCloseListing();
-            }
+            if (onCloseListing) await onCloseListing();
         } catch (error) {
-            console.log(error)
-            setErrors(error.response.data)
+            console.error(error);
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
-    }
+    };
 
     return (
         <>
-            <div onMouseEnter={() => setHovered(true)} 
-                onMouseLeave={() => setHovered(false)} 
-                className="border border-gray-300 rounded-lg p-4 shadow-sm bg-white max-w-md"
+            <div
+                onMouseEnter={() => setHovered(true)}
+                onMouseLeave={() => setHovered(false)}
+                className="pv-card max-w-md"
             >
                 <ListingDetails fields={fields} />
 
-                {(role === "vendor" && hovered) && (
-                    <Button onClick={() => {setOpen(true);setHovered(false);}} style={{ marginTop: "10px" }} className="inline-flex items-center gap-2 rounded-md bg-gray-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-gray-600 data-open:bg-gray-700">
+                {role === "vendor" && hovered && (
+                    <button onClick={() => { setOpen(true); setHovered(false); }} style={{ marginTop: '12px' }} className="pv-btn">
                         Check it out!
-                    </Button>
+                    </button>
                 )}
 
-                {(role === "organization" && hovered && username != fields.author.username) && (
-                    <Button onClick={() => navigate("/chat", {state:{receiverId: fields.author.id}})} style={{ marginTop: "10px" }} className="inline-flex items-center gap-2 rounded-md bg-gray-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-gray-600 data-open:bg-gray-700">
+                {role === "organization" && hovered && username !== fields.author.username && (
+                    <button onClick={() => navigate("/chat", { state: { receiverId: fields.author.id } })} style={{ marginTop: '12px' }} className="pv-btn">
                         Contact Organization
-                    </Button>
+                    </button>
                 )}
 
-                {(role === "organization" && hovered && username == fields.author.username) && (
-                    <Button onClick={handleClose} style={{ marginTop: "10px" }} className="inline-flex items-center gap-2 rounded-md bg-red-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-red-600 data-open:bg-red-700">
+                {role === "organization" && hovered && username === fields.author.username && (
+                    <button onClick={handleClose} disabled={loading} style={{ marginTop: '12px' }} className="pv-btn pv-btn--danger">
                         Close Listing
-                    </Button>
+                    </button>
                 )}
             </div>
+
             {role === "vendor" && open && (
-                <div 
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm overflow-y-auto"
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm overflow-y-auto"
                     onClick={() => setOpen(false)}
                 >
-                    <div 
-                        className="max-w-2xl w-full rounded-lg bg-white p-6 shadow-lg relative max-h-[90vh] overflow-y-auto"
+                    <div
+                        className="pv-card max-w-2xl w-full relative max-h-[90vh] overflow-y-auto m-4"
                         onClick={e => e.stopPropagation()}
+                        style={{ padding: '1.5rem' }}
                     >
                         <div className="flex flex-col md:flex-row h-full w-full">
-                            <div className="w-full md:w-2/5 p-4">
+                            <div className="w-full md:w-2/5 pr-0 md:pr-4 mb-4 md:mb-0">
                                 <ListingDetails fields={fields} />
                             </div>
-
-                            <div className="w-full md:w-3/5 border-t md:border-t-0 md:border-l border-gray-300 p-4">
+                            <div className="w-full md:w-3/5 border-t md:border-t-0 md:border-l pt-4 md:pt-0 md:pl-4" style={{ borderColor: 'var(--pv-card-border)' }}>
                                 <MakeOffer dates={dates} listing={fields} />
                             </div>
                         </div>
-
-                        <button
-                            onClick={() => setOpen(false)}
-                            className="absolute top-2 right-2 text-gray-500 hover:text-black"
-                        >
-                        <X/>
+                        <button onClick={() => setOpen(false)} className="absolute top-3 right-3 pv-muted hover:opacity-70 transition-opacity">
+                            <X size={18} />
                         </button>
                     </div>
                 </div>

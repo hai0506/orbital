@@ -30,7 +30,6 @@ const Home = () => {
       try {
         const listingsRes = await api.get('core/posts/');
         setListings(listingsRes.data);
-        listings.map(listing => console.log(listing));
       } catch (error) {
         console.error('Failed to load listings:', error);
       } finally {

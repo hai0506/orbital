@@ -14,61 +14,53 @@ const formatTime = (timeStr) =>
 const ListingDetails = ({ fields, status, days }) => {
     return (
         <>
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">{fields["title"]}</h3>
-            <CategoryTags categories={fields.categories}/>
+            <h3 className="pv-heading font-semibold text-base leading-snug mb-2">{fields["title"]}</h3>
+            <CategoryTags categories={fields.categories} />
             <dl style={{ marginTop: "10px" }} className="space-y-2">
                 <Link
                     to={`/profiles/${fields.author?.id}`}
-                    className="flex text-sm text-gray-700 hover:underline"
+                    className="pv-detail-row font-medium hover:opacity-80 transition-opacity"
                 >
-                    <Building2 className="mr-2" />
-                    <dt className="font-medium">{fields.author?.username}</dt>
+                    <Building2 size={15} />
+                    <dt>{fields.author?.username}</dt>
                 </Link>
-                <div className="flex text-sm text-gray-700">
-                    <MapPinned className="mr-2" />
+                <div className="pv-detail-row">
+                    <MapPinned size={15} />
                     <dt className="font-medium">{fields["location"]}</dt>
                 </div>
-                <div className="flex flex-col text-sm text-gray-700">
-                    <div className="flex items-center">
-                        <Calendar1 className="mr-2" />
+                <div className="flex flex-col gap-1">
+                    <div className="pv-detail-row">
+                        <Calendar1 size={15} />
                         <dt className="font-medium">
-                            {formatDate(fields.start_date)} - {formatDate(fields.end_date)}
+                            {formatDate(fields.start_date)} — {formatDate(fields.end_date)}
                         </dt>
                     </div>
-
                     {days && days.length > 0 && (
-                        <>
-                        <div className="flex items-center mt-1">
-                            <Calendar1 className="mr-2 invisible" />
-                            <dt className="font-medium">Except for:</dt>
+                        <div className="ml-5 space-y-0.5">
+                            <p className="pv-muted text-xs font-medium">Except:</p>
+                            {days.map((day, i) => (
+                                <p key={i} className="pv-muted text-xs">{formatDate(day)}</p>
+                            ))}
                         </div>
-                        {days.map((day, index) => (
-                            <div key={index} className="flex items-center">
-                                <Calendar1 className="mr-2 invisible" />
-                                <dt className="font-medium">{formatDate(day)}</dt>
-                            </div>
-                        ))}
-                        </>
                     )}
                 </div>
-                
-                <div className="flex text-sm text-gray-700">
-                    <Clock className="mr-2" />
-                    <dt className="font-medium">{formatTime(fields.start_time)} - {formatTime(fields.end_time)}</dt>
+                <div className="pv-detail-row">
+                    <Clock size={15} />
+                    <dt className="font-medium">{formatTime(fields.start_time)} — {formatTime(fields.end_time)}</dt>
                 </div>
-                <div className="flex text-sm text-gray-700">
-                    <HandCoins className="mr-2" />
-                    <dt className="font-medium">{fields.commission + "% of Total Revenue"}</dt>
+                <div className="pv-detail-row">
+                    <HandCoins size={15} />
+                    <dt className="font-medium">{fields.commission}% of Total Revenue</dt>
                 </div>
                 {status && (
-                    <div className="flex text-sm text-gray-700">
-                        <Activity className="mr-2" />
+                    <div className="pv-detail-row">
+                        <Activity size={15} />
                         <dt className="font-medium">{status.charAt(0).toUpperCase() + status.slice(1)}</dt>
                     </div>
                 )}
             </dl>
         </>
-    )
-}
+    );
+};
 
 export default ListingDetails;

@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
+import { ACCESS_TOKEN } from "../constants";
 import { useLocation } from 'react-router-dom';
 import Layout from '@/components/Layout';
-import { Button as ShadcnButton } from "@/components/ui/button"
 import { Send } from "lucide-react";
 import api from '../api';
 
@@ -11,11 +10,12 @@ const Chat = () => {
   const [loading, setLoading] = useState(false);
   const [input, setInput] = useState('');
   const socket = useRef(null);
+  const bottomRef = useRef(null);
 
   const location = useLocation();
   const receiverId = location.state.receiverId;
-
   const token = localStorage.getItem(ACCESS_TOKEN);
+  const myUsername = localStorage.getItem("username");
 
   useEffect(() => {
     if (!token || !receiverId) return;
@@ -24,17 +24,9 @@ const Chat = () => {
     const ws = new WebSocket(`ws://localhost:8000/ws/chat/${receiverId}/?token=${token}`);
     socket.client = ws;
 
-    ws.onopen = () => {
-      if (cancelled) ws.close();
-    };
-
-    ws.onmessage = (event) => {
-      setMessages((prev) => [...prev, JSON.parse(event.data)]);
-    };
-
-    ws.onclose = () => {
-      if (!cancelled) console.log('WebSocket disconnected');
-    };
+    ws.onopen = () => { if (cancelled) ws.close(); };
+    ws.onmessage = (event) => { setMessages((prev) => [...prev, JSON.parse(event.data)]); };
+    ws.onclose = () => { if (!cancelled) console.log('WebSocket disconnected'); };
 
     async function fetchMessages() {
       try {
@@ -47,7 +39,6 @@ const Chat = () => {
         setLoading(false);
       }
     }
-
     fetchMessages();
 
     return () => {
@@ -56,56 +47,57 @@ const Chat = () => {
     };
   }, []);
 
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
   const sendMessage = () => {
-    if (input.trim() && socket.client.readyState === WebSocket.OPEN) {
+    if (input.trim() && socket.client?.readyState === WebSocket.OPEN) {
       socket.client.send(JSON.stringify({ message: input }));
       setInput('');
     }
   };
+
   return (
     <Layout heading="Chat">
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 flex flex-col gap-4">
-        <div className="max-h-[65vh] overflow-auto border rounded p-4 flex-1">
+      <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8 flex flex-col gap-4" style={{ height: 'calc(100vh - 140px)' }}>
+        {/* Message list */}
+        <div
+          className="flex-1 overflow-auto rounded-xl p-4 flex flex-col gap-2"
+          style={{ background: 'var(--pv-chat-area-bg)', border: '1px solid var(--pv-card-border)' }}
+        >
+          {loading && (
+            <div className="flex justify-center py-8">
+              <div className="w-6 h-6 border-2 rounded-full animate-spin" style={{ borderColor: 'rgba(124,58,237,0.2)', borderTopColor: '#7c3aed' }} />
+            </div>
+          )}
           {messages.map((msg, idx) => {
-            const isCurrentUser = msg.sender.username === localStorage.getItem("username");
-
+            const isMe = msg.sender.username === myUsername;
             return (
-              <div
-                key={idx}
-                className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-2`}
-              >
-                <div
-                  className={`
-                    px-4 py-2 rounded-lg max-w-[70%] 
-                    ${isCurrentUser ? 'bg-blue-500 text-white rounded-br-none' : 'bg-gray-200 text-gray-800 rounded-bl-none'}
-                  `}
-                >
-                  <span className="text-sm block mb-1 font-semibold">{msg.sender.username}</span>
-                  <span className="break-all">{msg.content}</span>
+              <div key={idx} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+                <div className={isMe ? 'msg-bubble-self' : 'msg-bubble-other'}>
+                  <div className="msg-sender">{msg.sender.username}</div>
+                  <div className="text-sm break-words">{msg.content}</div>
                 </div>
               </div>
             );
           })}
+          <div ref={bottomRef} />
         </div>
-        <div className="flex flex-col w-full gap-2">
+
+        {/* Input row */}
+        <div className="flex flex-col gap-2">
           <textarea
-            type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter') sendMessage(); }}
-            placeholder="Type a message..."
-            className="w-full border px-4 py-2 rounded resize-y overflow-hidden"
-            style={{ maxHeight: '300px', minHeight: '50px' }}
+            onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
+            placeholder="Type a message…  (Enter to send, Shift+Enter for new line)"
+            className="pv-textarea"
+            style={{ minHeight: '60px', maxHeight: '180px' }}
           />
-          <ShadcnButton 
-            variant="outline" 
-            size="sm" 
-            onClick={sendMessage}
-            className=" text-black px-4 py-2 rounded self-start"
-          >
-                <Send /> 
-                Send Message
-          </ShadcnButton>
+          <button onClick={sendMessage} className="pv-btn self-start">
+            <Send size={15} /> Send
+          </button>
         </div>
       </div>
     </Layout>

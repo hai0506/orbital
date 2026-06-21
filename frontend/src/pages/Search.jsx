@@ -18,7 +18,6 @@ const Search = () => {
                 const profilesRes = await api.get('core/profiles/');
                 setAllProfiles(profilesRes.data);
                 setProfiles(profilesRes.data);
-                console.log(allProfiles);
             } catch (error) {
                 console.error('Failed to load profiles:', error);
             } finally {
