@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input"
 export default function InventoryTab({ inventory, searchItem, setSearchItem, addToCart, ongoing, isVendor }) {
   return (
     <>
-      <h5 className="text-2xl font-semibold mb-2">Inventory</h5>
+      <h5 className="pv-heading text-2xl font-semibold mb-2">Inventory</h5>
       <Input
         type="search"
         data-testid="search-item-input"
@@ -14,30 +14,36 @@ export default function InventoryTab({ inventory, searchItem, setSearchItem, add
         value={searchItem}
       />
       <div className="max-h-[60vh] overflow-auto">
-        <table className="w-full text-sm overflow-auto max-h-[60vh]">
-          <thead className="sticky top-0 bg-gray-100">
+        <table className="pv-table">
+          <thead className="sticky top-0">
             <tr>
-              <th className="p-2 text-left">Item</th>
-              <th className="p-2 text-left">Price</th>
-              <th className="p-2 text-left">Quantity</th>
-              <th className="p-2 text-left">Remarks</th>
-              {isVendor && (<th />)}
+              <th>Item</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>Remarks</th>
+              {isVendor && <th />}
             </tr>
           </thead>
           <tbody>
             {inventory?.map(row => (
-              <tr key={row.name} className="border-b">
-                <td className="p-2">{row.name}</td>
-                <td className="p-2">${row.price.toFixed(2)}</td>
-                <td className="p-2">{row.quantity}</td>
-                <td className="p-2">{row.remarks}</td>
-                <td className="p-2">
-                    {isVendor && row.quantity > 0 && ongoing && (
-                        <button onClick={() => addToCart(row)} className="text-blue-500 hover:text-blue-700">
-                            Add to cart
-                        </button>
+              <tr key={row.name}>
+                <td>{row.name}</td>
+                <td>${row.price.toFixed(2)}</td>
+                <td>{row.quantity}</td>
+                <td>{row.remarks}</td>
+                {isVendor && (
+                  <td>
+                    {row.quantity > 0 && ongoing && (
+                      <button
+                        onClick={() => addToCart(row)}
+                        className="pv-btn"
+                        style={{ padding: '0.2rem 0.6rem', fontSize: '0.8rem', boxShadow: 'none' }}
+                      >
+                        Add to cart
+                      </button>
                     )}
-                </td>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

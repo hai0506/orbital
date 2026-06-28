@@ -28,7 +28,6 @@ const Fundraisers = () => {
       try {
         const fundraisersRes = await api.get('core/fundraisers/');
         setFundraisers(fundraisersRes.data);
-        fundraisers.map(fundraiser => console.log(fundraiser));
       } catch (error) {
         console.error('Failed to load fundraisers:', error);
       } finally {
@@ -60,12 +59,12 @@ const Fundraisers = () => {
                 ))}
               </div>
             ) : (
-              <p className="text-gray-700">
+              <p className="pv-body">
                 You have no active fundraisers at this time.{" "}
                 {role === "organization" && (
                   <Link
                     to="/create"
-                    className="font-semibold text-indigo-600 hover:text-indigo-500"
+                    style={{ color: 'var(--pv-purple)', fontWeight: 600 }}
                   >
                     Why don't you start one?
                   </Link>

@@ -5,7 +5,7 @@ const CountdownClock = ({ startTime, endTime }) => {
     const now = new Date();
     return !(new Date(startTime) > now);
   });
-  
+
   const calculateTimeLeft = () => {
     const now = new Date();
     let difference;
@@ -40,15 +40,13 @@ const CountdownClock = ({ startTime, endTime }) => {
   }, [endTime]);
 
   if (!timeLeft) {
-    return <span className="text-red-600 font-medium">Fundraiser ended</span>;
+    return <span className="text-red-500 font-medium text-sm">Fundraiser ended</span>;
   }
 
   return (
-    <div className="flex flex-col text-sm font-semibold text-gray-700 mt-2">
-      <div>
-        {tillEnd ? 'Fundraiser ends in:' : 'Fundraiser starts in:'}
-      </div>
-      <div className="flex gap-2 mt-1">
+    <div className="flex flex-col text-sm font-semibold mt-2" style={{ color: 'var(--pv-text-body)' }}>
+      <div>{tillEnd ? 'Fundraiser ends in:' : 'Fundraiser starts in:'}</div>
+      <div className="flex gap-2 mt-1" style={{ color: 'var(--pv-purple)' }}>
         <div>{timeLeft.days}d</div>
         <div>{timeLeft.hours}h</div>
         <div>{timeLeft.minutes}m</div>

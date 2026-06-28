@@ -126,6 +126,27 @@ body {
 }
 .pv-btn--danger:hover:not(:disabled) { box-shadow: 0 6px 20px rgba(220, 38, 38, 0.38); }
 
+.pv-btn--success {
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.28);
+}
+.pv-btn--success:hover:not(:disabled) { box-shadow: 0 6px 20px rgba(22, 163, 74, 0.38); }
+
+/* ── Icon / ghost button ─────────────────────────────────────────── */
+.pv-icon-btn {
+  color: var(--pv-text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.875rem;
+  padding: 0;
+}
+.pv-icon-btn:hover { color: var(--pv-text-body); }
+
 /* ── Detail row (icon + label) ───────────────────────────────────── */
 .pv-detail-row {
   display: flex;
@@ -333,6 +354,25 @@ body {
 }
 .pv-form-control:disabled { opacity: 0.45; cursor: not-allowed; }
 .pv-form-control::placeholder { color: var(--pv-text-muted); }
+
+/* ── Table ───────────────────────────────────────────────────────── */
+.pv-table { width: 100%; font-size: 0.875rem; border-collapse: collapse; }
+.pv-table thead tr { background: var(--pv-card-border); }
+.pv-table thead th { padding: 0.5rem 0.75rem; text-align: left; color: var(--pv-text-h); font-weight: 600; }
+.pv-table tbody tr { border-bottom: 1px solid var(--pv-card-border); }
+.pv-table tbody td { padding: 0.5rem 0.75rem; color: var(--pv-text-body); }
+
+/* ── Status chip ─────────────────────────────────────────────────── */
+.pv-status { display: inline-block; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.2rem 0.65rem; border-radius: 99px; }
+.pv-status--ongoing  { background: rgba(34,197,94,0.15); color: #16a34a; }
+.pv-status--yet      { background: rgba(124,58,237,0.12); color: var(--pv-purple); }
+.pv-status--concluded{ background: rgba(100,116,139,0.12); color: #475569; }
+.dark .pv-status--ongoing  { background: rgba(34,197,94,0.18); color: #4ade80; }
+.dark .pv-status--yet      { background: rgba(167,139,250,0.15); color: var(--pv-purple-light); }
+.dark .pv-status--concluded{ background: rgba(148,163,184,0.12); color: #94a3b8; }
+
+/* ── Fundraiser sidebar ──────────────────────────────────────────── */
+.pv-sidebar { border-color: var(--pv-card-border); }
 
 /* ── Navbar profile dropdown ─────────────────────────────────────── */
 .pv-dropdown {

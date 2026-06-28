@@ -9,7 +9,7 @@ import {
   TabsTrigger,
   TabsContent
 } from "@/components/ui/tabs"
-import { MoveLeft, MoveRight, MoveDown, MoveUp, X } from "lucide-react";
+import { MoveLeft, MoveRight, MoveDown, MoveUp } from "lucide-react";
 import CountdownClock from '@/components/CountdownClock';
 import Dashboard from '@/components/Dashboard';
 import Review from '@/components/Review';
@@ -19,9 +19,6 @@ import InventoryTab from '@/components/InventoryTab';
 import TransactionsTab from '@/components/TransactionsTab';
 import Receipt from '@/components/Receipt';
 
-// comment this out to test api
-// import transactions from '@/data/Transactions';
- 
 const VendorFundraiser = () => {
     const { id } = useParams();
     const [fundraiser, setFundraiser] = useState(null);
@@ -39,7 +36,7 @@ const VendorFundraiser = () => {
     const [searchItem, setSearchItem] = useState("");
     const [searchBuyer, setSearchBuyer] = useState("");
     const [errors, setErrors] = useState({});
-    
+
     async function fetchFundraiser() {
         try {
             const fundraiserRes = await api.get(`core/fundraiser/${id}`);
@@ -47,7 +44,6 @@ const VendorFundraiser = () => {
             setFullInventory(fundraiserRes.data.inventory);
             setInventory(fundraiserRes.data.inventory);
             setOngoing(fundraiserRes.data.status == "ongoing");
-            console.log(fundraiserRes.data);
         } catch (error) {
             console.error('Failed to load fundraiser:', error);
         }
@@ -69,7 +65,6 @@ const VendorFundraiser = () => {
             const transactionsRes = await api.get(`core/transactions/${id}`);
             setFullTransactions(transactionsRes.data);
             setTransactions(transactionsRes.data);
-            console.log(transactionsRes.data);
         } catch (error) {
             console.error('Failed to load transactions:', error);
         }
@@ -83,7 +78,6 @@ const VendorFundraiser = () => {
         const filtered = fullTransactions.filter(txn =>
             txn.name?.toLowerCase().includes(searchBuyer.toLowerCase())
         );
-        console.log("Filtered Transactions:", filtered);
         setTransactions(filtered);
     }, [searchBuyer, fullTransactions]);
 
@@ -91,58 +85,39 @@ const VendorFundraiser = () => {
         const total = cart.reduce((sum, item) => sum + Number(item.price) * Number(item.quantity), 0);
         setTotalCost(total);
     }, [cart])
-    
-
-    // comment this out
-    // const fundraiser = offers[0];
 
     const addToCart = item => {
-        console.log(item);
         setCart(prevCart => {
             const exists = prevCart.find(i => i.item === item.name);
-            if (exists) {
-                return prevCart;
-            } else {
-                return [...prevCart, { product: item.product_id, item: item.name, price: item.price, quantity: 1, maxQuantity: item.quantity }];
-            }
+            if (exists) return prevCart;
+            return [...prevCart, { product: item.product_id, item: item.name, price: item.price, quantity: 1, maxQuantity: item.quantity }];
         })
-        setInventory(prev =>
-            prev.filter(product => product.name !== item.name)
-        );
+        setInventory(prev => prev.filter(product => product.name !== item.name));
     }
 
     const removeItem = item => {
         setCart(cart.filter(i => i !== item));
         setInventory(prevInventory => [
             ...prevInventory,
-            {
-                name: item.item,
-                price: item.price,
-                quantity: item.maxQuantity,
-            },
+            { name: item.item, price: item.price, quantity: item.maxQuantity },
         ]);
     }
 
     const handleCheckout = async () => {
         setLoading(true);
         try {
-            const checkout = { 
+            const checkout = {
                 items: cart,
                 name: buyerDetails.name,
                 phone: buyerDetails.phone,
                 email: buyerDetails.email,
                 payment: buyerDetails.payment
             };
-            console.log(checkout);
-            const checkoutRes = await api.post(`core/create-transaction/${id}/`, checkout);
+            await api.post(`core/create-transaction/${id}/`, checkout);
             cart.forEach(item => {
                 setInventory(prevInventory => [
                     ...prevInventory,
-                    {
-                        name: item.item,
-                        price: item.price,
-                        quantity: item.maxQuantity - item.quantity,
-                    },
+                    { name: item.item, price: item.price, quantity: item.maxQuantity - item.quantity },
                 ]);
             })
             setCart([]);
@@ -157,39 +132,39 @@ const VendorFundraiser = () => {
         }
     }
 
-    // if (loading || !fundraiser || !fundraiser.inventory) return <p>Loading...</p>;
     return (
         <Layout heading="View Fundraiser">
             <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 flex flex-col md:flex-row gap-4">
                 {!hidden && (
-                    <div className="relative w-full md:w-[20%] p-4 pt-8 border-b md:border-b-0 md:border-r border-gray-300">
+                    <div className="relative w-full md:w-[20%] p-4 pt-8 border-b md:border-b-0 md:border-r pv-sidebar">
                         <button
                             onClick={() => setHidden(true)}
-                            className="absolute top-2 right-2 text-gray-500 hover:text-black flex items-center"
+                            className="absolute top-2 right-2 pv-icon-btn"
                         >
                             <MoveUp className="md:hidden" />
                             <MoveLeft className="hidden md:inline" />
                             <span className="text-sm ml-1">Hide Info</span>
                         </button>
-                        <ListingDetails 
-                            fields={{...fundraiser?.offer.listing, 
-                                        commission: fundraiser?.offer.listing.commission, 
-                                        categories: fundraiser?.offer.selectedCategories
-                                    }} 
-                            days={fundraiser?.offer.selectedDays} 
+                        <ListingDetails
+                            fields={{
+                                ...fundraiser?.offer.listing,
+                                commission: fundraiser?.offer.listing.commission,
+                                categories: fundraiser?.offer.selectedCategories
+                            }}
+                            days={fundraiser?.offer.selectedDays}
                         />
-                        <CountdownClock 
+                        <CountdownClock
                             startTime={`${fundraiser?.listing?.start_date}T${fundraiser?.listing?.start_time}`}
-                            endTime={`${fundraiser?.offer.listing.end_date}T${fundraiser?.offer.listing.end_time}`} 
+                            endTime={`${fundraiser?.offer.listing.end_date}T${fundraiser?.offer.listing.end_time}`}
                         />
                     </div>
                 )}
-                <div className={`transition-all duration-300 w-full md:w-[80%]`}>
+                <div className="transition-all duration-300 w-full md:w-[80%]">
                     <div className="flex flex-col">
                         {hidden && (
                             <button
                                 onClick={() => setHidden(false)}
-                                className="mb-2 self-start md:self-end text-gray-500 hover:text-black flex items-center gap-1"
+                                className="mb-2 self-start md:self-end pv-icon-btn"
                             >
                                 <MoveDown className="md:hidden" />
                                 <MoveRight className="hidden md:inline" />
@@ -239,10 +214,7 @@ const VendorFundraiser = () => {
                                     setReceipt={setReceipt}
                                 />
                                 {receipt?.items && (
-                                    <Receipt
-                                        receipt={receipt}
-                                        setReceipt={setReceipt}
-                                    />
+                                    <Receipt receipt={receipt} setReceipt={setReceipt} />
                                 )}
                             </TabsContent>
                             <TabsContent value="statistics">
@@ -252,13 +224,13 @@ const VendorFundraiser = () => {
                                 <TabsContent value="review">
                                     {!fundraiser?.review_sent && (
                                         <>
-                                            <h5 className="text-2xl font-semibold mb-2">Review Organisation</h5>
+                                            <h5 className="pv-heading text-2xl font-semibold mb-2">Review Organisation</h5>
                                             <Review fundraiser={fundraiser} isVendor={true} onSubmitReview={fetchFundraiser} />
                                         </>
                                     )}
                                     {fundraiser?.review_sent && (
                                         <>
-                                            <h5 className="text-2xl font-semibold mb-2">Review from Organisation</h5>
+                                            <h5 className="pv-heading text-2xl font-semibold mb-2">Review from Organisation</h5>
                                             <LeftReview review={fundraiser?.review_received} isVendor={true} />
                                         </>
                                     )}
