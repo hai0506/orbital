@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import api from '../api';
-import Layout from "../components/Layout";
-import Listing from '../components/Listing';
-import Offers from './Offers';
+import api from '@/api';
+import Layout from "@/shared/Layout";
+import Listing from '@/features/listings/components/Listing';
+import Offers from '@/features/offers/pages/Offers';
 // JSON mock data
 // import listings from '../data/Listings'; // comment this out
-import ListingFilter from '../components/ListingFilter'
+import ListingFilter from '@/features/listings/components/ListingFilter'
 
 const Home = () => {
   const [listings, setListings] = useState([]); // uncomment this

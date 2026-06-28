@@ -1,21 +1,21 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import './styles/App.css';
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Home from "./pages/Home";
-import NotFound from "./pages/NotFound";
-import ProtectedRoute from "./components/ProtectedRoute";
-import CreateListing from "./pages/CreateListing";
-import Offers from "./pages/Offers";
-import Fundraisers from "./pages/Fundraisers";
-import VendorFundraiser from "./pages/VendorFundraiser";
-import OrgFundraiser from "./pages/OrgFundraiser";
-import Chat from "./pages/Chat"
-import Chats from "./pages/Chats"
-import Profile from "./pages/Profile";
-import Search from "./pages/Search";
-import OrgListings from "./pages/OrgListings";
+import Login from "@/features/auth/Login";
+import Register from "@/features/auth/Register";
+import Home from "@/pages/Home";
+import NotFound from "@/pages/NotFound";
+import ProtectedRoute from "@/shared/ProtectedRoute";
+import CreateListing from "@/features/listings/pages/CreateListing";
+import Offers from "@/features/offers/pages/Offers";
+import Fundraisers from "@/features/fundraisers/pages/Fundraisers";
+import VendorFundraiser from "@/features/fundraisers/pages/VendorFundraiser";
+import OrgFundraiser from "@/features/fundraisers/pages/OrgFundraiser";
+import Chat from "@/features/chat/pages/Chat"
+import Chats from "@/features/chat/pages/Chats"
+import Profile from "@/features/profile/pages/Profile";
+import Search from "@/features/listings/pages/Search";
+import OrgListings from "@/features/listings/pages/OrgListings";
 
 function Logout() {
   localStorage.clear()

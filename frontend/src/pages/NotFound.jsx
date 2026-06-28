@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import PV2 from '../styles/PV2.png'
+import PV2 from '@/styles/PV2.png'
 
 const NotFound = () => {
   return (

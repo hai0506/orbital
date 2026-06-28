@@ -1,4 +1,4 @@
-import VendorFundraiser from "@/pages/VendorFundraiser"
+import VendorFundraiser from "@/features/fundraisers/pages/VendorFundraiser"
 
 const vendorFundraiser = {
     "fundraiser_id": 6,
