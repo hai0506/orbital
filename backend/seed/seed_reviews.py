@@ -1,5 +1,5 @@
 import _setup  # noqa: F401
-from core.models import VendorFundraiser, Review
+from fundraisers.models import VendorFundraiser, Review
 
 # Reviews for concluded fundraisers only (both directions: org→vendor and vendor→org).
 # Each entry: (vendor_username, post_title, list_of_reviews)

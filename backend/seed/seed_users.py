@@ -1,5 +1,5 @@
 import _setup  # noqa: F401 — configures Django before any imports
-from core.models import User
+from accounts.models import User
 
 ORGANIZATIONS = [
     {

@@ -1,5 +1,6 @@
 import _setup  # noqa: F401
-from core.models import User, Message
+from accounts.models import User
+from chat.models import Message
 
 # (sender_username, receiver_username, content)
 CONVERSATIONS = [

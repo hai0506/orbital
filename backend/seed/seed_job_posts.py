@@ -1,6 +1,7 @@
 import _setup  # noqa: F401
 from datetime import date, time, timedelta
-from core.models import User, JobPost, Category
+from accounts.models import User
+from listings.models import JobPost, Category
 
 # Reference point: today
 TODAY = date.today()

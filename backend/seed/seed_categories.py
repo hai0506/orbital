@@ -1,5 +1,5 @@
 import _setup  # noqa: F401
-from core.models import Category
+from listings.models import Category
 
 CATEGORIES = [
     "Food & Beverages",

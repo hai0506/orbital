@@ -1,5 +1,6 @@
 import _setup  # noqa: F401
-from core.models import JobOffer, Fundraiser, VendorFundraiser
+from offers.models import JobOffer
+from fundraisers.models import Fundraiser, VendorFundraiser
 
 
 def run():

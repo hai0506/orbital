@@ -1,5 +1,5 @@
 import _setup  # noqa: F401
-from core.models import VendorFundraiser, Product
+from fundraisers.models import VendorFundraiser, Product
 
 # Keyed by (vendor_username, post_title)
 INVENTORY = {

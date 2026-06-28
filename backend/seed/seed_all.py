@@ -36,11 +36,10 @@ STEPS = [
 
 
 def clear_all():
-    from core.models import (
-        Review, TransactionItem, Transaction, Product,
-        VendorFundraiser, Fundraiser, JobOffer, JobPost,
-        Message, User,
-    )
+    from fundraisers.models import Review, TransactionItem, Transaction, Product, VendorFundraiser, Fundraiser
+    from offers.models import JobOffer
+    from listings.models import JobPost
+    from chat.models import Message
     from django.contrib.auth import get_user_model
     User = get_user_model()
 

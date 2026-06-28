@@ -1,5 +1,5 @@
 import _setup  # noqa: F401
-from core.models import VendorFundraiser, Product, Transaction, TransactionItem
+from fundraisers.models import VendorFundraiser, Product, Transaction, TransactionItem
 
 # Only seed transactions for concluded/ongoing fundraisers to simulate realistic sales.
 # Each entry: (vendor_username, post_title, list_of_transactions)
