@@ -1,10 +1,9 @@
-# this handles websocket messaging
-
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 import json
 from django.contrib.auth import get_user_model
 from .models import Message
+
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -21,7 +20,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         except User.DoesNotExist:
             await self.close()
             return
-        
+
         user_ids = sorted([int(sender.id), int(receiver_id)])
         self.room_name = f'chat_{user_ids[0]}-{user_ids[1]}'
         await self.channel_layer.group_add(self.room_name, self.channel_name)
@@ -53,16 +52,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
     async def chat_message(self, event):
-       await self.send(text_data=json.dumps({
+        await self.send(text_data=json.dumps({
             'content': event['message'],
-            'sender': {
-                'id': event['senderId'],
-                'username':event['senderUser']
-            },
-            'receiver': {
-                'id': event['receiverId'],
-                'username':event['receiverUser']
-            },
+            'sender': {'id': event['senderId'], 'username': event['senderUser']},
+            'receiver': {'id': event['receiverId'], 'username': event['receiverUser']},
             'time_created': event['time_created'],
             'read': event['read'],
         }))

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
-from core.views import CreateUserView
+from accounts.views import CreateUserView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.conf import settings
 from django.conf.urls.static import static
@@ -11,5 +11,9 @@ urlpatterns = [
     path("api/token/", TokenObtainPairView.as_view(), name="get_token"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="refresh"),
     path("api-auth/", include("rest_framework.urls")),
-    path("core/", include("core.urls")),
-]  + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path("core/", include("accounts.urls")),
+    path("core/", include("listings.urls")),
+    path("core/", include("offers.urls")),
+    path("core/", include("fundraisers.urls")),
+    path("core/", include("chat.urls")),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
